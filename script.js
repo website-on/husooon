@@ -3,10 +3,10 @@ const WA_LINK = `https://wa.me/${WA_NUMBER}`;
 
 const COUNTRY_SYSTEMS = {
     KW: [
-        { title: 'المرحلة الابتدائية', grades: [{ name: 'الصف الأول', val: 1, num: 1 }, { name: 'الثاني', val: 2, num: 2 }, { name: 'الثالث', val: 3, num: 3 }, { name: 'الرابع', val: 4, num: 4 }, { name: 'الخامس', val: 5, num: 5 }] },
-        { title: 'المرحلة المتوسطة', grades: [{ name: 'السادس', val: 6, num: 6 }, { name: 'السابع', val: 7, num: 7 }, { name: 'الثامن', val: 8, num: 8 }, { name: 'التاسع', val: 9, num: 9 }] },
-        { title: 'الثانوية العلمي', grades: [{ name: 'العاشر', val: 10, num: 10 }, { name: 'الحادي عشر', val: 11, num: 11 }, { name: 'الثاني عشر', val: 12, num: 12 }] },
-        { title: 'الثانوية الأدبي', grades: [{ name: 'العاشر', val: 13, num: 10 }, { name: 'الحادي عشر', val: 14, num: 11 }, { name: 'الثاني عشر', val: 15, num: 12 }] }
+        { title: 'المرحلة الابتدائية', grades: [{ name: 'الصف الأول', val: 1, num: 1 }, { name: 'الصف الثاني', val: 2, num: 2 }, { name: 'الصف الثالث', val: 3, num: 3 }, { name: 'الصف الرابع', val: 4, num: 4 }, { name: 'الصف الخامس', val: 5, num: 5 }] },
+        { title: 'المرحلة المتوسطة', grades: [{ name: 'الصف السادس', val: 6, num: 6 }, { name: 'الصف السابع', val: 7, num: 7 }, { name: 'الصف الثامن', val: 8, num: 8 }, { name: 'الصف التاسع', val: 9, num: 9 }] },
+        { title: 'الثانوية العلمي', grades: [{ name: 'الصف العاشر', val: 10, num: 10 }, { name: 'الصف الحادي عشر', val: 11, num: 11 }, { name: 'الصف الثاني عشر', val: 12, num: 12 }] },
+        { title: 'الثانوية الأدبي', grades: [{ name: 'الصف العاشر', val: 13, num: 10 }, { name: 'الصف الحادي عشر', val: 14, num: 11 }, { name: 'الصف الثاني عشر', val: 15, num: 12 }] }
     ],
     EG: [
         { title: 'المرحلة الابتدائية', grades: [{ name: 'الأول الابتدائي', val: 1, num: 1 }, { name: 'الثاني', val: 2, num: 2 }, { name: 'الثالث', val: 3, num: 3 }, { name: 'الرابع', val: 4, num: 4 }, { name: 'الخامس', val: 5, num: 5 }, { name: 'السادس', val: 6, num: 6 }] },
