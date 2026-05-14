@@ -52,5 +52,24 @@ window.fsData = {
         const q = query(collection(db, "results"), where("code", "==", userCode));
         const snap = await getDocs(q);
         return snap.docs.map(doc => doc.data());
+    },
+
+    // USERS
+    addUser: async (user) => {
+        const userDoc = doc(db, "users", user.code);
+        return await setDoc(userDoc, user);
+    },
+    getAllUsers: async () => {
+        const snap = await getDocs(collection(db, "users"));
+        return snap.docs.map(doc => doc.data());
+    },
+
+    // ATTENDANCE
+    addAttendance: async (att) => {
+        return await addDoc(collection(db, "attendance"), att);
+    },
+    getAttendance: async () => {
+        const snap = await getDocs(collection(db, "attendance"));
+        return snap.docs.map(doc => doc.data());
     }
 };

@@ -134,31 +134,27 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="firebase-data.js"></script>
     <script src="script.js"></script>
     <script>
         const STAGE_MAP = {
             'primary': [
-                { name: 'الصف الأول الابتدائي', val: '1' },
-                { name: 'الصف الثاني الابتدائي', val: '2' },
-                { name: 'الصف الثالث الابتدائي', val: '3' },
-                { name: 'الصف الرابع الابتدائي', val: '4' },
-                { name: 'الصف الخامس الابتدائي', val: '5' },
-                { name: 'الصف السادس الابتدائي', val: '6' }
+                { name: 'الصف الأول الابتدائي', val: '1' }, { name: 'الصف الثاني الابتدائي', val: '2' },
+                { name: 'الصف الثالث الابتدائي', val: '3' }, { name: 'الصف الرابع الابتدائي', val: '4' },
+                { name: 'الصف الخامس الابتدائي', val: '5' }, { name: 'الصف السادس الابتدائي', val: '6' }
             ],
             'middle': [
-                { name: 'الصف السادس (متوسط)', val: '6' },
-                { name: 'الصف السابع', val: '7' },
-                { name: 'الصف الثامن', val: '8' },
-                { name: 'الصف التاسع', val: '9' }
+                { name: 'الصف السادس (متوسط)', val: '6' }, { name: 'الصف السابع', val: '7' },
+                { name: 'الصف الثامن', val: '8' }, { name: 'الصف التاسع', val: '9' }
             ],
             'secondary_scientific': [
-                { name: 'الصف العاشر', val: '10' },
-                { name: 'الصف الحادي عشر - علمي', val: '11' },
+                { name: 'الصف العاشر', val: '10' }, { name: 'الصف الحادي عشر - علمي', val: '11' },
                 { name: 'الصف الثاني عشر - علمي', val: '12' }
             ],
             'secondary_literary': [
-                { name: 'الصف العاشر (عام/أدبي)', val: '13' },
-                { name: 'الصف الحادي عشر - أدبي', val: '14' },
+                { name: 'الصف العاشر (عام/أدبي)', val: '13' }, { name: 'الصف الحادي عشر - أدبي', val: '14' },
                 { name: 'الصف الثاني عشر - أدبي', val: '15' }
             ]
         };
@@ -166,8 +162,8 @@
         function updateRegisterGrades() {
             const stage = document.getElementById('reg-stage').value;
             const gradeSelect = document.getElementById('reg-grade');
+            if (!gradeSelect) return;
             gradeSelect.innerHTML = '<option value="">اختر الصف</option>';
-
             if (stage && STAGE_MAP[stage]) {
                 STAGE_MAP[stage].forEach(g => {
                     let opt = document.createElement('option');

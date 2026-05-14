@@ -1,6 +1,42 @@
 const WA_NUMBER = "201025792459";
 const WA_LINK = `https://wa.me/${WA_NUMBER}`;
 
+// Helper for Admin Dashboard content selection
+window.updateCountryStages = function (countryId, stageId, gradeId) {
+    const country = document.getElementById(countryId).value;
+    const stageSelect = document.getElementById(stageId);
+    if (!stageSelect) return;
+    stageSelect.innerHTML = '<option value="">اختر المرحلة</option>';
+    if (country === 'ALL') {
+        stageSelect.innerHTML += '<option value="ALL">كل المراحل</option>';
+    } else if (COUNTRY_SYSTEMS[country]) {
+        COUNTRY_SYSTEMS[country].forEach((stage, idx) => {
+            let opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = stage.title;
+            stageSelect.appendChild(opt);
+        });
+    }
+};
+
+window.updateGrades = function (countryId, stageId, gradeId) {
+    const country = document.getElementById(countryId).value;
+    const stageIdx = document.getElementById(stageId).value;
+    const gradeSelect = document.getElementById(gradeId);
+    if (!gradeSelect) return;
+    gradeSelect.innerHTML = '<option value="">اختر الصف</option>';
+    if (country === 'ALL' || stageIdx === 'ALL') {
+        gradeSelect.innerHTML += '<option value="ALL">كل الصفوف</option>';
+    } else if (COUNTRY_SYSTEMS[country] && COUNTRY_SYSTEMS[country][stageIdx]) {
+        COUNTRY_SYSTEMS[country][stageIdx].grades.forEach(g => {
+            let opt = document.createElement('option');
+            opt.value = g.val;
+            opt.textContent = g.name;
+            gradeSelect.appendChild(opt);
+        });
+    }
+};
+
 const COUNTRY_SYSTEMS = {
     KW: [
         { title: 'المرحلة الابتدائية', grades: [{ name: 'الصف الأول', val: 1, num: 1 }, { name: 'الصف الثاني', val: 2, num: 2 }, { name: 'الصف الثالث', val: 3, num: 3 }, { name: 'الصف الرابع', val: 4, num: 4 }, { name: 'الصف الخامس', val: 5, num: 5 }] },
@@ -247,19 +283,88 @@ function injectFloatingAdmin() {
         document.body.appendChild(btn);
     }
 }
+window.openCountryModal = function (e) {
+    if (e) e.preventDefault();
+    const modal = document.getElementById('country-modal');
+    if (modal) modal.style.display = 'flex';
+};
+
+window.closeCountryModal = function () {
+    const modal = document.getElementById('country-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.injectCountryModal = function () {
+    if (document.getElementById('country-modal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'country-modal';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(18,30,51,0.95); z-index:999999; display:none; justify-content:center; align-items:center; backdrop-filter:blur(15px); transition:0.3s;';
+
+    modal.innerHTML = `
+        <div style="background:#fff; width:90%; max-width:600px; border-radius:30px; padding:40px; position:relative; box-shadow:0 30px 60px rgba(0,0,0,0.5); text-align:center;">
+            <button onclick="closeCountryModal()" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:30px; cursor:pointer; color:#132644;"><i class="fas fa-times"></i></button>
+            <h2 style="font-size:32px; font-weight:900; color:#132644; margin-bottom:30px;">اختر الدولة <span style="color:#12b8c5;">Husoon</span></h2>
+            <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:20px;">
+                <div onclick="selectCountry('KW')" style="cursor:pointer; padding:20px; border:2px solid #f0f4f8; border-radius:20px; transition:0.3s;" onmouseover="this.style.borderColor='#12b8c5';this.style.background='#f0fcfd';" onmouseout="this.style.borderColor='#f0f4f8';this.style.background='#fff';">
+                    <img src="flag_kw.jpg" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #eee;">
+                    <div style="font-size:20px; font-weight:800; color:#132644;">الكويت</div>
+                </div>
+                <div onclick="selectCountry('SA')" style="cursor:pointer; padding:20px; border:2px solid #f0f4f8; border-radius:20px; transition:0.3s;" onmouseover="this.style.borderColor='#12b8c5';this.style.background='#f0fcfd';" onmouseout="this.style.borderColor='#f0f4f8';this.style.background='#fff';">
+                    <img src="https://flagcdn.com/sa.svg" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #eee;">
+                    <div style="font-size:20px; font-weight:800; color:#132644;">السعودية</div>
+                </div>
+                <div onclick="selectCountry('AE')" style="cursor:pointer; padding:20px; border:2px solid #f0f4f8; border-radius:20px; transition:0.3s;" onmouseover="this.style.borderColor='#12b8c5';this.style.background='#f0fcfd';" onmouseout="this.style.borderColor='#f0f4f8';this.style.background='#fff';">
+                    <img src="flag_ae.jpg" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #eee;">
+                    <div style="font-size:20px; font-weight:800; color:#132644;">الإمارات</div>
+                </div>
+                <div onclick="selectCountry('QA')" style="cursor:pointer; padding:20px; border:2px solid #f0f4f8; border-radius:20px; transition:0.3s;" onmouseover="this.style.borderColor='#12b8c5';this.style.background='#f0fcfd';" onmouseout="this.style.borderColor='#f0f4f8';this.style.background='#fff';">
+                    <img src="https://flagcdn.com/qa.svg" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #eee;">
+                    <div style="font-size:20px; font-weight:800; color:#132644;">قطر</div>
+                </div>
+                <div onclick="selectCountry('OM')" style="cursor:pointer; padding:20px; border:2px solid #f0f4f8; border-radius:20px; transition:0.3s;" onmouseover="this.style.borderColor='#12b8c5';this.style.background='#f0fcfd';" onmouseout="this.style.borderColor='#f0f4f8';this.style.background='#fff';">
+                    <img src="https://flagcdn.com/om.svg" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #eee;">
+                    <div style="font-size:20px; font-weight:800; color:#132644;">عمان</div>
+                </div>
+                <div onclick="selectCountry('EG')" style="cursor:pointer; padding:20px; border:2px solid #f0f4f8; border-radius:20px; transition:0.3s;" onmouseover="this.style.borderColor='#12b8c5';this.style.background='#f0fcfd';" onmouseout="this.style.borderColor='#f0f4f8';this.style.background='#fff';">
+                    <img src="https://flagcdn.com/eg.svg" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #eee;">
+                    <div style="font-size:20px; font-weight:800; color:#132644;">مصر</div>
+                </div>
+            </div>
+        </div>
+    `;
+    modal.onclick = (e) => { if (e.target === modal) closeCountryModal(); };
+    document.body.appendChild(modal);
+};
+
+window.selectCountry = function (code) {
+    localStorage.setItem('spedia_country', code);
+    window.location.reload();
+};
+
 window.injectFloatingAdmin = injectFloatingAdmin;
+
+
 
 window.attachGlobalEvents = function () {
     const countryFlag = document.querySelector('.country-flag');
-    // Country links inside the dropdown
-    const countryLinks = document.querySelectorAll('.country-dropdown a');
-    countryLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
+    // Country links inside the dropdown - Delegation for better robustness
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('.country-dropdown a');
+        if (link) {
             e.preventDefault();
-            const code = e.currentTarget.getAttribute('data-code');
-            localStorage.setItem('spedia_country', code);
-            window.location.reload();
-        });
+            const code = link.getAttribute('data-code');
+            if (code) {
+                localStorage.setItem('spedia_country', code);
+                window.location.reload();
+            }
+            return;
+        }
+
+        // Close dropdown if clicked outside - simplified
+        const menu = document.getElementById('country-dropdown-main');
+        if (menu && menu.style.display === 'block' && !e.target.closest('.country-flag') && !menu.contains(e.target)) {
+            menu.style.display = 'none';
+        }
     });
 
     const btnDiscover = document.querySelector('.btn-rocket');
@@ -434,6 +539,70 @@ window.addToCart = function (title, price, typeText) {
     cart.push({ title: title, price: price, type: typeText });
     localStorage.setItem('spedia_cart', JSON.stringify(cart));
     alert("تم الإضافة إلى السلة!");
+};
+
+window.handleLogin = async function (e) {
+    if (e) e.preventDefault();
+    let code = document.getElementById('code-input').value.trim().toUpperCase();
+    if (!code) return alert("الرجاء إدخال كود الاشتراك");
+
+    let allUsers = [];
+    if (window.fsData) {
+        allUsers = await window.fsData.getAllUsers();
+    }
+    // Fallback to local
+    if (!allUsers || allUsers.length === 0) {
+        allUsers = JSON.parse(localStorage.getItem('spedia_users') || '[]');
+    }
+
+    let user = allUsers.find(u => u.code === code);
+    if (!user) {
+        let allCodes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
+        let codeObj = allCodes.find(c => c.code === code);
+        if (codeObj) {
+            document.getElementById('register-modal').style.display = 'flex';
+            document.getElementById('register-modal').dataset.code = code;
+        } else {
+            alert("كود الاشتراك غير صحيح أو غير مفعل. يرجى التواصل مع الإدارة.");
+        }
+        return;
+    }
+
+    localStorage.setItem('spedia_currentUser', JSON.stringify(user));
+    window.location.href = 'dashboard.html';
+};
+
+window.requestCode = function () {
+    let msg = "أريد طلب كود اشتراك جديد لمنصة حصون التعليمية";
+    window.open(`${WA_LINK}?text=${encodeURIComponent(msg)}`, '_blank');
+};
+
+window.finishRegister = async function (e) {
+    if (e) e.preventDefault();
+    let code = document.getElementById('register-modal').dataset.code;
+    let name = document.getElementById('reg-name').value;
+    let phone = document.getElementById('reg-phone').value;
+    let grade = document.getElementById('reg-grade').value;
+
+    if (!code || !name || !phone || !grade) return alert("الرجاء إكمال كافة البيانات");
+
+    let newUser = { code, name, phone, grade, id: Date.now() };
+
+    if (window.fsData) {
+        await window.fsData.addUser(newUser);
+    } else {
+        let users = JSON.parse(localStorage.getItem('spedia_users') || '[]');
+        users.push(newUser);
+        localStorage.setItem('spedia_users', JSON.stringify(users));
+    }
+
+    localStorage.setItem('spedia_currentUser', JSON.stringify(newUser));
+    alert("تم التسجيل بنجاح!");
+    window.location.href = 'dashboard.html';
+};
+
+window.closeRegisterModal = function () {
+    if (document.getElementById('register-modal')) document.getElementById('register-modal').style.display = 'none';
 };
 
 window.submitCartOrder = function (e) {
@@ -769,7 +938,13 @@ window.loadStudentData = async function (user) {
     }
 
     // Set attendance days count
-    let attendance = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
+    let attendance = [];
+    if (window.fsData) {
+        attendance = await window.fsData.getAttendance();
+    } else {
+        attendance = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
+    }
+
     let myAtt = attendance.filter(a => a.code === user.code);
     let attCard = document.getElementById('stat-attendance-days');
     if (attCard) {
@@ -786,24 +961,33 @@ window.showDashTab = function (tabId, el) {
     }
 }
 
-window.registerAttendance = function () {
+window.registerAttendance = async function () {
     let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
     if (!user) return;
-    let attendance = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
     const todayDate = new Date().toLocaleDateString('ar-EG');
-
-    if (attendance.find(a => a.code === user.code && a.date === todayDate)) {
-        alert("تم تسجيل حضورك مسبقاً لهذا اليوم. استمر في المذاكرة! 👍");
-        return;
-    }
-
-    attendance.push({
+    let attObj = {
         code: user.code,
         name: user.name,
         date: todayDate,
         time: new Date().toLocaleTimeString('ar-EG')
-    });
-    localStorage.setItem('spedia_attendance', JSON.stringify(attendance));
+    };
+
+    if (window.fsData) {
+        let allAtt = await window.fsData.getAttendance();
+        if (allAtt.find(a => a.code === user.code && a.date === todayDate)) {
+            alert("تم تسجيل حضورك مسبقاً لهذا اليوم. استمر في المذاكرة! 👍");
+            return;
+        }
+        await window.fsData.addAttendance(attObj);
+    } else {
+        let attendance = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
+        if (attendance.find(a => a.code === user.code && a.date === todayDate)) {
+            alert("تم تسجيل حضورك مسبقاً لهذا اليوم. استمر في المذاكرة! 👍");
+            return;
+        }
+        attendance.push(attObj);
+        localStorage.setItem('spedia_attendance', JSON.stringify(attendance));
+    }
     alert("ممتاز! تم تسجيل حضورك بنجاح في سجلات منصة حصون للإدارة 🎓");
 }
 
@@ -836,7 +1020,6 @@ function promptAdmin() {
         alert("خطأ في الرقم السري! يرجى المحاولة مرة أخرى.");
     }
 }
-window.promptAdmin = promptAdmin;
 window.promptAdmin = promptAdmin;
 
 window.toggleResultStrike = function (chk) {
@@ -890,7 +1073,7 @@ window.unlockCourse = function (title, code) {
 
 document.addEventListener("DOMContentLoaded", async () => {
     if (!localStorage.getItem('spedia_country')) localStorage.setItem('spedia_country', 'EG');
-    window.forceFakeData();
+    // window.forceFakeData(); (Removed to fix crash)
     window.renderMegaMenu();
     window.applyCountryRules();
     window.attachGlobalEvents();
@@ -904,6 +1087,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (window.renderCurrentPage) await window.renderCurrentPage();
     }
 
+    if (window.injectCountryModal) window.injectCountryModal();
     if (window.injectFloatingAdmin) window.injectFloatingAdmin();
     if (window.injectCartModal) window.injectCartModal();
     if (window.injectBookTransition) window.injectBookTransition();

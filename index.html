@@ -182,14 +182,30 @@
         <i class="fas fa-user-shield"></i>
     </button>
     <script>
-        function promptAdmin() {
+        function promptAdmin(e) {
+            if (e) e.preventDefault();
             if (window.promptAdmin) {
                 window.promptAdmin();
             } else {
-                // Fallback if script.js not loaded
                 let pass = prompt("بوابة حصون للإدارة - الرقم السري:");
-                if (pass === "1234") { window.location.href = "admin.html"; }
+                if (pass === "135700") { sessionStorage.setItem('isAdmin', 'yes'); window.location.href = "admin.html"; }
             }
+        }
+
+        // Failsafe for UI toggles if script.js is still loading
+        window.toggleCountryMenu = window.toggleCountryMenu || function (e) {
+            if (e) e.preventDefault();
+            const menu = document.getElementById('country-dropdown-main');
+            if (menu) {
+                const isVisible = menu.style.display === 'block';
+                menu.style.display = isVisible ? 'none' : 'block';
+            }
+        };
+
+        function openCart(e) {
+            if (e) e.preventDefault();
+            const modal = document.getElementById('cart-modal');
+            if (modal) modal.style.display = 'flex';
         }
     </script>
 </head>
@@ -209,55 +225,41 @@
                 </div>
             </a>
             <div class="nav-actions">
+                <!-- Discover -->
                 <div class="discover-container">
                     <a href="explore.html" class="btn-discover"
                         style="padding:10px 25px; font-size:16px; border-radius:20px; background:linear-gradient(135deg, #12b8c5, #1e3c72); color:#fff !important; box-shadow:0 4px 10px rgba(18,184,197,0.2); text-decoration:none; display:flex; align-items:center; gap:8px;">
                         <i class="fas fa-rocket"></i> <span data-i18n="discover">اكتشف المواد</span>
                     </a>
-                </div>
-                <div class="country-container" style="position:relative;">
-                    <a href="#" class="nav-icon-circle country-flag" onclick="toggleCountryMenu(event)"
-                        style="border:2px solid #12b8c5; padding:2px; overflow:hidden; width:45px; height:45px; box-shadow:0 10px 20px rgba(0,0,0,0.05); display:flex; justify-content:center; align-items:center;">
-                        <img src="https://flagcdn.com/eg.svg" alt="Country"
-                            style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-                    </a>
-                    <div class="country-dropdown" id="country-dropdown-main"
-                        style="display:none; position:absolute; border-radius:15px; padding:10px; top:110%; left:0; width:150px; background:#fff; border:1px solid #12b8c5; box-shadow:0 10px 30px rgba(0,0,0,0.1); z-index:10;">
-                        <a href="#" data-code="KW"
-                            style="color:#132644; padding:8px 15px; display:flex; align-items:center; gap:8px; text-decoration:none;"><img
-                                src="flag_kw.jpg" alt="Kuwait" style="width:20px; height:20px; border-radius:50%;">
-                            الكويت</a>
-                        <a href="#" data-code="SA"
-                            style="color:#132644; padding:8px 15px; display:flex; align-items:center; gap:8px; text-decoration:none;"><img
-                                src="https://flagcdn.com/sa.svg" alt="KSA"
-                                style="width:20px; height:20px; border-radius:50%;"> السعودية</a>
-                        <a href="#" data-code="AE"
-                            style="color:#132644; padding:8px 15px; display:flex; align-items:center; gap:8px; text-decoration:none;"><img
-                                src="flag_ae.jpg" alt="UAE" style="width:20px; height:20px; border-radius:50%;">
-                            الإمارات</a>
-                        <a href="#" data-code="QA"
-                            style="color:#132644; padding:8px 15px; display:flex; align-items:center; gap:8px; text-decoration:none;"><img
-                                src="https://flagcdn.com/qa.svg" alt="Qatar"
-                                style="width:20px; height:20px; border-radius:50%;"> قطر</a>
-                        <a href="#" data-code="OM"
-                            style="color:#132644; padding:8px 15px; display:flex; align-items:center; gap:8px; text-decoration:none;"><img
-                                src="https://flagcdn.com/om.svg" alt="Oman"
-                                style="width:20px; height:20px; border-radius:50%;"> عمان</a>
-                        <a href="#" data-code="EG"
-                            style="color:#132644; padding:8px 15px; display:flex; align-items:center; gap:8px; text-decoration:none;"><img
-                                src="https://flagcdn.com/eg.svg" alt="Egypt"
-                                style="width:20px; height:20px; border-radius:50%;"> مصر</a>
+                    <div class="mega-menu" id="mega-menu-main">
+                        <div class="mega-menu-grid">
+                            <!-- Injected by JS -->
+                        </div>
                     </div>
                 </div>
+
+                <!-- Country -->
+                <div class="country-container" style="position:relative; z-index:1100;">
+                    <a href="javascript:void(0)" class="nav-icon-circle country-flag"
+                        onclick="window.openCountryModal(event)"
+                        style="border:2px solid var(--primary-color); padding:2px; overflow:hidden; width:45px; height:45px; box-shadow:0 10px 20px rgba(0,0,0,0.05); display:flex; justify-content:center; align-items:center; cursor:pointer; text-decoration:none;">
+                        <img src="" alt="Flag" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                    </a>
+                </div>
+
+                <!-- Cart -->
                 <a href="#" class="nav-icon-circle cart-icon" onclick="openCart(event)"
                     style="width:45px; height:45px; background:#f4f7fa; color:#12b8c5; font-size:20px; box-shadow:0 4px 10px rgba(0,0,0,0.05); text-decoration:none; display:flex; justify-content:center; align-items:center;">
                     <i class="fas fa-shopping-cart"></i>
                 </a>
+
+                <!-- Login -->
                 <a href="login.html" class="btn-login"
                     style="padding:10px 25px; font-size:16px; border-radius:20px; background:#fff; color:#12b8c5 !important; border:2px solid #12b8c5; font-weight:800; text-decoration:none; display:flex; align-items:center; gap:8px;">
                     <i class="fas fa-user-circle"></i> <span data-i18n="login">دخول</span>
                 </a>
             </div>
+        </div>
         </div>
     </header>
 
@@ -283,13 +285,7 @@
                 }
             }
         }
-        function toggleCountryMenu(e) {
-            if (e) e.preventDefault();
-            const menu = document.getElementById('country-dropdown-main');
-            if (menu) {
-                menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
-            }
-        }
+
     </script>
     <!-- Global Base Style Override -->
     <style>
@@ -369,7 +365,7 @@
     <!-- 1. Hero Section -->
     <section class="section-padding" style="text-align:center; padding-top:40px;">
 
-        <h1 style="font-size:60px; font-weight:900; color:#132644; margin-bottom:15px;"><span data-i18n="hero_t1">الخبرة
+        <h1 style="font-size:60px; font-weight:900; color:#121e33; margin-bottom:15px;"><span data-i18n="hero_t1">الخبرة
                 مو بس</span> <span style="color:#12b8c5;" data-i18n="hero_t2">رقم</span></h1>
         <p style="font-size:26px; color:#5a6c82; font-weight:600; margin-bottom:40px; max-width:800px; margin-left:auto; margin-right:auto;"
             data-i18n="hero_sub">هذي قصتنا في التعليم. جودة مدرسين تشرح القلب. وسعر؟ كأنك ما دفعت!</p>
@@ -435,8 +431,8 @@
                 <!-- Left half-circle tab -->
                 <div
                     style="background:#fff; height:100px; padding:0 30px 0 50px; border-radius:50px 0 0 50px; display:flex; align-items:center; gap:15px; box-shadow:0 15px 30px rgba(0,0,0,0.05); z-index:2; margin-left:-20px;">
-                    <i class="fas fa-play" style="color:#132644; font-size:14px;"></i>
-                    <span style="font-weight:800; color:#132644; font-size:22px;" data-i18n="hero_quality">جودة في
+                    <i class="fas fa-play" style="color:#121e33; font-size:14px;"></i>
+                    <span style="font-weight:800; color:#121e33; font-size:22px;" data-i18n="hero_quality">جودة في
                         الشرح</span>
                 </div>
 
@@ -445,7 +441,7 @@
                     style="background:#fff; padding:30px; border-radius:40px; text-align:center; z-index:2; box-shadow:0 20px 40px rgba(0,0,0,0.08); margin-right:-40px; width:280px; position:relative; top:-20px;">
                     <div style="background:#fff; padding:8px 20px; border-radius:20px; color:#12b8c5; font-weight:900; font-size:18px; position:absolute; top:-20px; left:50%; transform:translateX(-50%); box-shadow:0 10px 20px rgba(0,0,0,0.1); width:max-content;"
                         data-i18n="academy_name">منصة حصون</div>
-                    <h3 style="font-size:32px; font-weight:900; color:#132644; margin:15px 0 5px;"
+                    <h3 style="font-size:32px; font-weight:900; color:#121e33; margin:15px 0 5px;"
                         data-i18n="hero_pill_right_title">نخبة المعلمين</h3>
                     <p style="color:#12b8c5; font-weight:800; font-size:18px; margin:0;"
                         data-i18n="hero_pill_right_sub">شرح احترافي ومبسط</p>
@@ -487,7 +483,7 @@
 
         <!-- Right: Content -->
         <div style="flex:1; min-width:300px; text-align:right;">
-            <h1 style="font-size:65px; font-weight:900; color:#132644; margin-bottom:15px; letter-spacing:-1px;"><span
+            <h1 style="font-size:65px; font-weight:900; color:#121e33; margin-bottom:15px; letter-spacing:-1px;"><span
                     data-i18n="smart1">تدري إن كتبنا</span> <span style="color:#12b8c5;"
                     data-i18n="smart2">تتكلم؟</span></h1>
             <p style="font-size:30px; color:#8ba0b3; font-weight:700; margin-bottom:50px;" data-i18n="smart_desc">كتبنا
@@ -504,7 +500,7 @@
             <!-- Left: Massive Dark Blue Percentage -->
             <div style="position:absolute; left:0; z-index:1;">
                 <h1
-                    style="font-size:280px; font-weight:900; color:#132644; line-height:1; margin:0; font-family:'Roboto', sans-serif; letter-spacing:-8px;">
+                    style="font-size:280px; font-weight:900; color:#121e33; line-height:1; margin:0; font-family:'Roboto', sans-serif; letter-spacing:-8px;">
                     99<span style="font-size:160px; font-weight:bold;">%</span></h1>
             </div>
 
@@ -529,12 +525,12 @@
             <div style="position:absolute; right:0; top:30%; z-index:5;">
                 <div style="position:relative;">
                     <i class="fas fa-graduation-cap"
-                        style="font-size:140px; color:#132644; position:absolute; top:-80px; right:30px; transform:rotate(12deg); filter:drop-shadow(0 20px 30px rgba(19,38,68,0.3)); z-index:6;"></i>
+                        style="font-size:140px; color:#121e33; position:absolute; top:-80px; right:30px; transform:rotate(12deg); filter:drop-shadow(0 20px 30px rgba(19,38,68,0.3)); z-index:6;"></i>
                     <div
                         style="background:#e0f7fa; padding:25px 40px; border-radius:40px; text-align:center; box-shadow:0 20px 40px rgba(18,184,197,0.1);">
-                        <h3 style="font-size:26px; font-weight:900; color:#132644; margin:0;"
+                        <h3 style="font-size:26px; font-weight:900; color:#121e33; margin:0;"
                             data-i18n="success_student">الطالب المجتهد</h3>
-                        <p style="color:#132644; font-size:24px; font-weight:800; margin:0;" data-i18n="academy_name">
+                        <p style="color:#121e33; font-size:24px; font-weight:800; margin:0;" data-i18n="academy_name">
                             منصة حصون</p>
                     </div>
                 </div>
@@ -545,7 +541,7 @@
                 <div
                     style="position:absolute; width:120%; height:200px; left:-10%; top:-50px; background:radial-gradient(ellipse at center, rgba(18,184,197,0.4) 0%, rgba(235,252,250,0) 70%); filter:blur(30px); z-index:-1;">
                 </div>
-                <h2 style="font-size:55px; font-weight:900; color:#132644; margin:0; line-height:1.3;" data-i18n="suc1">
+                <h2 style="font-size:55px; font-weight:900; color:#121e33; margin:0; line-height:1.3;" data-i18n="suc1">
                     انضم إلى آلاف الطلاب</h2>
                 <h2 style="font-size:55px; font-weight:900; color:#12b8c5; margin:0; line-height:1.3;" data-i18n="suc2">
                     المتفوقين وابدأ رحلة التميز!</h2>
@@ -559,7 +555,7 @@
         style="text-align:center; background: radial-gradient(circle, #fff, #dbf8fa); padding-top: 150px; padding-bottom: 150px;">
         <div class="container">
             <div style="margin-bottom: 60px;">
-                <h1 style="font-size:65px; font-weight:900; color:#132644; margin-bottom:10px;">نجمة منصة حصون</h1>
+                <h1 style="font-size:65px; font-weight:900; color:#121e33; margin-bottom:10px;">نجمة منصة حصون</h1>
                 <h2 style="font-size:35px; color:#12b8c5; font-weight:800;">الطالبة المثالية لهذا الشهر 🏆</h2>
             </div>
 
@@ -582,7 +578,7 @@
 
                 <!-- Student Name & Title Badge -->
                 <div
-                    style="position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #132644, #1e3c72); color:#fff; padding:20px 60px; border-radius:50px; border:4px solid #12b8c5; box-shadow:0 20px 40px rgba(0,0,0,0.3); width:max-content; z-index:10;">
+                    style="position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #121e33, #1e3c72); color:#fff; padding:20px 60px; border-radius:50px; border:4px solid #12b8c5; box-shadow:0 20px 40px rgba(0,0,0,0.3); width:max-content; z-index:10;">
                     <h3 style="margin:0; font-size:32px; font-weight:900; letter-spacing:1px;">فرح عبدالرحمن عبدالسلام
                     </h3>
                     <p style="margin:5px 0 0; font-size:22px; color:#2ddbe8; font-weight:800; opacity:0.9;">طالبة متميزة
