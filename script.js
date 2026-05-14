@@ -343,8 +343,11 @@ window.renderCurrentPage = async function () {
         let books = filteredContent.filter(c => c.type == 'book');
         let courses = filteredContent.filter(c => c.type == 'course');
 
-        window.renderCards('books-list', books, "أريد طلب الكتاب", window.getDialect('req', cCode) || "الطلب الآن");
-        window.renderCards('courses-list', courses, "أريد الاشتراك في", window.getDialect('req', cCode) || "الاشتراك الآن");
+        const courseCont = document.getElementById('courses-list') || document.getElementById('courses-grid');
+        const bookCont = document.getElementById('books-list') || document.getElementById('books-grid');
+
+        if (bookCont) window.renderCards(bookCont.id, books, "أريد طلب الكتاب", window.getDialect('req', cCode) || "الطلب الآن");
+        if (courseCont) window.renderCards(courseCont.id, courses, "أريد الاشتراك في", window.getDialect('req', cCode) || "الاشتراك الآن");
     }
     else if (path.includes('dashboard.html')) {
         let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
@@ -374,7 +377,7 @@ window.renderCurrentPage = async function () {
 };
 
 window.renderCards = function (containerId, items, whatsappPrefix, btnText) {
-    const cont = document.getElementById(containerId);
+    let cont = document.getElementById(containerId);
     if (!cont) return;
     cont.innerHTML = '';
     if (items.length === 0) {
