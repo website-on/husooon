@@ -251,17 +251,7 @@ window.injectFloatingAdmin = injectFloatingAdmin;
 
 window.attachGlobalEvents = function () {
     const countryFlag = document.querySelector('.country-flag');
-    if (countryFlag) {
-        countryFlag.addEventListener('click', (e) => {
-            e.preventDefault();
-            const existingMenu = document.querySelector('.country-dropdown');
-            if (existingMenu) {
-                const isVisible = existingMenu.style.display === 'block';
-                existingMenu.style.display = isVisible ? 'none' : 'block';
-            }
-        });
-    }
-
+    // Country links inside the dropdown
     const countryLinks = document.querySelectorAll('.country-dropdown a');
     countryLinks.forEach(link => {
         link.addEventListener('click', (e) => {
