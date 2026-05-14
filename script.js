@@ -1001,26 +1001,33 @@ window.toggleSidebar = function () {
     if (sidebar) sidebar.classList.toggle('open');
 }
 
-function promptAdmin() {
+window.promptAdmin = async function () {
     let pass = prompt("بوابة حصون للإدارة - يرجى كتابة الرقم السري (الأساسي أو المساعد):");
 
-    // Admin 1: admin1@gmail.com (Full Admin - Access to Student Numbers)
-    if (pass === "135700") {
+    if (pass === "135700" || pass === "246800") {
+        const isAdmin1 = (pass === "135700");
+        const adminEmail = isAdmin1 ? "admin1@gmail.com" : "admin2@gmail.com";
+        const adminType = isAdmin1 ? "full" : "restricted";
+
         sessionStorage.setItem('isAdmin', 'yes');
-        sessionStorage.setItem('adminType', 'full');
-        window.location.href = "admin.html";
-    }
-    // Admin 2: admin2@gmail.com (Restricted Admin - No Student Numbers)
-    else if (pass === "246800") {
-        sessionStorage.setItem('isAdmin', 'yes');
-        sessionStorage.setItem('adminType', 'restricted');
-        window.location.href = "admin.html";
+        sessionStorage.setItem('adminType', adminType);
+
+        // Firebase Login with specific accounts as requested
+        try {
+            const { auth } = await import('./firebase-init.js');
+            const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+            await signInWithEmailAndPassword(auth, adminEmail, pass);
+            window.location.href = "admin.html";
+        } catch (e) {
+            console.error("Firebase Auth Error:", e);
+            // Fallback for UI access (permissions still checked by Firestore)
+            window.location.href = "admin.html";
+        }
     }
     else if (pass !== null) {
         alert("خطأ في الرقم السري! يرجى المحاولة مرة أخرى.");
     }
-}
-window.promptAdmin = promptAdmin;
+};
 
 window.toggleResultStrike = function (chk) {
     let parent = chk.closest('.animate-on-scroll');
