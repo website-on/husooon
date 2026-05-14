@@ -237,46 +237,44 @@
                     <input type="text" id="ct-course-code" placeholder="مثال: MATH101">
                 </div>
                 <div class="form-group">
-                    <label>المرحلة الدراسية</label>
-                    <select id="ct-stage" onchange="updateGrades('ct-stage', 'ct-grade')">
-                        <option value="">اختر المرحلة</option>
-                        <option value="primary">المرحلة الابتدائية</option>
-                        <option value="middle">المرحلة المتوسطة / الإعدادية</option>
-                        <option value="secondary_scientific">المرحلة الثانوية - علمي</option>
-                        <option value="secondary_literary">المرحلة الثانوية - أدبي</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>الصف الدراسي</label>
-                    <select id="ct-grade" required>
-                        <option value="">اختر المرحلة أولاً</option>
-                    </select>
-                </div>
-                <div class="form-group" id="img-container">
-                    <label>رفع صورة غلاف (للكتاب فقط)</label>
-                    <input type="file" id="ct-image" accept="image/*" required>
-                </div>
-                <div class="form-group" id="yt-container" style="display:none;">
-                    <label>رابط فيديو يوتيوب (للكورس)</label>
-                    <input type="url" id="ct-yt" placeholder="https://www.youtube.com/watch?v=...">
-                </div>
-                <div class="form-group">
-                    <label>الدولة المستهدفة</label>
-                    <select id="ct-country" required>
-                        <option value="ALL">جميع الدول</option>
-                        <option value="KW">الكويت</option>
-                        <option value="SA">السعودية</option>
-                        <option value="AE">الإمارات</option>
-                        <option value="QA">قطر</option>
-                        <option value="OM">عمان</option>
-                        <option value="EG">مصر</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>السعر الأساسي (ج.م) - يتحول تلقائيا للباقي</label>
-                    <input type="number" id="ct-price" required>
-                </div>
-                <button type="submit" class="btn-primary w-100">حفظ المحتوى</button>
+                    <div class="form-group">
+                        <label>الدولة المستهدفة</label>
+                        <select id="ct-country" required
+                            onchange="updateCountryStages('ct-country', 'ct-stage', 'ct-grade')">
+                            <option value="ALL">جميع الدول</option>
+                            <option value="KW">الكويت</option>
+                            <option value="SA">السعودية</option>
+                            <option value="AE">الإمارات</option>
+                            <option value="QA">قطر</option>
+                            <option value="OM">عمان</option>
+                            <option value="EG">مصر</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المرحلة الدراسية</label>
+                        <select id="ct-stage" onchange="updateGrades('ct-country', 'ct-stage', 'ct-grade')">
+                            <option value="">اختر الدولة أولاً</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الصف الدراسي</label>
+                        <select id="ct-grade" required>
+                            <option value="">اختر المرحلة أولاً</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="img-container">
+                        <label>رفع صورة غلاف (للكتاب فقط)</label>
+                        <input type="file" id="ct-image" accept="image/*" required>
+                    </div>
+                    <div class="form-group" id="yt-container" style="display:none;">
+                        <label>رابط فيديو يوتيوب (للكورس)</label>
+                        <input type="url" id="ct-yt" placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+                    <div class="form-group">
+                        <label>السعر الأساسي (ج.م) - يتحول تلقائيا للباقي</label>
+                        <input type="number" id="ct-price" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-100">حفظ المحتوى</button>
             </form>
         </div>
 
@@ -287,88 +285,86 @@
                 <form onsubmit="addExam(event)">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
                         <div class="form-group">
-                            <label><i class="fas fa-layer-group"></i> المرحلة الدراسية</label>
-                            <select id="ex-stage" onchange="updateGrades('ex-stage', 'ex-grade')">
-                                <option value="">اختر المرحلة</option>
-                                <option value="primary">المرحلة الابتدائية</option>
-                                <option value="middle">المرحلة المتوسطة / الإعدادية</option>
-                                <option value="secondary_scientific">المرحلة الثانوية - علمي</option>
-                                <option value="secondary_literary">المرحلة الثانوية - أدبي</option>
+                            <label><i class="fas fa-globe"></i> الدولة المستهدفة لهذا الاختبار</label>
+                            <select id="ex-country" required
+                                onchange="updateCountryStages('ex-country', 'ex-stage', 'ex-grade')">
+                                <option value="ALL">جميع الدول</option>
+                                <option value="KW">الكويت</option>
+                                <option value="SA">السعودية</option>
+                                <option value="AE">الإمارات</option>
+                                <option value="QA">قطر</option>
+                                <option value="OM">عمان</option>
+                                <option value="EG">مصر</option>
                             </select>
                         </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                            <div class="form-group">
+                                <label><i class="fas fa-layer-group"></i> المرحلة</label>
+                                <select id="ex-stage" onchange="updateGrades('ex-country', 'ex-stage', 'ex-grade')">
+                                    <option value="">اختر الدولة أولاً</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-graduation-cap"></i> الصف</label>
+                                <select id="ex-grade" required>
+                                    <option value="">اختر المرحلة</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-file-alt"></i> عنوان التكليف</label>
+                                <input type="text" id="ex-title" required placeholder="مثال: امتحان الفيزياء النهائي">
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                            <div class="form-group">
+                                <label><i class="fas fa-tags"></i> نوع التكليف</label>
+                                <select id="ex-type" required>
+                                    <option value="exam">امتحان نهائي 📝</option>
+                                    <option value="quiz">اختبار قصير ⏱️</option>
+                                    <option value="homework">تسميع / واجب 📚</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-stopwatch"></i> المدة المسموحة للحل (بالدقائق)</label>
+                                <input type="number" id="ex-time" value="60" required>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; gap:20px;">
+                            <div class="form-group" style="flex:1;">
+                                <label><i class="fas fa-calendar-check"></i> تاريخ ووقت فتح وتفعيل الاختبار</label>
+                                <input type="datetime-local" id="ex-start" required>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label><i class="fas fa-calendar-times"></i> تاريخ ووقت الانتهاء والإغلاق</label>
+                                <input type="datetime-local" id="ex-end" required>
+                            </div>
+                        </div>
+
                         <div class="form-group">
-                            <label><i class="fas fa-layer-group"></i> الصف الدراسي المستهدف</label>
-                            <select id="ex-grade" required>
-                                <option value="">اختر المرحلة أولاً</option>
-                            </select>
+                            <label><i class="fas fa-list-ol"></i> بنك الأسئلة (قم ببناء الاختبار تفاعلياً)</label>
+                            <div id="dynamic-questions-container"
+                                style="display:flex; flex-direction:column; gap:15px; margin-bottom:15px;">
+                                <!-- Questions go here -->
+                            </div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <button type="button" onclick="addQuestionField('mcq')" class="btn-primary"
+                                    style="background:#e3f2fd; color:#1976d2; border:1px solid #bbdefb; padding:10px; font-size:14px; flex:1; border-radius:10px; box-shadow:none;"><i
+                                        class="fas fa-list-ul"></i> اختيار من متعدد</button>
+                                <button type="button" onclick="addQuestionField('tf')" class="btn-primary"
+                                    style="background:#fce4ec; color:#c2185b; border:1px solid #f8bbd0; padding:10px; font-size:14px; flex:1; border-radius:10px; box-shadow:none;"><i
+                                        class="fas fa-check-circle"></i> صح أم خطأ</button>
+                                <button type="button" onclick="addQuestionField('essay')" class="btn-primary"
+                                    style="background:#e8f5e9; color:#388e3c; border:1px solid #c8e6c9; padding:10px; font-size:14px; flex:1; border-radius:10px; box-shadow:none;"><i
+                                        class="fas fa-align-right"></i> سؤال مقالي</button>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-file-alt"></i> عنوان التكليف</label>
-                            <input type="text" id="ex-title" required placeholder="مثال: امتحان الفيزياء النهائي">
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label><i class="fas fa-globe"></i> الدولة المستهدفة لهذا الاختبار</label>
-                        <select id="ex-country" required>
-                            <option value="ALL">جميع الدول</option>
-                            <option value="KW">الكويت</option>
-                            <option value="SA">السعودية</option>
-                            <option value="AE">الإمارات</option>
-                            <option value="QA">قطر</option>
-                            <option value="OM">عمان</option>
-                            <option value="EG">مصر</option>
-                        </select>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                        <div class="form-group">
-                            <label><i class="fas fa-tags"></i> نوع التكليف</label>
-                            <select id="ex-type" required>
-                                <option value="exam">امتحان نهائي 📝</option>
-                                <option value="quiz">اختبار قصير ⏱️</option>
-                                <option value="homework">تسميع / واجب 📚</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-stopwatch"></i> المدة المسموحة للحل (بالدقائق)</label>
-                            <input type="number" id="ex-time" value="60" required>
-                        </div>
-                    </div>
-
-                    <div style="display:flex; gap:20px;">
-                        <div class="form-group" style="flex:1;">
-                            <label><i class="fas fa-calendar-check"></i> تاريخ ووقت فتح وتفعيل الاختبار</label>
-                            <input type="datetime-local" id="ex-start" required>
-                        </div>
-                        <div class="form-group" style="flex:1;">
-                            <label><i class="fas fa-calendar-times"></i> تاريخ ووقت الانتهاء والإغلاق</label>
-                            <input type="datetime-local" id="ex-end" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-list-ol"></i> بنك الأسئلة (قم ببناء الاختبار تفاعلياً)</label>
-                        <div id="dynamic-questions-container"
-                            style="display:flex; flex-direction:column; gap:15px; margin-bottom:15px;">
-                            <!-- Questions go here -->
-                        </div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button type="button" onclick="addQuestionField('mcq')" class="btn-primary"
-                                style="background:#e3f2fd; color:#1976d2; border:1px solid #bbdefb; padding:10px; font-size:14px; flex:1; border-radius:10px; box-shadow:none;"><i
-                                    class="fas fa-list-ul"></i> اختيار من متعدد</button>
-                            <button type="button" onclick="addQuestionField('tf')" class="btn-primary"
-                                style="background:#fce4ec; color:#c2185b; border:1px solid #f8bbd0; padding:10px; font-size:14px; flex:1; border-radius:10px; box-shadow:none;"><i
-                                    class="fas fa-check-circle"></i> صح أم خطأ</button>
-                            <button type="button" onclick="addQuestionField('essay')" class="btn-primary"
-                                style="background:#e8f5e9; color:#388e3c; border:1px solid #c8e6c9; padding:10px; font-size:14px; flex:1; border-radius:10px; box-shadow:none;"><i
-                                    class="fas fa-align-right"></i> سؤال مقالي</button>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary w-100"
-                        style="padding:15px; font-size:20px; border-radius:15px; background:linear-gradient(135deg, #12b8c5, #0d8a94); box-shadow:0 10px 25px rgba(18,184,197,0.3);"><i
-                            class="fas fa-paper-plane"></i> نشر وتسجيل التكليف بالأنظمة</button>
+                        <button type="submit" class="btn-primary w-100"
+                            style="padding:15px; font-size:20px; border-radius:15px; background:linear-gradient(135deg, #12b8c5, #0d8a94); box-shadow:0 10px 25px rgba(18,184,197,0.3);"><i
+                                class="fas fa-paper-plane"></i> نشر وتسجيل التكليف بالأنظمة</button>
                 </form>
             </div>
         </div>
@@ -431,13 +427,37 @@
             ]
         };
 
-        function updateGrades(stageId, gradeId) {
-            const stage = document.getElementById(stageId).value;
+        function updateCountryStages(countryId, stageId, gradeId) {
+            let country = document.getElementById(countryId).value;
+            const stageSelect = document.getElementById(stageId);
+            const gradeSelect = document.getElementById(gradeId);
+
+            stageSelect.innerHTML = '<option value="">اختر المرحلة</option>';
+            gradeSelect.innerHTML = '<option value="">اختر المرحلة أولاً</option>';
+
+            // Fallback for ALL or non-existent systems
+            if (country === 'ALL') country = 'EG';
+
+            if (COUNTRY_SYSTEMS[country]) {
+                COUNTRY_SYSTEMS[country].forEach((stage, idx) => {
+                    let opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = stage.title;
+                    stageSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function updateGrades(countryId, stageId, gradeId) {
+            let country = document.getElementById(countryId).value;
+            const stageIdx = document.getElementById(stageId).value;
             const gradeSelect = document.getElementById(gradeId);
             gradeSelect.innerHTML = '<option value="">اختر الصف</option>';
 
-            if (stage && STAGE_MAP[stage]) {
-                STAGE_MAP[stage].forEach(g => {
+            if (country === 'ALL') country = 'EG';
+
+            if (stageIdx !== "" && COUNTRY_SYSTEMS[country] && COUNTRY_SYSTEMS[country][stageIdx]) {
+                COUNTRY_SYSTEMS[country][stageIdx].grades.forEach(g => {
                     let opt = document.createElement('option');
                     opt.value = g.val;
                     opt.textContent = g.name;
