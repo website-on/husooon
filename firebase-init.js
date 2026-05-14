@@ -1,0 +1,21 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBF0M8bVZ1wi2MHV_gT7yL9rUTUPrVDghE",
+    authDomain: "husoon-5b2f3.firebaseapp.com",
+    projectId: "husoon-5b2f3",
+    storageBucket: "husoon-5b2f3.firebasestorage.app",
+    messagingSenderId: "1312564028",
+    appId: "1:1312564028:web:c2e3465f2a9ba8cb873439"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+export { db, auth };

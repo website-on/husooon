@@ -156,64 +156,7 @@
             }
         }
 
-        /* Black & Blue Theme Styles */
-        body.dark-night-theme {
-            background: linear-gradient(135deg, #000, #1e3c72) !important;
-            color: #fff !important;
-        }
 
-        body.dark-night-theme .navbar {
-            background: rgba(0, 0, 0, 0.9) !important;
-            border-bottom: 1px solid #1e3c72 !important;
-        }
-
-        body.dark-night-theme .logo-text .en,
-        body.dark-night-theme .hero-title-box h1,
-        body.dark-night-theme .section-padding h1,
-        body.dark-night-theme p {
-            color: #fff !important;
-        }
-
-        body.dark-night-theme .large-stat {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid #1e3c72 !important;
-        }
-
-        body.dark-night-theme .large-stat h3 {
-            color: #2ddbe8 !important;
-        }
-
-        body.dark-night-theme .large-stat p {
-            color: #a0b2c6 !important;
-        }
-
-        body.dark-night-theme .edu-sticker {
-            background: rgba(255, 255, 255, 0.1) !important;
-        }
-
-        .theme-toggle-btn {
-            position: fixed;
-            bottom: 85px;
-            left: 20px;
-            z-index: 9999;
-            background: linear-gradient(135deg, #12b8c5, #1e3c72);
-            color: #fff;
-            border: 2px solid #fff;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transition: 0.3s;
-        }
-
-        .theme-toggle-btn:hover {
-            transform: scale(1.1);
-        }
 
         @keyframes pulse-gentle {
             0% {
@@ -233,20 +176,21 @@
             animation: pulse-gentle 4s ease-in-out infinite !important;
         }
     </style>
-    <button class="theme-toggle-btn" onclick="togglePlatformTheme()" title="تغيير المظهر">
-        <i class="fas fa-magic"></i>
+
+    <button id="floating-admin-btn-static" title="لوحة الإدارة" onclick="promptAdmin()"
+        style="position:fixed; bottom:20px; left:20px; z-index:99999; background:linear-gradient(135deg, #121e33, #1e3c72); color:#fff; border:none; width:50px; height:50px; border-radius:50%; font-family:'Tajawal'; font-weight:800; box-shadow:0 10px 20px rgba(0,0,0,0.4); cursor:pointer; font-size:20px; transition:0.3s; display:flex; align-items:center; justify-content:center; border:2px solid rgba(255,255,255,0.2);">
+        <i class="fas fa-user-shield"></i>
     </button>
     <script>
-        function togglePlatformTheme() {
-            document.body.classList.toggle('dark-night-theme');
-            const isDark = document.body.classList.contains('dark-night-theme');
-            localStorage.setItem('husoon_dark_theme', isDark ? 'yes' : 'no');
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('husoon_dark_theme') === 'yes') {
-                document.body.classList.add('dark-night-theme');
+        function promptAdmin() {
+            if (window.promptAdmin) {
+                window.promptAdmin();
+            } else {
+                // Fallback if script.js not loaded
+                let pass = prompt("بوابة حصون للإدارة - الرقم السري:");
+                if (pass === "1234") { window.location.href = "admin.html"; }
             }
-        });
+        }
     </script>
 </head>
 
@@ -698,6 +642,9 @@
 
     <!-- Footer Nav Removed -->
 
+    <!-- Firebase SDKs -->
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="firebase-data.js"></script>
     <script src="script.js"></script>
 </body>
 

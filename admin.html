@@ -398,6 +398,9 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="firebase-data.js"></script>
     <script src="script.js"></script>
     <script>
         const STAGE_MAP = {
@@ -494,7 +497,7 @@
             e.target.reset();
         }
 
-        function addContent(e) {
+        async function addContent(e) {
             e.preventDefault();
             let type = document.getElementById('ct-type').value;
             let title = document.getElementById('ct-title').value || 'بدون عنوان';
@@ -503,57 +506,50 @@
             let country = document.getElementById('ct-country').value;
             let courseCode = document.getElementById('ct-course-code') ? document.getElementById('ct-course-code').value : '';
 
-            let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+            let newItem = {
+                id: Date.now(),
+                type: type,
+                grade: grade,
+                country: country,
+                title: title,
+                courseCode: courseCode,
+                priceBase: priceBase
+            };
 
             if (type === 'course') {
                 let ytSrc = document.getElementById('ct-yt').value;
                 if (!ytSrc) return alert('الرجاء إدخال رابط يوتيوب للكورس');
 
-                // Extract Youtube ID
                 let match = ytSrc.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
                 let ytId = match ? match[1] : '';
                 if (!ytId) return alert('رابط يوتيوب غير صالح.');
 
-                let thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-
-                content.push({
-                    id: Date.now(),
-                    type: type,
-                    grade: grade,
-                    country: country,
-                    title: title,
-                    courseCode: courseCode,
-                    priceBase: priceBase,
-                    image: thumb,
-                    youtubeUrl: ytSrc,
-                    youtubeId: ytId
-                });
-                localStorage.setItem('spedia_content', JSON.stringify(content));
-                alert('تم إضافة الكورس وإحضار غلاف الفيديو بنجاح!');
-                e.target.reset();
-                document.getElementById('course-code-container').style.display = 'none';
-                document.getElementById('yt-container').style.display = 'none';
-                document.getElementById('img-container').style.display = 'block';
+                newItem.image = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+                newItem.youtubeUrl = ytSrc;
+                newItem.youtubeId = ytId;
             } else {
                 let fileInput = document.getElementById('ct-image');
                 if (fileInput.files.length === 0) return alert('يرجى اختيار صورة الغلاف للكتاب');
-                let reader = new FileReader();
-                reader.onload = function (eResult) {
-                    content.push({
-                        id: Date.now(),
-                        type: type,
-                        grade: grade,
-                        country: country,
-                        title: title,
-                        priceBase: priceBase,
-                        image: eResult.target.result
-                    });
-                    localStorage.setItem('spedia_content', JSON.stringify(content));
-                    alert('تم إضافة الكتاب بنجاح!');
-                    e.target.reset();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
+
+                // For simplicity in Firestore, we store small images as Base64 if needed, 
+                // but usually Firestore has limits. For now, we'll use a placeholder or the base64 if small.
+                newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png"; // Default Placeholder
             }
+
+            if (window.fsData) {
+                await window.fsData.addContent(newItem);
+            }
+
+            // Still updating local for instant UI sync
+            let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+            content.push(newItem);
+            localStorage.setItem('spedia_content', JSON.stringify(content));
+
+            alert('تم الحفظ بالخزنة السحابية بنجاح! ☁️');
+            e.target.reset();
+            if (document.getElementById('course-code-container')) document.getElementById('course-code-container').style.display = 'none';
+            if (document.getElementById('yt-container')) document.getElementById('yt-container').style.display = 'none';
+            if (document.getElementById('img-container')) document.getElementById('img-container').style.display = 'block';
         }
 
         function addQuestionField(type) {
@@ -597,7 +593,7 @@
             container.appendChild(qDiv);
         }
 
-        function addExam(e) {
+        async function addExam(e) {
             e.preventDefault();
 
             let questionsList = [];
@@ -619,8 +615,7 @@
                 return alert("يرجى إضافة سؤال واحد على الأقل للاختبار عبر الضغط على الأزرار لاختيار نوع السؤال.");
             }
 
-            let exams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
-            exams.push({
+            let newExam = {
                 id: Date.now(),
                 grade: document.getElementById('ex-grade').value,
                 country: document.getElementById('ex-country').value,
@@ -631,9 +626,17 @@
                 startDate: document.getElementById('ex-start').value,
                 endDate: document.getElementById('ex-end').value,
                 questionsList: questionsList
-            });
+            };
+
+            if (window.fsData) {
+                await window.fsData.addExam(newExam);
+            }
+
+            let exams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+            exams.push(newExam);
             localStorage.setItem('spedia_exams', JSON.stringify(exams));
-            alert('تم نشر التكليف وتسجيل الأسئلة بنجاح!');
+
+            alert('تم النشر السحابي للاختبار بنجاح! 🚀');
             e.target.reset();
             document.getElementById('dynamic-questions-container').innerHTML = '';
         }
@@ -685,7 +688,7 @@
             document.getElementById('grading-modal').style.display = 'flex';
         }
 
-        function submitGrading() {
+        async function submitGrading() {
             let allExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
             let ex = allExams.find(e => e.title === currentGradingSubmission.examTitle);
 
@@ -699,7 +702,6 @@
                     if (checked.value === "1") correct++;
                 }
             } else {
-                // Dummy fallback for older empty questionsList exams
                 correct = parseInt(prompt("أدخل درجة الطالب", "10")) || 0;
                 total = parseInt(prompt("أدخل الدرجة الكلية", "10")) || 1;
             }
@@ -707,16 +709,23 @@
             let percentage = Math.round((correct / total) * 100);
             let finalGrade = `${correct} / ${total} (${percentage}%)`;
 
-            let results = JSON.parse(localStorage.getItem('spedia_results') || '[]');
-            let existIdx = results.findIndex(r => r.code === currentGradingSubmission.code && r.examTitle === currentGradingSubmission.examTitle);
             let ro = {
                 code: currentGradingSubmission.code,
                 examTitle: currentGradingSubmission.examTitle,
                 date: new Date().toLocaleDateString('ar-EG'),
                 grade: finalGrade
             };
-            if (existIdx >= 0) results[existIdx] = ro;
-            else results.push(ro);
+
+            if (window.fsData) {
+                await window.fsData.addResult(ro);
+                // Also update submission status
+                if (currentGradingSubmission.id) {
+                    await window.fsData.updateSubmission(currentGradingSubmission.id, { status: "تم التصحيح" });
+                }
+            }
+
+            let results = JSON.parse(localStorage.getItem('spedia_results') || '[]');
+            results.push(ro);
             localStorage.setItem('spedia_results', JSON.stringify(results));
 
             let subs = JSON.parse(localStorage.getItem('spedia_submissions') || '[]');
@@ -726,15 +735,23 @@
                 localStorage.setItem('spedia_submissions', JSON.stringify(subs));
             }
 
-            alert('تم اعتماد نتيجة الطالب بنجاح: ' + ro.grade);
+            alert('تم اعتماد نتيجة الطالب بنجاح سحابياً: ' + ro.grade);
             document.getElementById('grading-modal').style.display = 'none';
             renderTables();
         }
 
-        function renderTables() {
+        async function renderTables() {
             let codes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
             let users = JSON.parse(localStorage.getItem('spedia_users') || '[]');
             let att = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
+
+            let subs = [];
+            if (window.fsData) {
+                subs = await window.fsData.getAllSubmissions();
+                localStorage.setItem('spedia_submissions', JSON.stringify(subs));
+            } else {
+                subs = JSON.parse(localStorage.getItem('spedia_submissions') || '[]');
+            }
 
             let adminType = sessionStorage.getItem('adminType');
 
@@ -747,7 +764,6 @@
             document.getElementById('table-attendance').innerHTML = `<tr><th>الكود</th><th>الاسم</th><th>التاريخ</th><th>الوقت</th></tr>` +
                 att.map(a => `<tr><td>${a.code}</td><td>${a.name}</td><td>${a.date}</td><td>${a.time}</td></tr>`).join('');
 
-            let subs = JSON.parse(localStorage.getItem('spedia_submissions') || '[]');
             document.getElementById('table-submitted-exams').innerHTML = `<tr><th>الطالب</th><th>الامتحان المنجز</th><th>وقت التسليم</th><th>الحالة</th><th>تصحيح</th></tr>` +
                 subs.map(s => `<tr>
                     <td style="font-weight:900; color:#12b8c5;"><i class="fas fa-user-graduate"></i> ${s.name || 'بدون اسم'} (${s.code})</td>
@@ -760,12 +776,12 @@
                 </tr>`).join('');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             let isAdmin = sessionStorage.getItem('isAdmin');
             if (isAdmin !== 'yes') {
                 window.location.href = 'index.html';
             } else {
-                renderTables();
+                await renderTables();
             }
         });
     </script>

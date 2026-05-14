@@ -48,9 +48,9 @@ const RATES = {
     EG: { cur: 'ج.م', rate: 1, dialect: { hero_sub: 'أهلاً بيك! جودة مدرسين تشرح القلب. وسعر؟ كأنك ما دفعتش!', hero_t1: 'الخبرة مش بس رقم', hero_t2: 'دي حكايتنا في التعليم', discover: 'اكتشف المواد', login: 'تسجيل الدخول', stat_vid: 'فيديو تعليمي تفاعلي', stat_stu: 'طالب مسجل متفوق', stat_qa: 'سؤال وجواب محلول', smart1: 'تعرف إن كتبنا', smart2: 'بتتكلم؟', smart_desc: 'أقوى المذكرات لتأهيل الأوائل، مبسطة ومصممة بأحدث الأساليب.', suc1: 'انضم لآلاف الطلاب', suc2: 'المتفوقين وابدأ التميز!', hero_btn: 'استكشف الكورسات', req: 'اطلب دلوقتي', academy_name: 'منصة حصون', hero_pill_left: 'طريقك للقمة', hero_pill_right_title: 'أفضل المعلمين', hero_pill_right_sub: 'شرح احترافي بجد', hero_quality: 'شرح ممتاز', success_student: 'الطالب المتفوق', private_lesson_title: 'حصة خصوصي', private_lesson_sub: 'انت دلوقتي VIP اسأل براحتك خالص', order_lesson: 'اطلب حصتك', live_students: 'الطلبة', live_teacher: 'المدرس', live_title: 'شرح مباشر مع نخبة من المدرسين', live_sub: 'شارك مع مدرسك انت وصحابك' } }
 };
 
-function getDialect(key, code) { return (RATES[code] && RATES[code].dialect[key]) ? RATES[code].dialect[key] : (RATES['EG'].dialect[key] || ''); }
+window.getDialect = function (key, code) { return (RATES[code] && RATES[code].dialect[key]) ? RATES[code].dialect[key] : (RATES['EG'].dialect[key] || ''); };
 
-function forceFakeData() {
+window.forceFakeData = function () {
     let codes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
     let needUpdateCodes = false;
     if (!codes.find(c => c.code === '1234')) { codes.push({ code: '1234', isUsed: true }); needUpdateCodes = true; }
@@ -76,7 +76,7 @@ function forceFakeData() {
     if (needUpdateContent) localStorage.setItem('spedia_content', JSON.stringify(content));
 
     let exams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
-    if (exams.length > 0 && !exams[0].questionsList) exams = []; // Force update for new schema
+    if (exams.length > 0 && !exams[0].questionsList) exams = [];
     if (exams.length === 0) {
         exams.push({
             id: 201, grade: '10', title: 'امتحان تجريبي شامل (للتقييم)', durationMinutes: 60, type: 'exam', typeName: 'امتحان نهائي',
@@ -90,22 +90,11 @@ function forceFakeData() {
         exams.push({ id: 203, grade: '10', title: 'تسميع فيزياء - قوانين نيوتن', durationMinutes: 120, type: 'homework', typeName: 'تسميع', questionsList: [{ type: 'essay', text: 'اكتب نص قانون نيوتن الثالث.' }] });
         localStorage.setItem('spedia_exams', JSON.stringify(exams));
     }
-}
+};
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (!localStorage.getItem('spedia_country')) localStorage.setItem('spedia_country', 'EG');
-    forceFakeData();
-    renderMegaMenu();
-    applyCountryRules();
-    attachGlobalEvents();
-    renderCurrentPage();
-    injectFloatingAdmin();
-    injectCartModal();
-    injectBookTransition();
-    injectGlobalAnimations();
-});
 
-function injectGlobalAnimations() {
+
+window.injectGlobalAnimations = function () {
     const icons = ['fas fa-book-open', 'fas fa-graduation-cap', 'fas fa-flask', 'fas fa-atom', 'fas fa-microscope', 'fas fa-calculator', 'fas fa-square-root-alt', 'fas fa-globe-americas', 'fas fa-pencil-ruler', 'fas fa-dna', 'far fa-lightbulb'];
     const colors = ['rgba(18, 184, 197, 0.6)', 'rgba(230, 126, 34, 0.5)', 'rgba(232, 28, 255, 0.5)', 'rgba(19, 38, 68, 0.4)'];
 
@@ -121,15 +110,11 @@ function injectGlobalAnimations() {
 
     setTimeout(() => {
         let maxH = window.innerHeight;
-        // Restricting floating icons primarily to viewport to avoid stretching the page
-
         for (let i = 0; i < 12; i++) {
             let el = document.createElement('i');
             el.className = icons[Math.floor(Math.random() * icons.length)];
             let size = Math.random() * 30 + 20;
-
             let color = colors[Math.floor(Math.random() * colors.length)];
-
             el.style.cssText = `
                 position: fixed;
                 top: ${Math.random() * 80 + 10}vh;
@@ -144,9 +129,9 @@ function injectGlobalAnimations() {
             document.body.appendChild(el);
         }
     }, 1500);
-}
+};
 
-function injectBookTransition() {
+window.injectBookTransition = function () {
     let loader = document.createElement('div');
     loader.id = 'book-transition';
     loader.style.cssText = `
@@ -183,9 +168,9 @@ function injectBookTransition() {
             }
         });
     });
-}
+};
 
-function injectCartModal() {
+window.injectCartModal = function () {
     if (!document.getElementById('cart-modal')) {
         let modal = document.createElement('div');
         modal.id = 'cart-modal';
@@ -194,7 +179,7 @@ function injectCartModal() {
             <div style="background:#fff; border-radius:20px; padding:30px; width:90%; max-width:500px; box-shadow:0 20px 50px rgba(0,0,0,0.2);">
                 <h3 style="font-size:24px; color:var(--primary-color); margin-bottom:20px; text-align:center;"><i class="fas fa-shopping-cart"></i> سلة المشتريات</h3>
                 <ul id="cart-items-list" style="list-style:none; padding:0; margin-bottom:20px; font-weight:bold; color:#121e33;"></ul>
-                <form id="cart-form" onsubmit="submitCartOrder(event)">
+                <form id="cart-form" onsubmit="window.submitCartOrder(event)">
                     <div style="margin-bottom:15px;">
                         <input id="cart-name" type="text" placeholder="الاسم كامل" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:10px;">
                     </div>
@@ -232,9 +217,9 @@ function injectCartModal() {
         `;
         document.body.appendChild(modal);
     }
-}
+};
 
-function renderMegaMenu() {
+window.renderMegaMenu = function () {
     const cCode = localStorage.getItem('spedia_country') || 'EG';
     const grid = document.querySelector('.mega-menu-grid');
     if (!grid) return;
@@ -246,29 +231,34 @@ function renderMegaMenu() {
             ${stage.grades.map(g => `<a href="grade.html?g=${g.val}&name=${encodeURIComponent(g.name)}">${g.name}</a>`).join('')}
         </div>
     `).join('');
-}
+};
 
 function injectFloatingAdmin() {
+    if (document.getElementById('floating-admin-btn-static')) return; // Already in HTML
     if (!document.getElementById('floating-admin-btn')) {
         let btn = document.createElement('button');
         btn.id = 'floating-admin-btn';
         btn.innerHTML = '<i class="fas fa-user-shield"></i>';
         btn.title = "لوحة الإدارة";
         btn.style.cssText = 'position:fixed; bottom:20px; left:20px; z-index:99999; background:linear-gradient(135deg, #121e33, #1e3c72); color:#fff; border:none; width:50px; height:50px; border-radius:50%; font-family:"Tajawal"; font-weight:800; box-shadow:0 10px 20px rgba(0,0,0,0.4); cursor:pointer; font-size:20px; transition:0.3s; display:flex; align-items:center; justify-content:center; border:2px solid rgba(255,255,255,0.2);';
-        btn.onclick = window.promptAdmin;
+        btn.onclick = () => { if (typeof promptAdmin === 'function') promptAdmin(); else if (window.promptAdmin) window.promptAdmin(); };
         btn.onmouseover = () => btn.style.transform = 'scale(1.1)';
         btn.onmouseout = () => btn.style.transform = 'scale(1)';
         document.body.appendChild(btn);
     }
 }
+window.injectFloatingAdmin = injectFloatingAdmin;
 
-function attachGlobalEvents() {
+window.attachGlobalEvents = function () {
     const countryFlag = document.querySelector('.country-flag');
     if (countryFlag) {
         countryFlag.addEventListener('click', (e) => {
             e.preventDefault();
             const existingMenu = document.querySelector('.country-dropdown');
-            if (existingMenu) existingMenu.classList.toggle('show');
+            if (existingMenu) {
+                const isVisible = existingMenu.style.display === 'block';
+                existingMenu.style.display = isVisible ? 'none' : 'block';
+            }
         });
     }
 
@@ -278,18 +268,17 @@ function attachGlobalEvents() {
             e.preventDefault();
             const code = e.currentTarget.getAttribute('data-code');
             localStorage.setItem('spedia_country', code);
-            window.location.reload(); // refresh current page instead of redirecting to index.html
+            window.location.reload();
         });
     });
 
-    const btnDiscover = document.querySelector('.btn-discover');
+    const btnDiscover = document.querySelector('.btn-rocket');
     if (btnDiscover) {
         btnDiscover.addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'explore.html';
         });
     }
-
     const scrollBtn = document.querySelector('.scroll-top-btn');
     if (scrollBtn) {
         window.addEventListener('scroll', () => {
@@ -300,14 +289,14 @@ function attachGlobalEvents() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
-}
+};
 
-function applyCountryRules() {
+window.applyCountryRules = function () {
     const cCode = localStorage.getItem('spedia_country') || 'EG';
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        let text = getDialect(key, cCode);
+        let text = window.getDialect(key, cCode);
         if (text) el.innerHTML = text;
     });
 
@@ -321,17 +310,17 @@ function applyCountryRules() {
     };
     const mainFlag = document.querySelector('.country-flag img');
     if (mainFlag) mainFlag.src = flagImages[cCode] || flagImages['EG'];
-}
+};
 
-function renderPrice(priceBase) {
+window.renderPrice = function (priceBase) {
     const cCode = localStorage.getItem('spedia_country') || 'EG';
     const info = RATES[cCode] || RATES['EG'];
     const converted = (priceBase * info.rate).toFixed(2);
     let txt = converted.endsWith('.00') ? converted.slice(0, -3) : converted;
     return `${txt} ${info.cur}`;
-}
+};
 
-function renderCurrentPage() {
+window.renderCurrentPage = async function () {
     const path = window.location.pathname;
 
     if (path.includes('grade.html')) {
@@ -341,7 +330,12 @@ function renderCurrentPage() {
         if (document.getElementById('grade-title')) document.getElementById('grade-title').innerText = name;
 
         const cCode = localStorage.getItem('spedia_country') || 'EG';
-        let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+        let content = [];
+        if (window.fsData) {
+            content = await window.fsData.getAllContent();
+        } else {
+            content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+        }
 
         // Filter by grade AND country
         let filteredContent = content.filter(c => c.grade == g && (!c.country || c.country === 'ALL' || c.country === cCode));
@@ -349,8 +343,8 @@ function renderCurrentPage() {
         let books = filteredContent.filter(c => c.type == 'book');
         let courses = filteredContent.filter(c => c.type == 'course');
 
-        renderCards('books-list', books, "أريد طلب الكتاب", getDialect('req', cCode) || "الطلب الآن");
-        renderCards('courses-list', courses, "أريد الاشتراك في", getDialect('req', cCode) || "الاشتراك الآن");
+        window.renderCards('books-list', books, "أريد طلب الكتاب", window.getDialect('req', cCode) || "الطلب الآن");
+        window.renderCards('courses-list', courses, "أريد الاشتراك في", window.getDialect('req', cCode) || "الاشتراك الآن");
     }
     else if (path.includes('dashboard.html')) {
         let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
@@ -362,7 +356,7 @@ function renderCurrentPage() {
         const elGrade = document.getElementById('dash-grade');
         if (elGrade) elGrade.innerText = `طالب مسجل كود: ${user.code}`;
 
-        loadStudentData(user);
+        await window.loadStudentData(user);
     }
     else if (path.includes('admin.html')) {
         if (sessionStorage.getItem('isAdmin') !== 'yes') {
@@ -377,9 +371,9 @@ function renderCurrentPage() {
         });
     });
     document.querySelectorAll('.animate-on-scroll, .subject-card').forEach(el => observer.observe(el));
-}
+};
 
-function renderCards(containerId, items, whatsappPrefix, btnText) {
+window.renderCards = function (containerId, items, whatsappPrefix, btnText) {
     const cont = document.getElementById(containerId);
     if (!cont) return;
     cont.innerHTML = '';
@@ -398,10 +392,10 @@ function renderCards(containerId, items, whatsappPrefix, btnText) {
                 let ytLink = item.youtubeUrl || '#';
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
             } else {
-                btnHtml = `<button onclick="unlockCourse('${item.title}', '${item.courseCode || ''}')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #f44336, #e53935);"><i class="fas fa-lock" style="font-size:24px;"></i> فتح الكورس السري </button>`;
+                btnHtml = `<button onclick="window.unlockCourse('${item.title}', '${item.courseCode || ''}')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #f44336, #e53935);"><i class="fas fa-lock" style="font-size:24px;"></i> فتح الكورس السري </button>`;
             }
         } else {
-            btnHtml = `<button onclick="addToCart('${item.title}', '${renderPrice(item.priceBase)}', '${btnText}')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px;"><i class="fas fa-cart-plus" style="font-size:24px;"></i> إضافة للسلة </button>`;
+            btnHtml = `<button onclick="window.addToCart('${item.title}', '${window.renderPrice(item.priceBase)}', '${btnText}')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px;"><i class="fas fa-cart-plus" style="font-size:24px;"></i> إضافة للسلة </button>`;
         }
 
         let imgStyle = item.type === 'course'
@@ -418,17 +412,17 @@ function renderCards(containerId, items, whatsappPrefix, btnText) {
             </div>
             <div class="subject-body" style="text-align:center; padding:25px;">
                 <h3 style="font-size:20px; font-weight:800; color:var(--text-dark); margin-bottom:10px;">${item.title}</h3>
-                <h4 class="highlight mt-10" style="font-size:26px; font-weight:900; margin-bottom:20px;">${renderPrice(item.priceBase)}</h4>
+                <h4 class="highlight mt-10" style="font-size:26px; font-weight:900; margin-bottom:20px;">${window.renderPrice(item.priceBase)}</h4>
                 ${btnHtml}
             </div>
         `;
         cont.appendChild(div);
     });
-}
+};
 
-function sendWhatsApp(msg) {
+window.sendWhatsApp = function (msg) {
     window.open(`${WA_LINK}?text=${encodeURIComponent(msg)}`, '_blank');
-}
+};
 
 function openCart(e) {
     if (e) e.preventDefault();
@@ -440,13 +434,14 @@ function openCart(e) {
     document.getElementById('cart-modal').style.display = 'flex';
     document.getElementById('cart-items-list').innerHTML = cart.map(c => `<li>${c.title} - ${c.price}</li>`).join('');
 }
+window.openCart = openCart;
 
-function addToCart(title, price, typeText) {
+window.addToCart = function (title, price, typeText) {
     let cart = JSON.parse(localStorage.getItem('spedia_cart') || '[]');
     cart.push({ title: title, price: price, type: typeText });
     localStorage.setItem('spedia_cart', JSON.stringify(cart));
     alert("تم الإضافة إلى السلة!");
-}
+};
 
 window.submitCartOrder = function (e) {
     e.preventDefault();
@@ -606,20 +601,25 @@ window.finishQuiz = function (title) {
         });
     }
 
-    let subs = JSON.parse(localStorage.getItem('spedia_submissions') || '[]');
-    let existsIndex = subs.findIndex(s => s.code === user.code && s.examTitle === title);
-    if (existsIndex >= 0) {
-        subs.splice(existsIndex, 1);
-    }
-
-    subs.push({
+    let submission = {
         code: user.code,
         name: user.name,
         examTitle: title,
         date: new Date().toLocaleDateString('ar-EG'),
         status: "قيد الانتظار",
         answers: answers
-    });
+    };
+
+    if (window.fsData) {
+        window.fsData.addSubmission(submission);
+    }
+
+    let subs = JSON.parse(localStorage.getItem('spedia_submissions') || '[]');
+    let existsIndex = subs.findIndex(s => s.code === user.code && s.examTitle === title);
+    if (existsIndex >= 0) {
+        subs.splice(existsIndex, 1);
+    }
+    subs.push(submission);
     localStorage.setItem('spedia_submissions', JSON.stringify(subs));
 
     alert('تم إنهاء الاختبار وإرساله بنجاح! يتم تصحيحه الآن من قبل المعلم. 🎓');
@@ -689,7 +689,7 @@ window.requestCode = function () {
 }
 
 /* DASHBOARD LOGIC */
-window.loadStudentData = function (user) {
+window.loadStudentData = async function (user) {
     let profileImg = localStorage.getItem('spedia_profile_img_' + user.code);
     if (profileImg) {
         let sideImg = document.getElementById('sidebar-profile-img');
@@ -697,7 +697,14 @@ window.loadStudentData = function (user) {
     }
 
     const cCode = localStorage.getItem('spedia_country') || 'EG';
-    let exams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+
+    let exams = [];
+    if (window.fsData) {
+        exams = await window.fsData.getAllExams();
+    } else {
+        exams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+    }
+
     let myExams = exams.filter(ex => String(ex.grade) === String(user.grade) && (!ex.country || ex.country === 'ALL' || ex.country === cCode));
     let listExams = document.getElementById('student-exams');
     if (listExams) {
@@ -720,12 +727,18 @@ window.loadStudentData = function (user) {
         }
     }
 
-    let results = JSON.parse(localStorage.getItem('spedia_results') || '[]');
-    let myResults = results.filter(r => r.code === user.code);
+    let results = [];
+    if (window.fsData) {
+        results = await window.fsData.getUserResults(user.code);
+    } else {
+        results = JSON.parse(localStorage.getItem('spedia_results') || '[]');
+        results = results.filter(r => r.code === user.code);
+    }
+
     let listResults = document.getElementById('student-results');
     if (listResults) {
-        if (myResults.length) {
-            listResults.innerHTML = myResults.map(r => `
+        if (results.length) {
+            listResults.innerHTML = results.map(r => `
                 <div class="animate-on-scroll" style="background:#fff; border-right:6px solid #9c27b0; border-radius:15px; padding:20px; margin-bottom:15px; box-shadow:0 8px 25px rgba(0,0,0,0.06); display:flex; gap:15px; align-items:center;">
                     <i class="fas fa-check-circle" style="color:#9c27b0; font-size:36px; background:#f3e5f5; padding:15px; border-radius:50%;"></i> 
                     <div class="res-content">
@@ -811,20 +824,27 @@ window.toggleSidebar = function () {
     if (sidebar) sidebar.classList.toggle('open');
 }
 
-window.promptAdmin = function () {
+function promptAdmin() {
     let pass = prompt("بوابة حصون للإدارة - يرجى كتابة الرقم السري (الأساسي أو المساعد):");
-    if (pass === "1234") {
+
+    // Admin 1: admin1@gmail.com (Full Admin - Access to Student Numbers)
+    if (pass === "135700") {
         sessionStorage.setItem('isAdmin', 'yes');
         sessionStorage.setItem('adminType', 'full');
         window.location.href = "admin.html";
-    } else if (pass === "5678") {
+    }
+    // Admin 2: admin2@gmail.com (Restricted Admin - No Student Numbers)
+    else if (pass === "246800") {
         sessionStorage.setItem('isAdmin', 'yes');
         sessionStorage.setItem('adminType', 'restricted');
         window.location.href = "admin.html";
-    } else if (pass !== null) {
-        alert("بيانات خاطئة، محاولة غير مصرح بها.");
+    }
+    else if (pass !== null) {
+        alert("خطأ في الرقم السري! يرجى المحاولة مرة أخرى.");
     }
 }
+window.promptAdmin = promptAdmin;
+window.promptAdmin = promptAdmin;
 
 window.toggleResultStrike = function (chk) {
     let parent = chk.closest('.animate-on-scroll');
@@ -874,3 +894,25 @@ window.unlockCourse = function (title, code) {
     }
 }
 
+
+document.addEventListener("DOMContentLoaded", async () => {
+    if (!localStorage.getItem('spedia_country')) localStorage.setItem('spedia_country', 'EG');
+    window.forceFakeData();
+    window.renderMegaMenu();
+    window.applyCountryRules();
+    window.attachGlobalEvents();
+
+    // Pulse check for Firebase data layer
+    if (!window.fsData) {
+        setTimeout(async () => {
+            if (window.renderCurrentPage) await window.renderCurrentPage();
+        }, 300);
+    } else {
+        if (window.renderCurrentPage) await window.renderCurrentPage();
+    }
+
+    if (window.injectFloatingAdmin) window.injectFloatingAdmin();
+    if (window.injectCartModal) window.injectCartModal();
+    if (window.injectBookTransition) window.injectBookTransition();
+    if (window.injectGlobalAnimations) window.injectGlobalAnimations();
+});
