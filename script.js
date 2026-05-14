@@ -252,11 +252,12 @@ function injectFloatingAdmin() {
     if (!document.getElementById('floating-admin-btn')) {
         let btn = document.createElement('button');
         btn.id = 'floating-admin-btn';
-        btn.innerHTML = '<i class="fas fa-user-shield"></i> الإدارة';
-        btn.style.cssText = 'position:fixed; bottom:20px; left:20px; z-index:99999; background:linear-gradient(135deg, #121e33, #1e3c72); color:#fff; border:none; padding:8px 15px; border-radius:20px; font-family:"Tajawal"; font-weight:800; box-shadow:0 10px 20px rgba(0,0,0,0.4); cursor:pointer; font-size:14px; transition:0.3s; display:flex; align-items:center; gap:8px; border:2px solid rgba(255,255,255,0.1);';
+        btn.innerHTML = '<i class="fas fa-user-shield"></i>';
+        btn.title = "لوحة الإدارة";
+        btn.style.cssText = 'position:fixed; bottom:20px; left:20px; z-index:99999; background:linear-gradient(135deg, #121e33, #1e3c72); color:#fff; border:none; width:50px; height:50px; border-radius:50%; font-family:"Tajawal"; font-weight:800; box-shadow:0 10px 20px rgba(0,0,0,0.4); cursor:pointer; font-size:20px; transition:0.3s; display:flex; align-items:center; justify-content:center; border:2px solid rgba(255,255,255,0.2);';
         btn.onclick = window.promptAdmin;
-        btn.onmouseover = () => btn.style.transform = 'translateY(-8px) scale(1.05)';
-        btn.onmouseout = () => btn.style.transform = 'none';
+        btn.onmouseover = () => btn.style.transform = 'scale(1.1)';
+        btn.onmouseout = () => btn.style.transform = 'scale(1)';
         document.body.appendChild(btn);
     }
 }
@@ -339,11 +340,15 @@ function renderCurrentPage() {
         const name = urlParams.get('name') || `الصف ${g}`;
         if (document.getElementById('grade-title')) document.getElementById('grade-title').innerText = name;
 
-        let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
-        let books = content.filter(c => c.grade == g && c.type == 'book');
-        let courses = content.filter(c => c.grade == g && c.type == 'course');
-
         const cCode = localStorage.getItem('spedia_country') || 'EG';
+        let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+
+        // Filter by grade AND country
+        let filteredContent = content.filter(c => c.grade == g && (!c.country || c.country === 'ALL' || c.country === cCode));
+
+        let books = filteredContent.filter(c => c.type == 'book');
+        let courses = filteredContent.filter(c => c.type == 'course');
+
         renderCards('books-list', books, "أريد طلب الكتاب", getDialect('req', cCode) || "الطلب الآن");
         renderCards('courses-list', courses, "أريد الاشتراك في", getDialect('req', cCode) || "الاشتراك الآن");
     }
@@ -691,8 +696,9 @@ window.loadStudentData = function (user) {
         if (sideImg) sideImg.src = profileImg;
     }
 
+    const cCode = localStorage.getItem('spedia_country') || 'EG';
     let exams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
-    let myExams = exams.filter(ex => String(ex.grade) === String(user.grade));
+    let myExams = exams.filter(ex => String(ex.grade) === String(user.grade) && (!ex.country || ex.country === 'ALL' || ex.country === cCode));
     let listExams = document.getElementById('student-exams');
     if (listExams) {
         if (myExams.length) {

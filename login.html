@@ -110,13 +110,19 @@
                     <input type="tel" id="reg-phone" required placeholder="مثال: 01012345678">
                 </div>
                 <div class="form-group">
+                    <label>المرحلة الدراسية</label>
+                    <select id="reg-stage" onchange="updateRegisterGrades()">
+                        <option value="">اختر المرحلة</option>
+                        <option value="primary">المرحلة الابتدائية</option>
+                        <option value="middle">المرحلة المتوسطة / الإعدادية</option>
+                        <option value="secondary_scientific">المرحلة الثانوية - علمي</option>
+                        <option value="secondary_literary">المرحلة الثانوية - أدبي</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>الصف الدراسي</label>
                     <select id="reg-grade" required>
-                        <option value="1">الصف الأول</option>
-                        <option value="2">الصف الثاني</option>
-                        <option value="10">الصف العاشر</option>
-                        <option value="11">الصف الحادي عشر (علمي/أدبي)</option>
-                        <option value="12">الصف الثاني عشر (علمي/أدبي)</option>
+                        <option value="">اختر المرحلة أولاً</option>
                     </select>
                 </div>
                 <button type="submit" class="btn-primary w-100 mt-10">حفظ وبدء التعلم</button>
@@ -129,6 +135,49 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        const STAGE_MAP = {
+            'primary': [
+                { name: 'الصف الأول الابتدائي', val: '1' },
+                { name: 'الصف الثاني الابتدائي', val: '2' },
+                { name: 'الصف الثالث الابتدائي', val: '3' },
+                { name: 'الصف الرابع الابتدائي', val: '4' },
+                { name: 'الصف الخامس الابتدائي', val: '5' },
+                { name: 'الصف السادس الابتدائي', val: '6' }
+            ],
+            'middle': [
+                { name: 'الصف السادس (متوسط)', val: '6' },
+                { name: 'الصف السابع', val: '7' },
+                { name: 'الصف الثامن', val: '8' },
+                { name: 'الصف التاسع', val: '9' }
+            ],
+            'secondary_scientific': [
+                { name: 'الصف العاشر', val: '10' },
+                { name: 'الصف الحادي عشر - علمي', val: '11' },
+                { name: 'الصف الثاني عشر - علمي', val: '12' }
+            ],
+            'secondary_literary': [
+                { name: 'الصف العاشر (عام/أدبي)', val: '13' },
+                { name: 'الصف الحادي عشر - أدبي', val: '14' },
+                { name: 'الصف الثاني عشر - أدبي', val: '15' }
+            ]
+        };
+
+        function updateRegisterGrades() {
+            const stage = document.getElementById('reg-stage').value;
+            const gradeSelect = document.getElementById('reg-grade');
+            gradeSelect.innerHTML = '<option value="">اختر الصف</option>';
+
+            if (stage && STAGE_MAP[stage]) {
+                STAGE_MAP[stage].forEach(g => {
+                    let opt = document.createElement('option');
+                    opt.value = g.val;
+                    opt.textContent = g.name;
+                    gradeSelect.appendChild(opt);
+                });
+            }
+        }
+    </script>
 </body>
 
 </html>

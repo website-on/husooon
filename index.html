@@ -155,7 +155,99 @@
                 font-size: 32px;
             }
         }
+
+        /* Black & Blue Theme Styles */
+        body.dark-night-theme {
+            background: linear-gradient(135deg, #000, #1e3c72) !important;
+            color: #fff !important;
+        }
+
+        body.dark-night-theme .navbar {
+            background: rgba(0, 0, 0, 0.9) !important;
+            border-bottom: 1px solid #1e3c72 !important;
+        }
+
+        body.dark-night-theme .logo-text .en,
+        body.dark-night-theme .hero-title-box h1,
+        body.dark-night-theme .section-padding h1,
+        body.dark-night-theme p {
+            color: #fff !important;
+        }
+
+        body.dark-night-theme .large-stat {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid #1e3c72 !important;
+        }
+
+        body.dark-night-theme .large-stat h3 {
+            color: #2ddbe8 !important;
+        }
+
+        body.dark-night-theme .large-stat p {
+            color: #a0b2c6 !important;
+        }
+
+        body.dark-night-theme .edu-sticker {
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .theme-toggle-btn {
+            position: fixed;
+            bottom: 85px;
+            left: 20px;
+            z-index: 9999;
+            background: linear-gradient(135deg, #12b8c5, #1e3c72);
+            color: #fff;
+            border: 2px solid #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse-gentle {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .breath-anim {
+            animation: pulse-gentle 4s ease-in-out infinite !important;
+        }
     </style>
+    <button class="theme-toggle-btn" onclick="togglePlatformTheme()" title="تغيير المظهر">
+        <i class="fas fa-magic"></i>
+    </button>
+    <script>
+        function togglePlatformTheme() {
+            document.body.classList.toggle('dark-night-theme');
+            const isDark = document.body.classList.contains('dark-night-theme');
+            localStorage.setItem('husoon_dark_theme', isDark ? 'yes' : 'no');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('husoon_dark_theme') === 'yes') {
+                document.body.classList.add('dark-night-theme');
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -272,10 +364,10 @@
                 <!-- Flag Sticker -->
                 <img src="flag_kw.jpg" alt="KW"
                     style="position:absolute; top:10px; right:10px; width:45px; height:45px; border-radius:50%; border:2px solid #fff; z-index:10; box-shadow:0 5px 15px rgba(0,0,0,0.2);">
-                <img src="media__student_boy_new.jpg" alt="طالب" style="width:100%; display:block;">
+                <img src="media__student_boy_new.jpg" alt="طالب" style="width:100%; display:block;" class="breath-anim">
                 <div
                     style="background:linear-gradient(135deg, #12b8c5, #1e3c72); color:#fff; padding:10px; font-weight:800; font-size:16px;">
-                    الطلاب المتميزين</div>
+                    فهد خالد الجاسم</div>
             </div>
 
             <!-- The Book image in the middle -->
@@ -289,10 +381,11 @@
                 <!-- Flag Sticker -->
                 <img src="flag_ae.jpg" alt="AE"
                     style="position:absolute; top:10px; left:10px; width:45px; height:45px; border-radius:50%; border:2px solid #fff; z-index:10; box-shadow:0 5px 15px rgba(0,0,0,0.2);">
-                <img src="media__student_girl_new.jpg" alt="طالبة" style="width:100%; display:block;">
+                <img src="media__student_girl_new.jpg" alt="طالبة" style="width:100%; display:block;"
+                    class="breath-anim">
                 <div
                     style="background:linear-gradient(135deg, #e81cff, #40c9ff); color:#fff; padding:10px; font-weight:800; font-size:16px;">
-                    الطالبات المتميزات</div>
+                    نورة يوسف المرشد</div>
             </div>
         </div>
         <style>
@@ -394,8 +487,9 @@
             <!-- Center: Image -->
             <div
                 style="animation: floatUp 6s ease-in-out infinite; position:absolute; left:45%; bottom:40px; z-index:3;">
-                <img src="media__1778617038591.jpg" alt="Students"
-                    style="height:380px; width:450px; border-radius:40px; border:10px solid #fff; object-fit:cover; filter:drop-shadow(0 20px 40px rgba(0,0,0,0.2));">
+                <img src="WhatsApp Image 2026-05-14 at 1.40.28 PM.jpeg" alt="Students"
+                    style="height:410px; width:450px; border-radius:40px; border:10px solid #fff; object-fit:cover; filter:drop-shadow(0 20px 40px rgba(0,0,0,0.2));"
+                    class="breath-anim">
                 <div
                     style="position:absolute; bottom:0; width:100%; height:200px; background:linear-gradient(to top, rgba(235,252,250,1), transparent); z-index:4;">
                 </div>
@@ -433,6 +527,44 @@
                     المتفوقين وابدأ رحلة التميز!</h2>
             </div>
 
+        </div>
+    </section>
+
+    <!-- Student of the Month - Centered Section -->
+    <section class="section-padding"
+        style="text-align:center; background: radial-gradient(circle, #fff, #dbf8fa); padding-top: 150px; padding-bottom: 150px;">
+        <div class="container">
+            <div style="margin-bottom: 60px;">
+                <h1 style="font-size:65px; font-weight:900; color:#132644; margin-bottom:10px;">نجمة منصة حصون</h1>
+                <h2 style="font-size:35px; color:#12b8c5; font-weight:800;">الطالبة المثالية لهذا الشهر 🏆</h2>
+            </div>
+
+            <div style="position:relative; display:inline-block; animation: floatUp 6s ease-in-out infinite;">
+                <!-- Decorative Glow -->
+                <div
+                    style="position:absolute; width:150%; height:150%; top:-25%; left:-25%; background:radial-gradient(circle, rgba(45,219,232,0.3), transparent); filter:blur(40px); z-index:0;">
+                </div>
+
+                <!-- Main Circular Frame -->
+                <div
+                    style="width:450px; height:450px; border-radius:50%; border:15px solid #fff; box-shadow:0 40px 80px rgba(18,184,197,0.4); overflow:hidden; background:#fff; position:relative; z-index:2;">
+                    <img src="WhatsApp Image 2026-05-14 at 1.57.14 PM.jpeg" alt="Ideal Student"
+                        style="width:100%; height:100%; object-fit:cover;" class="breath-anim">
+                </div>
+
+                <!-- Floating Crown -->
+                <i class="fas fa-crown"
+                    style="position:absolute; top:-30px; right:30px; font-size:100px; color:#ffca28; transform:rotate(20deg); filter:drop-shadow(0 15px 25px rgba(0,0,0,0.2)); z-index:5;"></i>
+
+                <!-- Student Name & Title Badge -->
+                <div
+                    style="position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #132644, #1e3c72); color:#fff; padding:20px 60px; border-radius:50px; border:4px solid #12b8c5; box-shadow:0 20px 40px rgba(0,0,0,0.3); width:max-content; z-index:10;">
+                    <h3 style="margin:0; font-size:32px; font-weight:900; letter-spacing:1px;">فرح عبدالرحمن عبدالسلام
+                    </h3>
+                    <p style="margin:5px 0 0; font-size:22px; color:#2ddbe8; font-weight:800; opacity:0.9;">طالبة متميزة
+                        في منصة حصون</p>
+                </div>
+            </div>
         </div>
     </section>
 
