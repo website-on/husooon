@@ -366,6 +366,63 @@
             if (btn) btn.classList.add('active');
         }
 
+        window.updateCountryStages = function (countryId, stageId, gradeId) {
+            const country = document.getElementById(countryId).value;
+            const stageSel = document.getElementById(stageId);
+            const gradeSel = document.getElementById(gradeId);
+            stageSel.innerHTML = '<option value="">اختر المرحلة</option>';
+            gradeSel.innerHTML = '<option value="">اختر الصف</option>';
+
+            let stages = [];
+            if (country === 'KW' || country === 'SA' || country === 'AE' || country === 'QA' || country === 'OM') {
+                stages = [
+                    { val: 'primary', text: 'المرحلة الابتدائية' },
+                    { val: 'intermediate', text: 'المرحلة المتوسطة' },
+                    { val: 'secondary', text: 'المرحلة الثانوية' }
+                ];
+            } else if (country === 'EG') {
+                stages = [
+                    { val: 'primary', text: 'الابتدائي' },
+                    { val: 'preparatory', text: 'الإعدادي' },
+                    { val: 'secondary', text: 'الثانوي' }
+                ];
+            } else {
+                stages = [{ val: 'all', text: 'مستوى عام' }];
+            }
+
+            stages.forEach(s => {
+                let opt = document.createElement('option');
+                opt.value = s.val;
+                opt.innerText = s.text;
+                stageSel.appendChild(opt);
+            });
+        }
+
+        window.updateGrades = function (countryId, stageId, gradeId) {
+            const country = document.getElementById(countryId).value;
+            const stage = document.getElementById(stageId).value;
+            const gradeSel = document.getElementById(gradeId);
+            gradeSel.innerHTML = '<option value="">اختر الصف</option>';
+
+            let grades = [];
+            if (stage === 'primary') {
+                grades = country === 'KW' ? ['الصف الأول', 'الصف الثاني', 'الصف الثالث', 'الصف الرابع', 'الصف الخامس'] : ['الصف الأول الابتدائى', 'الصف الثاني الابتدائى', 'الصف الثالث الابتدائى', 'الصف الرابع الابتدائى', 'الصف الخامس الابتدائى', 'الصف السادس الابتدائى'];
+            } else if (stage === 'intermediate' || stage === 'preparatory') {
+                grades = country === 'EG' ? ['الصف الأول الإعدادي', 'الصف الثاني الإعدادي', 'الصف الثالث الإعدادي'] : ['الصف السادس', 'الصف السابع', 'الصف الثامن', 'الصف التاسع'];
+            } else if (stage === 'secondary') {
+                grades = ['الصف العاشر', 'الصف الحادي عشر', 'الصف الثاني عشر'];
+            }
+
+            if (grades.length === 0) grades = ['عام'];
+
+            grades.forEach(g => {
+                let opt = document.createElement('option');
+                opt.value = g;
+                opt.innerText = g;
+                gradeSel.appendChild(opt);
+            });
+        }
+
         window.addEval = async function (e) {
             e.preventDefault();
             let code = document.getElementById('ev-code').value;
@@ -436,9 +493,9 @@
                 };
                 if (newItem.type === 'course') {
                     let yt = document.getElementById('ct-yt').value;
-                    let m = yt.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+                    let m = yt ? yt.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/) : null;
                     newItem.youtubeId = m ? m[1] : '';
-                    newItem.image = `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg`;
+                    newItem.image = newItem.youtubeId ? `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg` : "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
                 } else {
                     newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
                 }
