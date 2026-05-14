@@ -207,6 +207,16 @@
             const modal = document.getElementById('cart-modal');
             if (modal) modal.style.display = 'flex';
         }
+        window.openCountryModal = window.openCountryModal || function (e) {
+            if (e) e.preventDefault();
+            const m = document.getElementById('country-modal');
+            if (m) m.style.display = 'flex';
+            else {
+                // Urgent fallback if not injected yet
+                alert("جاري تجهيز قائمة الدول... يرجى الانتظار ثانية.");
+                if (window.injectCountryModal) window.injectCountryModal();
+            }
+        };
     </script>
 </head>
 

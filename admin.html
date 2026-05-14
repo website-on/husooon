@@ -488,7 +488,7 @@
                     title: document.getElementById('ct-title').value,
                     grade: document.getElementById('ct-grade').value,
                     country: document.getElementById('ct-country').value,
-                    priceBase: parseInt(document.getElementById('ct-price').value),
+                    priceBase: parseInt(document.getElementById('ct-price').value) || 0,
                     courseCode: document.getElementById('ct-course-code').value || ''
                 };
                 if (newItem.type === 'course') {
@@ -506,11 +506,12 @@
                     c.push(newItem);
                     localStorage.setItem('spedia_content', JSON.stringify(c));
                 }
-                alert('تم الحفظ بنجاح في النظام!');
+                alert('تم الحفظ بنجاح! سيتم عرض المحتوى في المنصة فوراً.');
                 e.target.reset();
+                if (window.renderTables) renderTables();
             } catch (err) {
-                console.error(err);
-                alert('حدث خطأ أثناء الحفظ. يرجى المحاولة لاحقاً.');
+                console.error("Save Error:", err);
+                alert('عذراً، فشل الحفظ. تأكد من اتصال الإنترنت أو صلاحيات الإدارة.\n' + err.message);
             } finally {
                 if (btn) btn.innerText = "حفظ المحتوى";
             }
