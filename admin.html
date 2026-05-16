@@ -221,6 +221,7 @@
                     <select id="ct-type" onchange="
                         document.getElementById('course-code-container').style.display = this.value === 'course' ? 'block' : 'none';
                         document.getElementById('yt-container').style.display = this.value === 'course' ? 'block' : 'none';
+                        document.getElementById('book-whatsapp-container').style.display = this.value === 'course' ? 'none' : 'block';
                         document.getElementById('img-container').style.display = this.value === 'course' ? 'none' : 'block';
                         ">
                         <option value="book">كتاب متاح للطلب</option>
@@ -232,8 +233,12 @@
                     <input type="text" id="ct-title" required>
                 </div>
                 <div class="form-group" id="course-code-container" style="display:none;">
-                    <label>كود التفعيل (كلمة المرور)</label>
+                    <label>كود التفعيل (كلمة المرور) - لغلق الكورس والسيرفر</label>
                     <input type="text" id="ct-course-code">
+                </div>
+                <div class="form-group" id="book-whatsapp-container">
+                    <label>رقم واتساب لطلب الكتاب (اختياري)</label>
+                    <input type="text" id="ct-whatsapp" placeholder="مثال: 201025792459">
                 </div>
                 <div class="form-group">
                     <label>الدولة</label>
@@ -489,7 +494,8 @@
                     grade: document.getElementById('ct-grade').value,
                     country: document.getElementById('ct-country').value,
                     priceBase: parseInt(document.getElementById('ct-price').value) || 0,
-                    courseCode: document.getElementById('ct-course-code').value || ''
+                    courseCode: document.getElementById('ct-course-code').value || '',
+                    whatsapp: document.getElementById('ct-whatsapp').value || ''
                 };
                 if (newItem.type === 'course') {
                     let yt = document.getElementById('ct-yt').value;
