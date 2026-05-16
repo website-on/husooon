@@ -425,11 +425,12 @@ window.renderCurrentPage = async function () {
         if (document.getElementById('grade-title')) document.getElementById('grade-title').innerText = name;
 
         const cCode = localStorage.getItem('spedia_country') || 'EG';
-        let content = [];
+        let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
         if (window.fsData) {
-            content = await window.fsData.getAllContent();
-        } else {
-            content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+            try {
+                let fsContent = await window.fsData.getAllContent();
+                content = [...content, ...fsContent];
+            } catch (e) { console.warn(e); }
         }
 
         // Filter by grade AND country
