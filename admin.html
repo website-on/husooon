@@ -496,48 +496,62 @@
             if (btn) btn.innerText = "جاري الحفظ...";
 
             try {
-                let ctType = document.getElementById('ct-type').value;
+                let ctType = document.getElementById('ct-type') ? document.getElementById('ct-type').value : 'course';
+
+                let titleEl = document.getElementById('ct-title');
+                let gradeEl = document.getElementById('ct-grade');
+                let countryEl = document.getElementById('ct-country');
+                let priceEl = document.getElementById('ct-price');
+                let codeEl = document.getElementById('ct-course-code');
+
                 let newItem = {
                     id: Date.now(),
                     type: ctType,
-                    title: document.getElementById('ct-title').value,
-                    grade: document.getElementById('ct-grade').value,
-                    country: document.getElementById('ct-country').value,
-                    priceBase: parseInt(document.getElementById('ct-price').value) || 0,
-                    courseCode: document.getElementById('ct-course-code').value || ''
+                    title: titleEl ? titleEl.value : '',
+                    grade: gradeEl ? gradeEl.value : '',
+                    country: countryEl ? countryEl.value : 'EG',
+                    priceBase: (priceEl ? parseInt(priceEl.value) : 0) || 0,
+                    courseCode: codeEl ? codeEl.value : ''
                 };
 
                 // Upload Image Cover
-                let imgFile = document.getElementById('ct-image').files[0];
+                let imgInput = document.getElementById('ct-image');
+                let imgFile = imgInput && imgInput.files ? imgInput.files[0] : null;
                 if (imgFile && window.fsData && window.fsData.uploadFile) {
                     newItem.image = await window.fsData.uploadFile(imgFile, `covers/${Date.now()}_${imgFile.name}`);
                 }
 
                 if (newItem.type === 'course') {
-                    let yt = document.getElementById('ct-yt').value;
+                    let ytEl = document.getElementById('ct-yt');
+                    let yt = ytEl ? ytEl.value : '';
                     let m = yt ? yt.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/) : null;
                     newItem.youtubeId = m ? m[1] : '';
                     if (!newItem.image) newItem.image = newItem.youtubeId ? `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg` : "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
                 } else if (newItem.type === 'book') {
-                    let pdfFile = document.getElementById('ct-pdf').files[0];
+                    let pdfInput = document.getElementById('ct-pdf');
+                    let pdfFile = pdfInput && pdfInput.files ? pdfInput.files[0] : null;
                     if (pdfFile && window.fsData && window.fsData.uploadFile) {
                         newItem.pdfUrl = await window.fsData.uploadFile(pdfFile, `books/${Date.now()}_${pdfFile.name}`);
                     }
                     if (!newItem.image) newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
                 }
 
-                if (window.fsData) await window.fsData.addContent(newItem);
-                else {
+                if (window.fsData && window.fsData.addContent) {
+                    // Wrap Firestore addDoc in timeout
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("طال وقت الاتصال بقاعدة البيانات. تأكد من الإنترنت أو صلاحيات Firebase")), 15000));
+                    await Promise.race([window.fsData.addContent(newItem), timeoutPromise]);
+                } else {
                     let c = JSON.parse(localStorage.getItem('spedia_content') || '[]');
                     c.push(newItem);
                     localStorage.setItem('spedia_content', JSON.stringify(c));
                 }
+
                 alert('تم الحفظ بنجاح! سيتم عرض المحتوى في المنصة فوراً.');
-                e.target.reset();
-                if (window.renderTables) renderTables();
+                if (e.target && e.target.reset) e.target.reset();
+                if (window.renderTables) window.renderTables();
             } catch (err) {
                 console.error("Save Error:", err);
-                alert('عذراً، فشل الحفظ. تأكد من إعدادات Storage أو اتصال الإنترنت.\n' + err.message);
+                alert('عذراً، فشل الحفظ. تأكد من إعدادات Storage أو اتصال الإنترنت.\nالمشكلة: ' + err.message);
             } finally {
                 if (btn) btn.innerText = "حفظ المحتوى";
             }

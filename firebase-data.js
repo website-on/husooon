@@ -19,7 +19,17 @@ window.fsData = {
     // STORAGE
     uploadFile: async (file, path) => {
         const fileRef = ref(storage, path);
-        await uploadBytes(fileRef, file);
+
+        // Wrap in a 15-second timeout to prevent infinite hang if Storage isn't initialized or blocked
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Storage Timeout: تاكد من تفعيل Storage في Firebase")), 15000)
+        );
+
+        await Promise.race([
+            uploadBytes(fileRef, file),
+            timeoutPromise
+        ]);
+
         return await getDownloadURL(fileRef);
     },
 
