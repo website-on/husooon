@@ -11,9 +11,32 @@ import {
     deleteDoc,
     setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { storage } from './firebase-init.js';
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 // Global exports to window for non-module script.js to access
 window.fsData = {
+    // STORAGE
+    uploadFile: async (file, path) => {
+        const fileRef = ref(storage, path);
+        await uploadBytes(fileRef, file);
+        return await getDownloadURL(fileRef);
+    },
+
+    // SUBSCRIPTIONS (Content purchased with generated codes)
+    addSubscriptionCode: async (sub) => {
+        return await addDoc(collection(db, "subscription_codes"), sub);
+    },
+    getAllSubscriptionCodes: async () => {
+        const snap = await getDocs(collection(db, "subscription_codes"));
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    },
+    getSubscriptionsByCode: async (code) => {
+        const q = query(collection(db, "subscription_codes"), where("code", "==", code));
+        const snap = await getDocs(q);
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    },
+
     // CONTENT (Books/Courses)
     addContent: async (item) => {
         return await addDoc(collection(db, "content"), item);

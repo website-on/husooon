@@ -184,6 +184,11 @@
             <div style="overflow-x:auto;">
                 <table id="table-codes"></table>
             </div>
+
+            <h3 class="mt-30">أكواد اشتراكات الطلاب (مشتريات الكورسات والكتب)</h3>
+            <div style="overflow-x:auto;">
+                <table id="table-sub-codes"></table>
+            </div>
         </div>
 
         <div id="tab-users" class="admin-section">
@@ -219,12 +224,10 @@
                 <div class="form-group">
                     <label>النوع</label>
                     <select id="ct-type" onchange="
-                        document.getElementById('course-code-container').style.display = this.value === 'course' ? 'block' : 'none';
                         document.getElementById('yt-container').style.display = this.value === 'course' ? 'block' : 'none';
-                        document.getElementById('book-whatsapp-container').style.display = this.value === 'course' ? 'none' : 'block';
-                        document.getElementById('img-container').style.display = this.value === 'course' ? 'none' : 'block';
+                        document.getElementById('pdf-container').style.display = this.value === 'course' ? 'none' : 'block';
                         ">
-                        <option value="book">كتاب متاح للطلب</option>
+                        <option value="book">كتاب إلكتروني</option>
                         <option value="course">كورس واشتراك (فيديو يوتيوب)</option>
                     </select>
                 </div>
@@ -232,13 +235,9 @@
                     <label>عنوان المحتوى</label>
                     <input type="text" id="ct-title" required>
                 </div>
-                <div class="form-group" id="course-code-container" style="display:none;">
-                    <label>كود التفعيل (كلمة المرور) - لغلق الكورس والسيرفر</label>
+                <div class="form-group" id="course-code-container">
+                    <label>كود التفعيل (كلمة المرور) - لغلق المحتوى (إن وجد)</label>
                     <input type="text" id="ct-course-code">
-                </div>
-                <div class="form-group" id="book-whatsapp-container">
-                    <label>رقم واتساب لطلب الكتاب (اختياري)</label>
-                    <input type="text" id="ct-whatsapp" placeholder="مثال: 201025792459">
                 </div>
                 <div class="form-group">
                     <label>الدولة</label>
@@ -274,11 +273,15 @@
                     <label>رابط فيديو يوتيوب</label>
                     <input type="url" id="ct-yt">
                 </div>
+                <div class="form-group" id="pdf-container">
+                    <label>رفع ملف الكتاب (PDF)</label>
+                    <input type="file" id="ct-pdf" accept="application/pdf">
+                </div>
                 <div class="form-group">
                     <label>السعر الأساسي (ج.م)</label>
                     <input type="number" id="ct-price" required>
                 </div>
-                <button type="submit" class="btn-primary w-100">حفظ المحتوى</button>
+                <button type="submit" class="btn-primary w-100" id="btn-save-content">حفظ المحتوى</button>
             </form>
         </div>
 
@@ -445,12 +448,15 @@
             let codes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
             let users = [];
             let att = [];
+            let subCodes = [];
             if (window.fsData) {
                 users = await window.fsData.getAllUsers();
                 att = await window.fsData.getAttendance();
+                if (window.fsData.getAllSubscriptionCodes) subCodes = await window.fsData.getAllSubscriptionCodes();
             } else {
                 users = JSON.parse(localStorage.getItem('spedia_users') || '[]');
                 att = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
+                subCodes = JSON.parse(localStorage.getItem('spedia_sub_codes') || '[]');
             }
             let subs = [];
             if (window.fsData) {
@@ -462,6 +468,9 @@
 
             const tCodes = document.getElementById('table-codes');
             if (tCodes) tCodes.innerHTML = `<tr><th>الكود</th><th>مستخدم؟</th></tr>` + codes.map(c => `<tr><td>${c.code}</td><td style="color:${c.isUsed ? 'red' : 'green'}">${c.isUsed ? 'مستخدم' : 'متاح'}</td></tr>`).join('');
+
+            const tSubCodes = document.getElementById('table-sub-codes');
+            if (tSubCodes) tSubCodes.innerHTML = `<tr><th>الكود</th><th>النوع</th><th>العنوان</th><th>التاريخ</th></tr>` + subCodes.map(c => `<tr><td>${c.code}</td><td>${c.type === 'course' ? 'كورس' : 'كتاب'}</td><td>${c.title}</td><td>${c.date || ''}</td></tr>`).join('');
 
             const tUsers = document.getElementById('table-users');
             if (tUsers) tUsers.innerHTML = `<tr><th>الكود</th><th>الاسم</th><th>الهاتف</th><th>الصف</th></tr>` + users.map(u => `<tr><td>${u.code}</td><td>${u.name}</td><td>${adminType === 'restricted' ? '********' : u.phone}</td><td>${u.grade}</td></tr>`).join('');
@@ -487,23 +496,34 @@
             if (btn) btn.innerText = "جاري الحفظ...";
 
             try {
+                let ctType = document.getElementById('ct-type').value;
                 let newItem = {
                     id: Date.now(),
-                    type: document.getElementById('ct-type').value,
+                    type: ctType,
                     title: document.getElementById('ct-title').value,
                     grade: document.getElementById('ct-grade').value,
                     country: document.getElementById('ct-country').value,
                     priceBase: parseInt(document.getElementById('ct-price').value) || 0,
-                    courseCode: document.getElementById('ct-course-code').value || '',
-                    whatsapp: document.getElementById('ct-whatsapp').value || ''
+                    courseCode: document.getElementById('ct-course-code').value || ''
                 };
+
+                // Upload Image Cover
+                let imgFile = document.getElementById('ct-image').files[0];
+                if (imgFile && window.fsData && window.fsData.uploadFile) {
+                    newItem.image = await window.fsData.uploadFile(imgFile, `covers/${Date.now()}_${imgFile.name}`);
+                }
+
                 if (newItem.type === 'course') {
                     let yt = document.getElementById('ct-yt').value;
                     let m = yt ? yt.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/) : null;
                     newItem.youtubeId = m ? m[1] : '';
-                    newItem.image = newItem.youtubeId ? `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg` : "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
-                } else {
-                    newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
+                    if (!newItem.image) newItem.image = newItem.youtubeId ? `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg` : "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
+                } else if (newItem.type === 'book') {
+                    let pdfFile = document.getElementById('ct-pdf').files[0];
+                    if (pdfFile && window.fsData && window.fsData.uploadFile) {
+                        newItem.pdfUrl = await window.fsData.uploadFile(pdfFile, `books/${Date.now()}_${pdfFile.name}`);
+                    }
+                    if (!newItem.image) newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
                 }
 
                 if (window.fsData) await window.fsData.addContent(newItem);
@@ -517,7 +537,7 @@
                 if (window.renderTables) renderTables();
             } catch (err) {
                 console.error("Save Error:", err);
-                alert('عذراً، فشل الحفظ. تأكد من اتصال الإنترنت أو صلاحيات الإدارة.\n' + err.message);
+                alert('عذراً، فشل الحفظ. تأكد من إعدادات Storage أو اتصال الإنترنت.\n' + err.message);
             } finally {
                 if (btn) btn.innerText = "حفظ المحتوى";
             }

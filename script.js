@@ -484,21 +484,22 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText) {
         div.className = 'subject-card animate-on-scroll';
 
         let btnHtml = '';
-        if (item.type === 'course') {
-            let unlocked = JSON.parse(localStorage.getItem('spedia_unlocked') || '[]');
-            if (unlocked.includes(item.title)) {
-                let ytLink = item.youtubeUrl || '#';
+        let unlocked = JSON.parse(localStorage.getItem('spedia_unlocked') || '[]');
+        let isUnlocked = unlocked.includes(item.title);
+
+        if (isUnlocked) {
+            if (item.type === 'course') {
+                let ytLink = item.youtubeUrl || item.youtubeId ? `https://www.youtube.com/watch?v=${item.youtubeId}` : '#';
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
             } else {
-                btnHtml = `<button onclick="window.unlockCourse('${item.title}', '${item.courseCode || ''}')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #f44336, #e53935);"><i class="fas fa-lock" style="font-size:24px;"></i> فتح الكورس السري </button>`;
+                let pdfLink = item.pdfUrl || '#';
+                btnHtml = `<button onclick="window.open('${pdfLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </button>`;
             }
         } else {
-            let waHref = item.whatsapp ? `https://wa.me/${item.whatsapp}?text=${encodeURIComponent("أهلاً بك في منصة حصون التعليمية.\\n\\nأريد طلب الكتاب: " + item.title)}` : `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("أهلاً بك في منصة حصون التعليمية.\\n\\nأريد طلب الكتاب: " + item.title)}`;
-            let cartAction = `window.addToCart('${item.title}', '${window.renderPrice(item.priceBase)}', '${btnText}')`;
+            let cartAction = `window.initiatePurchase('${item.title}', '${window.renderPrice(item.priceBase)}', '${item.type === 'course' ? 'كورس' : 'كتاب'}')`;
 
             btnHtml = `<div style="display:flex; gap:5px; width:100%;">
-                <button onclick="${cartAction}" class="btn-primary" style="flex:1; padding:15px; border-radius:12px; font-size:14px;"><i class="fas fa-cart-plus"></i> إضافة للسلة</button>
-                <button onclick="window.open('${waHref}', '_blank')" class="btn-primary" style="flex:1; padding:15px; border-radius:12px; font-size:14px; background:linear-gradient(135deg, #25d366, #128c7e);"><i class="fab fa-whatsapp"></i> طلب واتساب</button>
+                <button onclick="${cartAction}" class="btn-primary w-100" style="flex:1; padding:15px; border-radius:12px; font-size:16px;"><i class="fas fa-shopping-cart"></i> ${btnText}</button>
             </div>`;
         }
 
@@ -541,11 +542,76 @@ function openCart(e) {
 }
 window.openCart = openCart;
 
-window.addToCart = function (title, price, typeText) {
+window.initiatePurchase = function (title, price, typeText) {
+    if (!document.getElementById('sub-code-modal')) {
+        let modal = document.createElement('div');
+        modal.id = 'sub-code-modal';
+        modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:100005; justify-content:center; align-items:center; backdrop-filter:blur(5px);';
+        modal.innerHTML = `
+            <div style="background:#fff; border-radius:20px; padding:30px; width:90%; max-width:500px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+                <h3 style="margin-bottom:20px; color:#1e3c72;">كود الاشتراك</h3>
+                <p style="margin-bottom:20px; color:#555;">أدخل كودك المكون من 4 أرقام إذا كنت مسجلاً من قبل لإضافة المحتوى إلى حسابك.</p>
+                <input type="text" id="sub-exist-code" placeholder="مثال: 1234" maxlength="4" style="width:100%; padding:15px; margin-bottom:15px; font-size:20px; text-align:center; border:2px solid #ccc; border-radius:10px;">
+                <button id="btn-sub-continue" class="btn-primary w-100" style="margin-bottom:20px;">متابعة الشراء بهذا الكود</button>
+                <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+                <p style="margin-bottom:15px; color:#555;font-weight:bold;">مستخدم جديد؟ قم بإنشاء كود مكون من 4 أرقام</p>
+                <button id="btn-sub-generate" class="btn-primary w-100" style="background:linear-gradient(135deg, #FF9800, #F57C00);">توليد كود تلقائي ومتابعة</button>
+                <button onclick="document.getElementById('sub-code-modal').style.display='none'" class="btn-secondary w-100 mt-10" style="background:none; color:#888; border:none; margin-top:15px;">إلغاء</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('btn-sub-continue').onclick = () => {
+            let code = document.getElementById('sub-exist-code').value.trim();
+            if (code.length < 4) return alert('الرجاء إدخال كود صحيح من 4 أرقام');
+            window.continuePurchaseWithCode(code);
+        };
+        document.getElementById('btn-sub-generate').onclick = () => {
+            let code = Math.floor(1000 + Math.random() * 9000).toString();
+            alert("تم توليد الكود الخاص بك: " + code + "\\nيرجى حفظه للدخول به لاحقاً.");
+            window.continuePurchaseWithCode(code);
+        };
+    }
+    document.getElementById('sub-code-modal').dataset.title = title;
+    document.getElementById('sub-code-modal').dataset.price = price;
+    document.getElementById('sub-code-modal').dataset.type = typeText;
+    document.getElementById('sub-exist-code').value = localStorage.getItem('spedia_my_sub_code') || '';
+    document.getElementById('sub-code-modal').style.display = 'flex';
+};
+
+window.continuePurchaseWithCode = async function (code) {
+    let modal = document.getElementById('sub-code-modal');
+    modal.style.display = 'none';
+    let title = modal.dataset.title;
+    let price = modal.dataset.price;
+    let typeText = modal.dataset.type;
+
+    localStorage.setItem('spedia_my_sub_code', code);
+
+    // Add to backend automatically if not paid yet, will require admin approval ideally, but for now we register early
+    let subItem = { code: code, title: title, type: typeText === 'كورس' ? 'course' : 'book', date: new Date().toLocaleDateString('ar-EG') };
+    if (window.fsData && window.fsData.addSubscriptionCode) {
+        window.fsData.addSubscriptionCode(subItem);
+    } else {
+        let subs = JSON.parse(localStorage.getItem('spedia_sub_codes') || '[]');
+        subs.push(subItem);
+        localStorage.setItem('spedia_sub_codes', JSON.stringify(subs));
+    }
+
+    // Automatically unlock for this device for convenience (or rely on My Subscriptions page)
+    let unlocked = JSON.parse(localStorage.getItem('spedia_unlocked') || '[]');
+    if (!unlocked.includes(title)) unlocked.push(title);
+    localStorage.setItem('spedia_unlocked', JSON.stringify(unlocked));
+
+    window.addToCart(title, price, typeText, code);
+};
+
+window.addToCart = function (title, price, typeText, code = '') {
     let cart = JSON.parse(localStorage.getItem('spedia_cart') || '[]');
-    cart.push({ title: title, price: price, type: typeText });
+    cart.push({ title: title, price: price, type: typeText, code: code });
     localStorage.setItem('spedia_cart', JSON.stringify(cart));
-    alert("تم الإضافة إلى السلة!");
+    alert("تم الإضافة إلى السلة! ومحتوياتك الآن مرتبطة بالكود: " + code);
+    if (window.renderCards) window.location.reload();
 };
 
 window.handleLogin = async function (e) {
@@ -628,6 +694,77 @@ window.submitCartOrder = function (e) {
     document.getElementById('cart-modal').style.display = 'none';
     sendWhatsApp(msg);
 }
+
+window.openMySubscriptions = async function () {
+    if (!document.getElementById('my-subs-login-modal')) {
+        let modal = document.createElement('div');
+        modal.id = 'my-subs-login-modal';
+        modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:100005; justify-content:center; align-items:center; backdrop-filter:blur(5px);';
+        modal.innerHTML = `
+            <div style="background:#fff; border-radius:20px; padding:30px; width:90%; max-width:500px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+                <h3 style="margin-bottom:20px; color:#1e3c72;"><i class="fas fa-book-reader"></i> كورساتي وكتبي</h3>
+                <p style="margin-bottom:20px; color:#555;">الرجاء إدخال كود الاشتراك الخاص بك (4 أرقام) للوصول إلى محتوياتك المسجلة.</p>
+                <input type="text" id="my-subs-code-input" placeholder="أدخل الكود... مثال: 1234" maxlength="4" style="width:100%; padding:15px; margin-bottom:15px; font-size:20px; text-align:center; border:2px solid #ccc; border-radius:10px;">
+                <button id="btn-my-subs-login" class="btn-primary w-100" style="margin-bottom:15px; background:linear-gradient(135deg, #12b8c5, #1e3c72);">دخول للمحتوى</button>
+                <a href="#" onclick="window.sendWhatsApp('أهلاً، نسيت كود الاشتراك الخاص بي لمنصة حصون، هل يمكنكم مساعدتي؟'); return false;" style="color:#f44336; font-weight:bold; text-decoration:underline;">هل نسيت الكود؟</a>
+                <button onclick="document.getElementById('my-subs-login-modal').style.display='none'" class="btn-secondary w-100" style="background:none; color:#888; border:none; margin-top:20px;">إلغاء</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('btn-my-subs-login').onclick = async () => {
+            let code = document.getElementById('my-subs-code-input').value.trim();
+            if (code.length < 4) return alert('الرجاء إدخال كود صحيح من 4 أرقام');
+
+            let btn = document.getElementById('btn-my-subs-login');
+            btn.innerText = 'جاري التحقق...';
+
+            let subCodes = [];
+            if (window.fsData && window.fsData.getSubscriptionsByCode) {
+                subCodes = await window.fsData.getSubscriptionsByCode(code);
+            } else {
+                let subs = JSON.parse(localStorage.getItem('spedia_sub_codes') || '[]');
+                subCodes = subs.filter(s => s.code === code);
+            }
+
+            btn.innerText = 'دخول للمحتوى';
+
+            if (subCodes.length === 0) {
+                alert("لا يوجد محتوى مرتبط بهذا الكود حالياً.");
+                return;
+            }
+
+            localStorage.setItem('spedia_my_sub_code', code);
+
+            let unlocked = JSON.parse(localStorage.getItem('spedia_unlocked') || '[]');
+            subCodes.forEach(sc => { if (!unlocked.includes(sc.title)) unlocked.push(sc.title); });
+            localStorage.setItem('spedia_unlocked', JSON.stringify(unlocked));
+
+            document.getElementById('my-subs-login-modal').style.display = 'none';
+            alert("تم فتح المحتويات المرتبطة بهذا الكود بنجاح!");
+
+            if (window.renderCards) window.location.reload();
+            else window.location.href = "explore.html";
+        };
+    }
+    document.getElementById('my-subs-code-input').value = localStorage.getItem('spedia_my_sub_code') || '';
+    document.getElementById('my-subs-login-modal').style.display = 'flex';
+};
+
+window.injectMySubscriptionsBtn = function () {
+    let navActions = document.querySelector('.nav-actions');
+    if (navActions && !document.getElementById('my-subs-btn')) {
+        let btn = document.createElement('a');
+        btn.id = 'my-subs-btn';
+        btn.href = '#';
+        btn.onclick = (e) => { e.preventDefault(); window.openMySubscriptions(); };
+        btn.style.cssText = 'padding:10px 15px; font-size:14px; border-radius:20px; background:#fff; color:#FF9800; border:2px solid #FF9800; font-weight:800; text-decoration:none; display:flex; align-items:center; gap:5px; box-shadow:0 4px 10px rgba(0,0,0,0.05); transition:0.3s;';
+        btn.innerHTML = '<i class="fas fa-book-reader"></i> <span data-i18n="my_subs">كورساتي وكتبي</span>';
+
+        let cart = document.querySelector('.cart-icon');
+        if (cart) navActions.insertBefore(btn, cart);
+    }
+};
 
 window.submitExam = function (title) {
     let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
