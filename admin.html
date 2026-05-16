@@ -226,6 +226,7 @@
                     <select id="ct-type" onchange="
                         document.getElementById('yt-container').style.display = this.value === 'course' ? 'block' : 'none';
                         document.getElementById('pdf-container').style.display = this.value === 'course' ? 'none' : 'block';
+                        document.getElementById('img-container').style.display = this.value === 'course' ? 'none' : 'block';
                         ">
                         <option value="book">كتاب إلكتروني</option>
                         <option value="course">كورس واشتراك (فيديو يوتيوب)</option>
@@ -514,32 +515,42 @@
                     courseCode: codeEl ? codeEl.value : ''
                 };
 
-                // Upload Image Cover
-                let imgInput = document.getElementById('ct-image');
-                let imgFile = imgInput && imgInput.files ? imgInput.files[0] : null;
-                if (imgFile && window.fsData && window.fsData.uploadFile) {
-                    newItem.image = await window.fsData.uploadFile(imgFile, `covers/${Date.now()}_${imgFile.name}`);
-                }
-
                 if (newItem.type === 'course') {
                     let ytEl = document.getElementById('ct-yt');
                     let yt = ytEl ? ytEl.value : '';
                     let m = yt ? yt.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/) : null;
                     newItem.youtubeId = m ? m[1] : '';
-                    if (!newItem.image) newItem.image = newItem.youtubeId ? `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg` : "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
+                    newItem.image = newItem.youtubeId ? `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg` : "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
                 } else if (newItem.type === 'book') {
+                    // Upload Image Cover ONLY for Books
+                    let imgInput = document.getElementById('ct-image');
+                    let imgFile = imgInput && imgInput.files ? imgInput.files[0] : null;
+                    if (imgFile && window.fsData && window.fsData.uploadFile) {
+                        try {
+                            newItem.image = await window.fsData.uploadFile(imgFile, `covers/${Date.now()}_${imgFile.name}`);
+                        } catch (e) {
+                            console.warn("Cover image upload failed:", e);
+                        }
+                    }
+                    if (!newItem.image) newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
+
                     let pdfInput = document.getElementById('ct-pdf');
                     let pdfFile = pdfInput && pdfInput.files ? pdfInput.files[0] : null;
                     if (pdfFile && window.fsData && window.fsData.uploadFile) {
                         newItem.pdfUrl = await window.fsData.uploadFile(pdfFile, `books/${Date.now()}_${pdfFile.name}`);
                     }
-                    if (!newItem.image) newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
                 }
 
                 if (window.fsData && window.fsData.addContent) {
-                    // Wrap Firestore addDoc in timeout
-                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("طال وقت الاتصال بقاعدة البيانات. تأكد من الإنترنت أو صلاحيات Firebase")), 15000));
-                    await Promise.race([window.fsData.addContent(newItem), timeoutPromise]);
+                    try {
+                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Firebase Timeout")), 5000));
+                        await Promise.race([window.fsData.addContent(newItem), timeoutPromise]);
+                    } catch (e) {
+                        console.warn("Firestore save failed, saving locally instead:", e);
+                        let c = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+                        c.push(newItem);
+                        localStorage.setItem('spedia_content', JSON.stringify(c));
+                    }
                 } else {
                     let c = JSON.parse(localStorage.getItem('spedia_content') || '[]');
                     c.push(newItem);
