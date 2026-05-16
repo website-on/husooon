@@ -632,13 +632,23 @@ window.continuePurchaseWithCode = async function (code) {
 
     localStorage.setItem('spedia_my_sub_code', code);
 
-    // Register intent under this code
     let subItem = { code: code, title: title, type: typeText === 'كورس' ? 'course' : 'book', date: new Date().toLocaleDateString('ar-EG') };
+
+    let fbSuccess = false;
     if (window.fsData && window.fsData.addSubscriptionCode) {
-        window.fsData.addSubscriptionCode(subItem);
-    } else {
+        try {
+            await window.fsData.addSubscriptionCode(subItem);
+            fbSuccess = true;
+        } catch (e) {
+            console.warn("Saving subscription to Firebase failed. Falling back to local storage.", e);
+        }
+    }
+
+    if (!fbSuccess) {
         let subs = JSON.parse(localStorage.getItem('spedia_sub_codes') || '[]');
-        subs.push(subItem);
+        if (!subs.some(s => s.code === code && s.title === title)) {
+            subs.push(subItem);
+        }
         localStorage.setItem('spedia_sub_codes', JSON.stringify(subs));
     }
 
@@ -759,9 +769,14 @@ window.openMySubscriptions = async function () {
             btn.innerText = 'جاري التحقق...';
 
             let subCodes = [];
+            let fbSuccess = false;
             if (window.fsData && window.fsData.getSubscriptionsByCode) {
-                subCodes = await window.fsData.getSubscriptionsByCode(code);
-            } else {
+                try {
+                    subCodes = await window.fsData.getSubscriptionsByCode(code);
+                    fbSuccess = true;
+                } catch (e) { console.warn("Firebase fetch failed, fallback to local:", e); }
+            }
+            if (!fbSuccess) {
                 let subs = JSON.parse(localStorage.getItem('spedia_sub_codes') || '[]');
                 subCodes = subs.filter(s => s.code === code);
             }
@@ -1279,6 +1294,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (window.injectCartModal) window.injectCartModal();
     if (window.injectBookTransition) window.injectBookTransition();
     if (window.injectGlobalAnimations) window.injectGlobalAnimations();
+    if (window.injectMySubscriptionsBtn) window.injectMySubscriptionsBtn();
 });
 
 window.injectThemeButton = function () {
