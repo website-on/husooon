@@ -445,6 +445,44 @@ window.renderCurrentPage = async function () {
         if (bookCont) window.renderCards(bookCont.id, books, "أريد طلب الكتاب", window.getDialect('req', cCode) || "الطلب الآن");
         if (courseCont) window.renderCards(courseCont.id, courses, "أريد الاشتراك في", window.getDialect('req', cCode) || "الاشتراك الآن");
     }
+    else if (path.includes('my-subscriptions.html')) {
+        let code = localStorage.getItem('spedia_my_sub_code');
+        if (!code) {
+            alert('يرجى الدخول بكود اشتراكك (من خلال رز الكورسات بالأعلى).');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+        if (window.fsData) {
+            try {
+                let fsContent = await window.fsData.getAllContent();
+                content = [...content, ...fsContent];
+            } catch (e) { console.warn(e); }
+        }
+
+        let subCodesList = [];
+        if (window.fsData && window.fsData.getSubscriptionsByCode) {
+            try {
+                subCodesList = await window.fsData.getSubscriptionsByCode(code);
+            } catch (e) { console.warn(e); }
+        } else {
+            let subs = JSON.parse(localStorage.getItem('spedia_sub_codes') || '[]');
+            subCodesList = subs.filter(s => s.code === code);
+        }
+
+        let subscribedTitles = subCodesList.map(s => s.title);
+        let filteredContent = content.filter(c => subscribedTitles.includes(c.title));
+
+        let books = filteredContent.filter(c => c.type == 'book');
+        let courses = filteredContent.filter(c => c.type == 'course');
+
+        const courseCont = document.getElementById('courses-grid');
+        const bookCont = document.getElementById('books-grid');
+
+        if (bookCont) window.renderCards(bookCont.id, books, "", "إدخال كود القفل السري", true);
+        if (courseCont) window.renderCards(courseCont.id, courses, "", "إدخال كود القفل السري", true);
+    }
     else if (path.includes('dashboard.html')) {
         let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
         if (!user) { window.location.href = 'login.html'; return; }
@@ -472,12 +510,12 @@ window.renderCurrentPage = async function () {
     document.querySelectorAll('.animate-on-scroll, .subject-card').forEach(el => observer.observe(el));
 };
 
-window.renderCards = function (containerId, items, whatsappPrefix, btnText) {
+window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMySubscriptions = false) {
     let cont = document.getElementById(containerId);
     if (!cont) return;
     cont.innerHTML = '';
     if (items.length === 0) {
-        cont.innerHTML = '<p style="text-align:center;width:100%;color:#888;font-weight:bold;padding:40px;">لا يوجد محتوى لهذا الصف حالياً. الإدارة ستضيفه قريباً.</p>';
+        cont.innerHTML = '<p style="text-align:center;width:100%;color:#888;font-weight:bold;padding:40px;">لا يوجد محتوى. الإدارة ستضيفه قريباً.</p>';
         return;
     }
     items.forEach(item => {
@@ -497,11 +535,16 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText) {
                 btnHtml = `<button onclick="window.open('${pdfLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </button>`;
             }
         } else {
-            let cartAction = `window.initiatePurchase('${item.title}', '${window.renderPrice(item.priceBase)}', '${item.type === 'course' ? 'كورس' : 'كتاب'}')`;
-
-            btnHtml = `<div style="display:flex; gap:5px; width:100%;">
-                <button onclick="${cartAction}" class="btn-primary w-100" style="flex:1; padding:15px; border-radius:12px; font-size:16px;"><i class="fas fa-shopping-cart"></i> ${btnText}</button>
-            </div>`;
+            if (isMySubscriptions) {
+                btnHtml = `<div style="display:flex; gap:5px; width:100%;">
+                    <button onclick="window.unlockCourse('${item.title}', '${item.courseCode || ''}')" class="btn-primary w-100" style="flex:1; padding:15px; border-radius:12px; font-size:16px; background:linear-gradient(135deg, #f44336, #e53935);"><i class="fas fa-lock"></i> إدخال كود القفل من الإدارة</button>
+                </div>`;
+            } else {
+                let cartAction = `window.initiatePurchase('${item.title}', '${window.renderPrice(item.priceBase)}', '${item.type === 'course' ? 'كورس' : 'كتاب'}')`;
+                btnHtml = `<div style="display:flex; gap:5px; width:100%;">
+                    <button onclick="${cartAction}" class="btn-primary w-100" style="flex:1; padding:15px; border-radius:12px; font-size:16px;"><i class="fas fa-shopping-cart"></i> ${btnText}</button>
+                </div>`;
+            }
         }
 
         let imgStyle = item.type === 'course'
@@ -589,7 +632,7 @@ window.continuePurchaseWithCode = async function (code) {
 
     localStorage.setItem('spedia_my_sub_code', code);
 
-    // Add to backend automatically if not paid yet, will require admin approval ideally, but for now we register early
+    // Register intent under this code
     let subItem = { code: code, title: title, type: typeText === 'كورس' ? 'course' : 'book', date: new Date().toLocaleDateString('ar-EG') };
     if (window.fsData && window.fsData.addSubscriptionCode) {
         window.fsData.addSubscriptionCode(subItem);
@@ -598,11 +641,6 @@ window.continuePurchaseWithCode = async function (code) {
         subs.push(subItem);
         localStorage.setItem('spedia_sub_codes', JSON.stringify(subs));
     }
-
-    // Automatically unlock for this device for convenience (or rely on My Subscriptions page)
-    let unlocked = JSON.parse(localStorage.getItem('spedia_unlocked') || '[]');
-    if (!unlocked.includes(title)) unlocked.push(title);
-    localStorage.setItem('spedia_unlocked', JSON.stringify(unlocked));
 
     window.addToCart(title, price, typeText, code);
 };
@@ -737,15 +775,10 @@ window.openMySubscriptions = async function () {
 
             localStorage.setItem('spedia_my_sub_code', code);
 
-            let unlocked = JSON.parse(localStorage.getItem('spedia_unlocked') || '[]');
-            subCodes.forEach(sc => { if (!unlocked.includes(sc.title)) unlocked.push(sc.title); });
-            localStorage.setItem('spedia_unlocked', JSON.stringify(unlocked));
-
             document.getElementById('my-subs-login-modal').style.display = 'none';
-            alert("تم فتح المحتويات المرتبطة بهذا الكود بنجاح!");
 
-            if (window.renderCards) window.location.reload();
-            else window.location.href = "explore.html";
+            // Redirect to the dedicated subscripton page
+            window.location.href = "my-subscriptions.html";
         };
     }
     document.getElementById('my-subs-code-input').value = localStorage.getItem('spedia_my_sub_code') || '';
