@@ -267,16 +267,16 @@
                     </select>
                 </div>
                 <div class="form-group" id="img-container">
-                    <label>رفع صورة غلاف (اختياري)</label>
-                    <input type="file" id="ct-image" accept="image/*">
+                    <label>رابط صورة غلاف الكتاب (اختياري - رابط خارجي)</label>
+                    <input type="url" id="ct-image" placeholder="https://...">
                 </div>
                 <div class="form-group" id="yt-container" style="display:none;">
                     <label>رابط فيديو يوتيوب</label>
                     <input type="url" id="ct-yt">
                 </div>
                 <div class="form-group" id="pdf-container">
-                    <label>رفع ملف الكتاب (PDF)</label>
-                    <input type="file" id="ct-pdf" accept="application/pdf">
+                    <label>رابط ملف الكتاب (Google Drive أو مصدر خارجي لفتح الـ PDF)</label>
+                    <input type="url" id="ct-pdf" placeholder="https://...">
                 </div>
                 <div class="form-group">
                     <label>السعر الأساسي (ج.م)</label>
@@ -466,23 +466,12 @@
                     newItem.youtubeId = m ? m[1] : '';
                     newItem.image = newItem.youtubeId ? `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg` : "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
                 } else if (newItem.type === 'book') {
-                    // Upload Image Cover ONLY for Books
+                    // Image Cover ONLY for Books
                     let imgInput = document.getElementById('ct-image');
-                    let imgFile = imgInput && imgInput.files ? imgInput.files[0] : null;
-                    if (imgFile && window.fsData && window.fsData.uploadFile) {
-                        try {
-                            newItem.image = await window.fsData.uploadFile(imgFile, `covers/${Date.now()}_${imgFile.name}`);
-                        } catch (e) {
-                            console.warn("Cover image upload failed:", e);
-                        }
-                    }
-                    if (!newItem.image) newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
+                    newItem.image = imgInput && imgInput.value.trim() !== '' ? imgInput.value.trim() : "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
 
                     let pdfInput = document.getElementById('ct-pdf');
-                    let pdfFile = pdfInput && pdfInput.files ? pdfInput.files[0] : null;
-                    if (pdfFile && window.fsData && window.fsData.uploadFile) {
-                        newItem.pdfUrl = await window.fsData.uploadFile(pdfFile, `books/${Date.now()}_${pdfFile.name}`);
-                    }
+                    newItem.pdfUrl = pdfInput && pdfInput.value.trim() !== '' ? pdfInput.value.trim() : '';
                 }
 
                 if (window.fsData && window.fsData.addContent) {

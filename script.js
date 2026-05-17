@@ -532,12 +532,16 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
             } else {
                 let pdfLink = item.pdfUrl || '#';
-                btnHtml = `<button onclick="window.open('${pdfLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </button>`;
+                let viewerLink = (item.pdfUrl && !item.pdfUrl.includes('drive.google.com') && !item.pdfUrl.includes('docs.google.com'))
+                    ? 'https://docs.google.com/viewer?url=' + encodeURIComponent(item.pdfUrl)
+                    : pdfLink;
+                btnHtml = `<button onclick="window.open('${viewerLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </button>`;
             }
         } else {
             if (isMySubscriptions) {
-                btnHtml = `<div style="display:flex; gap:5px; width:100%;">
-                    <button onclick="window.unlockCourse('${item.title}', '${item.courseCode || ''}')" class="btn-primary w-100" style="flex:1; padding:15px; border-radius:12px; font-size:16px; background:linear-gradient(135deg, #f44336, #e53935);"><i class="fas fa-lock"></i> إدخال كود القفل من الإدارة</button>
+                btnHtml = `<div style="display:flex; flex-direction:column; gap:10px; width:100%;">
+                    <button onclick="window.unlockCourse('${item.title}', '${item.courseCode || ''}')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:16px; background:linear-gradient(135deg, #f44336, #e53935);"><i class="fas fa-lock"></i> إدخال كود القفل من الإدارة</button>
+                    <a href="#" onclick="window.sendWhatsApp('أريد طلب كود فتح المحتوى لـ: ${item.title}'); return false;" style="display:block; text-align:center; color:#f44336; font-size:15px; font-weight:800; text-decoration:underline;">طلب كود فتح المحتوى</a>
                 </div>`;
             } else {
                 let cartAction = `window.initiatePurchase('${item.title}', '${window.renderPrice(item.priceBase)}', '${item.type === 'course' ? 'كورس' : 'كتاب'}')`;
