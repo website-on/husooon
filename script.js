@@ -544,8 +544,10 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
                 </div>`;
             } else {
                 let cartAction = `window.initiatePurchase('${item.title}', '${window.renderPrice(item.priceBase)}', '${item.type === 'course' ? 'كورس' : 'كتاب'}')`;
+                let unlockBtn = item.courseCode ? `<button onclick="window.unlockCourse('${item.title}', '${item.courseCode}')" class="btn-primary" style="flex:1; padding:15px; border-radius:12px; font-size:16px; background:linear-gradient(135deg, #FF9800, #F57C00);"><i class="fas fa-key"></i> لدي كود</button>` : '';
                 btnHtml = `<div style="display:flex; gap:5px; width:100%;">
-                    <button onclick="${cartAction}" class="btn-primary w-100" style="flex:1; padding:15px; border-radius:12px; font-size:16px;"><i class="fas fa-shopping-cart"></i> ${btnText}</button>
+                    <button onclick="${cartAction}" class="btn-primary w-100" style="flex:2; padding:15px; border-radius:12px; font-size:16px;"><i class="fas fa-shopping-cart"></i> ${btnText}</button>
+                    ${unlockBtn}
                 </div>`;
             }
         }
@@ -1259,18 +1261,18 @@ window.updateProfileImg = async function (input) {
 
 window.unlockCourse = function (title, code) {
     if (!code || code.trim() === '' || code === 'undefined') {
-        alert('هذا الكورس قيد التجهيز أو الكود السري مفقود.');
+        alert('هذا المحتوى قيد التجهيز أو الكود السري مفقود.');
         return;
     }
-    let input = prompt('هذا الكورس محمي بقفل 🔒.\\nالرجاء إدخال كود الكورس السري لفتحه:');
+    let input = prompt('هذا المحتوى محمي بقفل 🔒.\\nالرجاء إدخال الكود السري لفتحه:');
     if (input === code) {
-        alert('تم فتح كورس "' + title + '" بنجاح! 🎉\\n(تمت المطابقة، يمكنك الآن مشاهدة المحتوى)');
+        alert('تم فتح "' + title + '" بنجاح! 🎉\\n(تمت المطابقة، يمكنك الآن مشاهدة المحتوى)');
         let cart = JSON.parse(localStorage.getItem('spedia_unlocked') || '[]');
         cart.push(title);
         localStorage.setItem('spedia_unlocked', JSON.stringify(cart));
         window.location.reload();
     } else if (input !== null) {
-        alert('الكود الذي أدخلته غير صحيح. يرجى التواصل مع الإدارة.');
+        alert('الكود الذي أدخلته غير صحيح. يرجى التأكد أو التواصل مع الإدارة.');
     }
 }
 
