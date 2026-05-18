@@ -528,7 +528,7 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
 
         if (isUnlocked) {
             if (item.type === 'course') {
-                let ytLink = item.youtubeUrl || item.youtubeId ? `https://www.youtube.com/watch?v=${item.youtubeId}` : '#';
+                let ytLink = item.videoUrl ? item.videoUrl : (item.youtubeId ? `https://www.youtube.com/watch?v=${item.youtubeId}` : '#');
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
             } else {
                 let pdfLink = item.pdfUrl || '#';
@@ -1242,18 +1242,34 @@ window.toggleResultStrike = function (chk) {
     }
 }
 
-window.updateProfileImg = function (input) {
+window.updateProfileImg = async function (input) {
     if (input.files && input.files[0]) {
         let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
         if (!user) return alert('يرجى تسجيل الدخول أولاً');
 
-        let reader = new FileReader();
-        reader.onload = function (e) {
-            let imgData = e.target.result;
-            localStorage.setItem('spedia_profile_img_' + user.code, imgData);
-            document.getElementById('sidebar-profile-img').src = imgData;
+        let file = input.files[0];
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'husoon');
+
+            const response = await fetch('https://api.cloudinary.com/v1_1/dnbpfkeuk/auto/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Cloudinary upload failed: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            let imgUrl = data.secure_url;
+
+            localStorage.setItem('spedia_profile_img_' + user.code, imgUrl);
+            document.getElementById('sidebar-profile-img').src = imgUrl;
+        } catch (e) {
+            alert('خطأ أثناء رفع الصورة: ' + e.message);
         }
-        reader.readAsDataURL(input.files[0]);
     }
 }
 

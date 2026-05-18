@@ -18,19 +18,21 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
 window.fsData = {
     // STORAGE
     uploadFile: async (file, path) => {
-        const fileRef = ref(storage, path);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'husoon');
 
-        // Wrap in a 15-second timeout to prevent infinite hang if Storage isn't initialized or blocked
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Storage Timeout: تاكد من تفعيل Storage في Firebase")), 15000)
-        );
+        const response = await fetch('https://api.cloudinary.com/v1_1/dnbpfkeuk/auto/upload', {
+            method: 'POST',
+            body: formData
+        });
 
-        await Promise.race([
-            uploadBytes(fileRef, file),
-            timeoutPromise
-        ]);
+        if (!response.ok) {
+            throw new Error(`Cloudinary upload failed: ${response.statusText}`);
+        }
 
-        return await getDownloadURL(fileRef);
+        const data = await response.json();
+        return data.secure_url;
     },
 
     // SUBSCRIPTIONS (Content purchased with generated codes)

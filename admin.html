@@ -267,16 +267,16 @@
                     </select>
                 </div>
                 <div class="form-group" id="img-container">
-                    <label>رابط صورة غلاف الكتاب (اختياري - رابط خارجي)</label>
-                    <input type="url" id="ct-image" placeholder="https://...">
+                    <label>صورة غلاف الكتاب (اختياري - الرفع المباشر)</label>
+                    <input type="file" id="ct-image" accept="image/*">
                 </div>
                 <div class="form-group" id="yt-container" style="display:none;">
-                    <label>رابط فيديو يوتيوب</label>
-                    <input type="url" id="ct-yt">
+                    <label>ملف فيديو الكورس (الرفع المباشر)</label>
+                    <input type="file" id="ct-yt" accept="video/*">
                 </div>
                 <div class="form-group" id="pdf-container">
-                    <label>رابط ملف الكتاب (Google Drive أو مصدر خارجي لفتح الـ PDF)</label>
-                    <input type="url" id="ct-pdf" placeholder="https://...">
+                    <label>ملف الكتاب / المذكرة (PDF - الرفع المباشر)</label>
+                    <input type="file" id="ct-pdf" accept=".pdf">
                 </div>
                 <div class="form-group">
                     <label>السعر الأساسي (ج.م)</label>
@@ -461,17 +461,35 @@
 
                 if (newItem.type === 'course') {
                     let ytEl = document.getElementById('ct-yt');
-                    let yt = ytEl ? ytEl.value : '';
-                    let m = yt ? yt.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/) : null;
-                    newItem.youtubeId = m ? m[1] : '';
-                    newItem.image = newItem.youtubeId ? `https://img.youtube.com/vi/${newItem.youtubeId}/hqdefault.jpg` : "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
+                    if (ytEl && ytEl.files && ytEl.files[0]) {
+                        try {
+                            newItem.videoUrl = await window.fsData.uploadFile(ytEl.files[0]);
+                        } catch (e) {
+                            throw new Error("فشل رفع فيديو الكورس: " + e.message);
+                        }
+                    }
+                    newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
                 } else if (newItem.type === 'book') {
                     // Image Cover ONLY for Books
                     let imgInput = document.getElementById('ct-image');
-                    newItem.image = imgInput && imgInput.value.trim() !== '' ? imgInput.value.trim() : "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
+                    if (imgInput && imgInput.files && imgInput.files[0]) {
+                        try {
+                            newItem.image = await window.fsData.uploadFile(imgInput.files[0]);
+                        } catch (e) {
+                            throw new Error("فشل رفع صورة الكتاب: " + e.message);
+                        }
+                    } else {
+                        newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
+                    }
 
                     let pdfInput = document.getElementById('ct-pdf');
-                    newItem.pdfUrl = pdfInput && pdfInput.value.trim() !== '' ? pdfInput.value.trim() : '';
+                    if (pdfInput && pdfInput.files && pdfInput.files[0]) {
+                        try {
+                            newItem.pdfUrl = await window.fsData.uploadFile(pdfInput.files[0]);
+                        } catch (e) {
+                            throw new Error("فشل رفع ملف الكتاب (PDF): " + e.message);
+                        }
+                    }
                 }
 
                 if (window.fsData && window.fsData.addContent) {
