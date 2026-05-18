@@ -226,7 +226,7 @@
                     <select id="ct-type" onchange="
                         document.getElementById('yt-container').style.display = this.value === 'course' ? 'block' : 'none';
                         document.getElementById('pdf-container').style.display = this.value === 'course' ? 'none' : 'block';
-                        document.getElementById('img-container').style.display = this.value === 'course' ? 'none' : 'block';
+                        document.getElementById('img-container').style.display = 'block';
                         ">
                         <option value="book">كتاب إلكتروني</option>
                         <option value="course">كورس واشتراك (فيديو يوتيوب)</option>
@@ -267,7 +267,7 @@
                     </select>
                 </div>
                 <div class="form-group" id="img-container">
-                    <label>صورة غلاف الكتاب (اختياري - الرفع المباشر)</label>
+                    <label>صورة الغلاف (الكتاب أو الكورس - الرفع المباشر)</label>
                     <input type="file" id="ct-image" accept="image/*">
                 </div>
                 <div class="form-group" id="yt-container" style="display:none;">
@@ -459,33 +459,35 @@
                     courseCode: codeEl ? codeEl.value : ''
                 };
 
+                let imgInput = document.getElementById('ct-image');
+                if (imgInput && imgInput.files && imgInput.files[0]) {
+                    try {
+                        newItem.image = await window.uploadToCloudinary(imgInput.files[0]);
+                    } catch (e) {
+                        throw new Error("فشل رفع صورة الغلاف: " + e.message);
+                    }
+                } else {
+                    newItem.image = newItem.type === 'course'
+                        ? "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png"
+                        : "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
+                }
+
                 if (newItem.type === 'course') {
                     let ytEl = document.getElementById('ct-yt');
                     if (ytEl && ytEl.files && ytEl.files[0]) {
                         try {
-                            newItem.videoUrl = await window.fsData.uploadFile(ytEl.files[0]);
+                            btn.innerText = "جاري رفع الفيديو... (يرجى عدم إغلاق الصفحة)";
+                            newItem.videoUrl = await window.uploadToCloudinary(ytEl.files[0]);
                         } catch (e) {
                             throw new Error("فشل رفع فيديو الكورس: " + e.message);
                         }
                     }
-                    newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2766324-2305593.png";
                 } else if (newItem.type === 'book') {
-                    // Image Cover ONLY for Books
-                    let imgInput = document.getElementById('ct-image');
-                    if (imgInput && imgInput.files && imgInput.files[0]) {
-                        try {
-                            newItem.image = await window.fsData.uploadFile(imgInput.files[0]);
-                        } catch (e) {
-                            throw new Error("فشل رفع صورة الكتاب: " + e.message);
-                        }
-                    } else {
-                        newItem.image = "https://cdni.iconscout.com/illustration/premium/thumb/book-4113220-3406254.png";
-                    }
-
                     let pdfInput = document.getElementById('ct-pdf');
                     if (pdfInput && pdfInput.files && pdfInput.files[0]) {
                         try {
-                            newItem.pdfUrl = await window.fsData.uploadFile(pdfInput.files[0]);
+                            btn.innerText = "جاري رفع الكتاب (PDF)... (يرجى عدم إغلاق الصفحة)";
+                            newItem.pdfUrl = await window.uploadToCloudinary(pdfInput.files[0]);
                         } catch (e) {
                             throw new Error("فشل رفع ملف الكتاب (PDF): " + e.message);
                         }

@@ -1249,22 +1249,7 @@ window.updateProfileImg = async function (input) {
 
         let file = input.files[0];
         try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', 'husoon');
-
-            const response = await fetch('https://api.cloudinary.com/v1_1/dnbpfkeuk/auto/upload', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`Cloudinary upload failed: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            let imgUrl = data.secure_url;
-
+            let imgUrl = await window.uploadToCloudinary(file);
             localStorage.setItem('spedia_profile_img_' + user.code, imgUrl);
             document.getElementById('sidebar-profile-img').src = imgUrl;
         } catch (e) {
@@ -1480,3 +1465,28 @@ window.injectWhatsAppButton = function () {
     btn.onmouseout = () => btn.style.transform = 'scale(1)';
     document.body.appendChild(btn);
 }
+
+window.uploadToCloudinary = async function (file) {
+    if (!file) throw new Error("الملف غير موجود");
+
+    // Default to auto (handles images, videos, raw files)
+    let resourceType = 'auto';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'husoon');
+
+    const response = await fetch(`https://api.cloudinary.com/v1_1/dnbpfkeuk/${resourceType}/upload`, {
+        method: 'POST',
+        body: formData
+    });
+
+    if (!response.ok) {
+        let errJson = await response.json().catch(() => ({}));
+        let errMsg = (errJson.error && errJson.error.message) ? errJson.error.message : response.statusText;
+        throw new Error(`مشكلة في سيرفر الرفع (Cloudinary): ${errMsg}`);
+    }
+
+    const data = await response.json();
+    return data.secure_url;
+};
