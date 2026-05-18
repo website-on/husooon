@@ -472,7 +472,9 @@ window.renderCurrentPage = async function () {
         }
 
         let subscribedTitles = subCodesList.map(s => s.title);
-        let filteredContent = content.filter(c => subscribedTitles.includes(c.title));
+        let unlockedLocal = JSON.parse(localStorage.getItem('spedia_unlocked') || '[]');
+        let allowedTitles = [...new Set([...subscribedTitles, ...unlockedLocal])];
+        let filteredContent = content.filter(c => allowedTitles.includes(c.title));
 
         let books = filteredContent.filter(c => c.type == 'book');
         let courses = filteredContent.filter(c => c.type == 'course');
@@ -532,9 +534,10 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
             } else {
                 let pdfLink = item.pdfUrl || '#';
-                // فتح روابط Cloudinary مباشرة حيث تدعم المتصفحات قراءة الـ PDF بشكل مدمج بامتياز
-                // دون الحاجة للوسيط الخاص بـ Google Docs الذي قد يحظر بعض الروابط
-                btnHtml = `<button onclick="window.open('${pdfLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </button>`;
+                let isFirebase = pdfLink.includes('firebasestorage');
+                let target = isFirebase ? '_blank' : '_self';
+                // HTML5 download property to strongly hint modern browsers to save the file.
+                btnHtml = `<a href="${pdfLink}" target="${target}" download="book.pdf" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32); text-decoration:none;"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح أو تحميل الكتاب </a>`;
             }
         } else {
             if (isMySubscriptions) {

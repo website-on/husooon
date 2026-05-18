@@ -35,6 +35,12 @@ window.fsData = {
         return data.secure_url;
     },
 
+    uploadPdfToFirebase: async (file) => {
+        const storageRef = ref(storage, `pdfs/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        return await getDownloadURL(storageRef);
+    },
+
     // SUBSCRIPTIONS (Content purchased with generated codes)
     addSubscriptionCode: async (sub) => {
         return await addDoc(collection(db, "subscription_codes"), sub);

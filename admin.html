@@ -529,8 +529,9 @@
                     let pdfInput = document.getElementById('ct-pdf');
                     if (pdfInput && pdfInput.files && pdfInput.files[0]) {
                         try {
-                            btn.innerText = "جاري رفع الكتاب (PDF)... (يرجى عدم إغلاق الصفحة)";
-                            newItem.pdfUrl = await window.uploadToCloudinary(pdfInput.files[0]);
+                            btn.innerText = "جاري رفع الكتاب (PDF) إلى التخزين الآمن... (يرجى عدم إغلاق الصفحة)";
+                            // Firebase Storage handles PDF correctly across all modern browsers and bypasses Cloudinary's forced limitations.
+                            newItem.pdfUrl = await window.fsData.uploadPdfToFirebase(pdfInput.files[0]);
                         } catch (e) {
                             throw new Error("فشل رفع ملف الكتاب (PDF): " + e.message);
                         }
