@@ -1470,8 +1470,8 @@ window.injectWhatsAppButton = function () {
 window.uploadToCloudinary = async function (file) {
     if (!file) throw new Error("الملف غير موجود");
 
-    // Default to auto, but explicitly use raw for pdfs to bypass Cloudinary's strict PDF image restrictions
-    let resourceType = (file.type && file.type.includes('pdf')) || (file.name && file.name.toLowerCase().endsWith('.pdf')) ? 'raw' : 'auto';
+    // Force 'auto' so Cloudinary puts PDFs in the 'image' bucket where transformations are permitted
+    let resourceType = 'auto';
 
     const formData = new FormData();
     formData.append('file', file);
@@ -1489,5 +1489,13 @@ window.uploadToCloudinary = async function (file) {
     }
 
     const data = await response.json();
-    return data.secure_url;
+    let url = data.secure_url;
+
+    // In Cloudinary free tiers, PDF delivery is blocked (401 Unauthorized) 
+    // unless 'fl_attachment' transformation is applied, which forces it to download safely.
+    if (url.includes('.pdf') && url.includes('/upload/')) {
+        url = url.replace('/upload/', '/upload/fl_attachment/');
+    }
+
+    return url;
 };
