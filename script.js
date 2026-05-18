@@ -1470,8 +1470,8 @@ window.injectWhatsAppButton = function () {
 window.uploadToCloudinary = async function (file) {
     if (!file) throw new Error("الملف غير موجود");
 
-    // Default to auto (handles images, videos, raw files)
-    let resourceType = 'auto';
+    // Default to auto, but explicitly use raw for pdfs to bypass Cloudinary's strict PDF image restrictions
+    let resourceType = (file.type && file.type.includes('pdf')) || (file.name && file.name.toLowerCase().endsWith('.pdf')) ? 'raw' : 'auto';
 
     const formData = new FormData();
     formData.append('file', file);
