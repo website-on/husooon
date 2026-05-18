@@ -55,7 +55,24 @@ window.fsData = {
     },
     getAllContent: async () => {
         const snap = await getDocs(collection(db, "content"));
-        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+    deleteContent: async (id) => {
+        try {
+            // Because 'id' might be the timestamp inside the document data instead of the Firestore doc.id
+            const q = query(collection(db, "content"), where("id", "==", parseInt(id)));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                for (let document of snap.docs) {
+                    await deleteDoc(doc(db, "content", document.id));
+                }
+            } else {
+                // Fallback: try deleting by exact string doc ID if parsed as such
+                await deleteDoc(doc(db, "content", id.toString()));
+            }
+        } catch (e) {
+            console.error("Firestore Delete Error:", e);
+        }
     },
 
     // EXAMS
