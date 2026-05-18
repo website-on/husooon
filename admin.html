@@ -284,6 +284,11 @@
                 </div>
                 <button type="submit" class="btn-primary w-100" id="btn-save-content">حفظ المحتوى</button>
             </form>
+
+            <h3 class="mt-30">المحتوى الحالي (تعديل / حذف)</h3>
+            <div style="overflow-x:auto;">
+                <table id="table-content-manager"></table>
+            </div>
         </div>
 
         <div id="tab-exams" class="admin-section">
@@ -425,7 +430,45 @@
 
             const tExams = document.getElementById('table-submitted-exams');
             if (tExams) tExams.innerHTML = `<tr><th>الطالب</th><th>الامتحان</th><th>الحالة</th><th>تصحيح</th></tr>` + subs.map(s => `<tr><td>${s.name || s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px;">فتح</button></td></tr>`).join('');
+
+            let contentList = [];
+            if (window.fsData && window.fsData.getAllContent) {
+                try {
+                    contentList = await window.fsData.getAllContent();
+                } catch (e) { }
+            }
+            let localContent = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+            // Merge to avoid duplicates
+            localContent.forEach(lc => { if (!contentList.find(cc => cc.id === lc.id)) contentList.push(lc); });
+
+            const tContent = document.getElementById('table-content-manager');
+            if (tContent) {
+                tContent.innerHTML = `<tr><th>النوع</th><th>العنوان</th><th>الدولة</th><th>السعر</th><th>إجراءات</th></tr>` + contentList.map(c => `<tr>
+                    <td>${c.type === 'course' ? 'كورس' : 'كتاب'}</td>
+                    <td>${c.title}</td>
+                    <td>${c.country === 'ALL' ? 'كل الدول' : c.country}</td>
+                    <td>${c.priceBase || 0}</td>
+                    <td>
+                        <button onclick="window.deleteContent(${c.id})" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;"><i class="fas fa-trash"></i> حذف</button>
+                    </td>
+                </tr>`).join('');
+            }
         }
+
+        window.deleteContent = async function (id) {
+            if (!confirm('هل أنت متأكد من الحذف؟')) return;
+            let c = JSON.parse(localStorage.getItem('spedia_content') || '[]');
+            c = c.filter(item => item.id !== id);
+            localStorage.setItem('spedia_content', JSON.stringify(c));
+
+            if (window.fsData && window.fsData.deleteContent) {
+                try {
+                    await window.fsData.deleteContent(id.toString());
+                } catch (e) { console.warn(e) }
+            }
+            alert('تم الحذف بنجاح');
+            renderTables();
+        };
 
         window.generateCode = function () {
             let rnd = "SPD-" + Math.floor(10000 + Math.random() * 90000);
