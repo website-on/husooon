@@ -449,7 +449,7 @@
                     <td>${c.country === 'ALL' ? 'كل الدول' : c.country}</td>
                     <td>${c.priceBase || 0}</td>
                     <td>
-                        <button onclick="window.deleteContent(${c.id})" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;"><i class="fas fa-trash"></i> حذف</button>
+                        <button onclick="window.deleteContent('${c.id}')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;"><i class="fas fa-trash"></i> حذف</button>
                     </td>
                 </tr>`).join('');
             }
@@ -458,7 +458,7 @@
         window.deleteContent = async function (id) {
             if (!confirm('هل أنت متأكد من الحذف؟')) return;
             let c = JSON.parse(localStorage.getItem('spedia_content') || '[]');
-            c = c.filter(item => item.id !== id);
+            c = c.filter(item => item.id.toString() !== id.toString());
             localStorage.setItem('spedia_content', JSON.stringify(c));
 
             if (window.fsData && window.fsData.deleteContent) {
