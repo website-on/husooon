@@ -534,13 +534,7 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
             } else {
                 let pdfLink = item.pdfUrl || '#';
-                if (pdfLink.includes('.bin')) {
-                    btnHtml = `<button onclick="window.downloadCloudinaryPdf(this, '${pdfLink}', '${item.title}')" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32); text-decoration:none; cursor:pointer;"><i class="fas fa-download" style="font-size:24px;"></i> تحميل أو تصفح الكتاب </button>`;
-                } else {
-                    let isFirebase = pdfLink.includes('firebasestorage');
-                    let target = isFirebase ? '_blank' : '_self';
-                    btnHtml = `<a href="${pdfLink}" target="${target}" download="book.pdf" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32); text-decoration:none;"><i class="fas fa-download" style="font-size:24px;"></i> تحميل أو تصفح الكتاب </a>`;
-                }
+                btnHtml = `<a href="${pdfLink}" target="_blank" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32); text-decoration:none;"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </a>`;
             }
         } else {
             if (isMySubscriptions) {
@@ -1495,66 +1489,5 @@ window.uploadToCloudinary = async function (file) {
     }
 
     const data = await response.json();
-    let url = data.secure_url;
-
-    // In Cloudinary free tiers, PDF delivery is blocked (401 Unauthorized) 
-    // unless 'fl_attachment' transformation is applied, which forces it to download safely.
-    if (url.includes('.pdf') && url.includes('/upload/')) {
-        url = url.replace('/upload/', '/upload/fl_attachment/');
-    }
-
-    return url;
-};
-
-window.uploadPdfSecretlyToCloudinary = async function (file) {
-    if (!file) throw new Error("الملف غير موجود");
-
-    // Cloudinary blocks PDF files arbitrarily. We mask the PDF as binary object (.bin).
-    let fakeFile = new File([file], file.name.replace(/\.pdf$/i, '.bin'), { type: 'application/octet-stream' });
-
-    const formData = new FormData();
-    formData.append('file', fakeFile);
-    formData.append('upload_preset', 'husoon');
-
-    const response = await fetch(`https://api.cloudinary.com/v1_1/dnbpfkeuk/raw/upload`, {
-        method: 'POST',
-        body: formData
-    });
-
-    if (!response.ok) {
-        throw new Error(`مشكلة في الرفع: ${response.statusText}`);
-    }
-
-    const data = await response.json();
     return data.secure_url;
-};
-
-window.downloadCloudinaryPdf = async function (btn, url, title) {
-    let originalText = btn.innerHTML;
-    try {
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التنزيل...';
-        btn.disabled = true;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Network response was not ok");
-        const blob = await response.blob();
-
-        // Reconstruct as PDF explicitly
-        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
-        const objUrl = window.URL.createObjectURL(pdfBlob);
-
-        const a = document.createElement('a');
-        a.href = objUrl;
-        a.download = (title || 'الكتاب') + '.pdf';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        // Clean up memory
-        setTimeout(() => window.URL.revokeObjectURL(objUrl), 5000);
-    } catch (err) {
-        alert('فشل التنزيل. تأكد من اتصال الإنترنت.');
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
 };

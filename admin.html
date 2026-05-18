@@ -530,7 +530,7 @@
                     if (pdfInput && pdfInput.files && pdfInput.files[0]) {
                         try {
                             btn.innerText = "جاري رفع الكتاب (PDF)... (يرجى عدم إغلاق الصفحة)";
-                            newItem.pdfUrl = await window.uploadPdfSecretlyToCloudinary(pdfInput.files[0]);
+                            newItem.pdfUrl = await window.uploadToCloudinary(pdfInput.files[0]);
                         } catch (e) {
                             throw new Error("فشل رفع ملف الكتاب (PDF): " + e.message);
                         }
