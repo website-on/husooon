@@ -59,16 +59,18 @@ window.fsData = {
     },
     deleteContent: async (id) => {
         try {
-            // Because 'id' might be the timestamp inside the document data instead of the Firestore doc.id
-            const q = query(collection(db, "content"), where("id", "==", parseInt(id)));
-            const snap = await getDocs(q);
-            if (!snap.empty) {
-                for (let document of snap.docs) {
-                    await deleteDoc(doc(db, "content", document.id));
+            // First, attempt to delete exactly by the Firestore document ID (fsId) which is guaranteed unique
+            await deleteDoc(doc(db, "content", id.toString()));
+
+            // Second, attempt query deletion in case the ID passed was the numeric timestamp
+            if (!isNaN(parseInt(id))) {
+                const q = query(collection(db, "content"), where("id", "==", parseInt(id)));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    for (let document of snap.docs) {
+                        await deleteDoc(doc(db, "content", document.id));
+                    }
                 }
-            } else {
-                // Fallback: try deleting by exact string doc ID if parsed as such
-                await deleteDoc(doc(db, "content", id.toString()));
             }
         } catch (e) {
             console.error("Firestore Delete Error:", e);
