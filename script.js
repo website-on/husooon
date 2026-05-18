@@ -532,10 +532,9 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
             } else {
                 let pdfLink = item.pdfUrl || '#';
-                let viewerLink = (item.pdfUrl && !item.pdfUrl.includes('drive.google.com') && !item.pdfUrl.includes('docs.google.com'))
-                    ? 'https://docs.google.com/viewer?url=' + encodeURIComponent(item.pdfUrl)
-                    : pdfLink;
-                btnHtml = `<button onclick="window.open('${viewerLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </button>`;
+                // فتح روابط Cloudinary مباشرة حيث تدعم المتصفحات قراءة الـ PDF بشكل مدمج بامتياز
+                // دون الحاجة للوسيط الخاص بـ Google Docs الذي قد يحظر بعض الروابط
+                btnHtml = `<button onclick="window.open('${pdfLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </button>`;
             }
         } else {
             if (isMySubscriptions) {
