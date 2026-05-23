@@ -72,6 +72,11 @@ const COUNTRY_SYSTEMS = {
         { title: 'الحلقة الأولى', grades: [{ name: 'الصف الأول', val: 1, num: 1 }, { name: 'الثاني', val: 2, num: 2 }, { name: 'الثالث', val: 3, num: 3 }, { name: 'الرابع', val: 4, num: 4 }] },
         { title: 'الحلقة الثانية', grades: [{ name: 'الخامس', val: 5, num: 5 }, { name: 'السادس', val: 6, num: 6 }, { name: 'السابع', val: 7, num: 7 }, { name: 'الثامن', val: 8, num: 8 }] },
         { title: 'الحلقة الثالثة', grades: [{ name: 'التاسع', val: 9, num: 9 }, { name: 'العاشر', val: 10, num: 10 }, { name: 'الحادي عشر', val: 11, num: 11 }, { name: 'الثاني عشر', val: 12, num: 12 }] }
+    ],
+    BH: [
+        { title: 'المرحلة الابتدائية', grades: [{ name: 'الأول الابتدائي', val: 1, num: 1 }, { name: 'الثاني', val: 2, num: 2 }, { name: 'الثالث', val: 3, num: 3 }, { name: 'الرابع', val: 4, num: 4 }, { name: 'الخامس', val: 5, num: 5 }, { name: 'السادس', val: 6, num: 6 }] },
+        { title: 'المرحلة الإعدادية', grades: [{ name: 'الأول الإعدادي', val: 7, num: 1 }, { name: 'الثاني', val: 8, num: 2 }, { name: 'الثالث', val: 9, num: 3 }] },
+        { title: 'المرحلة الثانوية', grades: [{ name: 'الأول الثانوي', val: 10, num: 1 }, { name: 'الثاني الثانوي', val: 11, num: 2 }, { name: 'الثالث الثانوي', val: 12, num: 3 }] }
     ]
 };
 
@@ -81,7 +86,8 @@ const RATES = {
     AE: { cur: 'د.إ', rate: 1 / 13, dialect: { hero_sub: 'مرحبابك! جودة معلمين تثلج الصدر، وأسعار ولا أروع.', hero_t1: 'التميز يبدأ من هنا', hero_t2: 'وهذي حكايتنا في التعليم', discover: 'تصفح المواد', login: 'دخول الحين', stat_vid: 'فيديو تعليمي حصري', stat_stu: 'طالب متميز معانا', stat_qa: 'سؤال وجواب مشروح', smart1: 'تعرف إن كتبنا', smart2: 'تتحدث لك؟', smart_desc: 'منهجك صار بمتناول إيدك، مبسط ومصمم بأسلوب يخليك الأول.', suc1: 'كون واحد من آلاف', suc2: 'المتفوقين وابدأ الإبداع!', hero_btn: 'تصفح الكورسات', req: 'اطلب الحين', academy_name: 'منصة حصون', hero_pill_left: 'للتفوق دروب', hero_pill_right_title: 'أمهر المعلمين', hero_pill_right_sub: 'مبسط وسريع', hero_quality: 'شرح متميز', success_student: 'الطالب المتميز', private_lesson_title: 'حصة خاصة', private_lesson_sub: 'أنت الحين VIP إسأل بدون توقف', order_lesson: 'اطلب حصتك', live_students: 'الطلاب', live_teacher: 'المعلم', live_title: 'بث مباشر وفعال', live_sub: 'تفاعل مع أصدقائك بمتعة' } },
     QA: { cur: 'ر.ق', rate: 1 / 13, dialect: { hero_sub: 'حياك الله! جودة تشرح الخاطر، وبسعر في متناول الكل.', hero_t1: 'شرح مبسط ومميز', hero_t2: 'قصّتنا ويا التعلام', discover: 'تصفح المواد', login: 'تسجيل دخول', stat_vid: 'فيديو شرح تفاعلي', stat_stu: 'طالب مسجل متفوق', stat_qa: 'سؤال وجواب محلول', smart1: 'تدري إن ملازمنا', smart2: 'تشرح لك؟', smart_desc: 'كتب تلخص لك كل ما تحتاجه، مصممة بطريقة عصرية وسهلة.', suc1: 'انضم لآلاف الطلاب', suc2: 'المتفوقين وابدأ التميز!', hero_btn: 'اكتشف دوراتنا', req: 'اطلب الآن', academy_name: 'منصة حصون', hero_pill_left: 'طريقك للتفوق', hero_pill_right_title: 'نخبة المعلمين', hero_pill_right_sub: 'شرح احترافي ومبسط', hero_quality: 'جودة في الشرح', success_student: 'الطالب المتميز', private_lesson_title: 'حصة خاصة', private_lesson_sub: 'انت الحين VIP اسأل وناقش مثل ما تبي', order_lesson: 'اطلب حصتك', live_students: 'الطلاب', live_teacher: 'المعلم', live_title: 'شرح مباشر مع نخبة من المعلمين', live_sub: 'شارك مع المعلم انت و ربعك' } },
     OM: { cur: 'ر.ع', rate: 1 / 125, dialect: { hero_sub: 'أهلاً بك! مدرسين يشرحوا الصدر، وبأسعار جداً ممتازة.', hero_t1: 'طريقك للتفوق', hero_t2: 'هذي قصتنا التعليمية', discover: 'تصفح المنصة', login: 'تسجيل الدخول', stat_vid: 'فيديو تعليمي مميز', stat_stu: 'طالب متميز معانا', stat_qa: 'سؤال محدد ومجاب', smart1: 'تعرف إن ملخصاتنا', smart2: 'تحاكيك؟', smart_desc: 'ملخصات متقنة، شاملة وبسيطة، تضمن وصولك للقمة.', suc1: 'انضم لزملائك', suc2: 'المتفوقين وابدأ التفوق!', hero_btn: 'تصفح منصتنا', req: 'اطلب الآن', academy_name: 'منصة حصون', hero_pill_left: 'طريقك للتفوق', hero_pill_right_title: 'نخبة المعلمين', hero_pill_right_sub: 'شرح احترافي ومبسط', hero_quality: 'جودة في الشرح', success_student: 'الطالب المتميز', private_lesson_title: 'حصة خاصة', private_lesson_sub: 'انت الحين VIP اسأل وناقش مثل ما تبي', order_lesson: 'اطلب حضور', live_students: 'الطلاب', live_teacher: 'المعلم', live_title: 'شرح مباشر مع نخبة من المعلمين', live_sub: 'شارك مع المعلم انت و ربعك' } },
-    EG: { cur: 'ج.م', rate: 1, dialect: { hero_sub: 'أهلاً بيك! جودة مدرسين تشرح القلب. وسعر؟ كأنك ما دفعتش!', hero_t1: 'الخبرة مش بس رقم', hero_t2: 'دي حكايتنا في التعليم', discover: 'اكتشف المواد', login: 'تسجيل الدخول', stat_vid: 'فيديو تعليمي تفاعلي', stat_stu: 'طالب مسجل متفوق', stat_qa: 'سؤال وجواب محلول', smart1: 'تعرف إن كتبنا', smart2: 'بتتكلم؟', smart_desc: 'أقوى المذكرات لتأهيل الأوائل، مبسطة ومصممة بأحدث الأساليب.', suc1: 'انضم لآلاف الطلاب', suc2: 'المتفوقين وابدأ التميز!', hero_btn: 'استكشف الكورسات', req: 'اطلب دلوقتي', academy_name: 'منصة حصون', hero_pill_left: 'طريقك للقمة', hero_pill_right_title: 'أفضل المعلمين', hero_pill_right_sub: 'شرح احترافي بجد', hero_quality: 'شرح ممتاز', success_student: 'الطالب المتفوق', private_lesson_title: 'حصة خصوصي', private_lesson_sub: 'انت دلوقتي VIP اسأل براحتك خالص', order_lesson: 'اطلب حصتك', live_students: 'الطلبة', live_teacher: 'المدرس', live_title: 'شرح مباشر مع نخبة من المدرسين', live_sub: 'شارك مع مدرسك انت وصحابك' } }
+    EG: { cur: 'ج.م', rate: 1, dialect: { hero_sub: 'أهلاً بيك! جودة مدرسين تشرح القلب. وسعر؟ كأنك ما دفعتش!', hero_t1: 'الخبرة مش بس رقم', hero_t2: 'دي حكايتنا في التعليم', discover: 'اكتشف المواد', login: 'تسجيل الدخول', stat_vid: 'فيديو تعليمي تفاعلي', stat_stu: 'طالب مسجل متفوق', stat_qa: 'سؤال وجواب محلول', smart1: 'تعرف إن كتبنا', smart2: 'بتتكلم؟', smart_desc: 'أقوى المذكرات لتأهيل الأوائل، مبسطة ومصممة بأحدث الأساليب.', suc1: 'انضم لآلاف الطلاب', suc2: 'المتفوقين وابدأ التميز!', hero_btn: 'استكشف الكورسات', req: 'اطلب دلوقتي', academy_name: 'منصة حصون', hero_pill_left: 'طريقك للقمة', hero_pill_right_title: 'أفضل المعلمين', hero_pill_right_sub: 'شرح احترافي بجد', hero_quality: 'شرح ممتاز', success_student: 'الطالب المتفوق', private_lesson_title: 'حصة خصوصي', private_lesson_sub: 'انت دلوقتي VIP اسأل براحتك خالص', order_lesson: 'اطلب حصتك', live_students: 'الطلبة', live_teacher: 'المدرس', live_title: 'شرح مباشر مع نخبة من المدرسين', live_sub: 'شارك مع مدرسك انت وصحابك' } },
+    BH: { cur: 'د.ب', rate: 1 / 13, dialect: { hero_sub: 'حياك الله! جودة تشرح الخاطر، وبسعر في متناول الكل.', hero_t1: 'شرح مبسط ومميز', hero_t2: 'قصّتنا ويا التعلام', discover: 'تصفح المواد', login: 'تسجيل دخول', stat_vid: 'فيديو شرح تفاعلي', stat_stu: 'طالب مسجل متفوق', stat_qa: 'سؤال وجواب محلول', smart1: 'تدري إن ملازمنا', smart2: 'تشرح لك؟', smart_desc: 'كتب تلخص لك كل ما تحتاجه، مصممة بطريقة عصرية وسهلة.', suc1: 'انضم لآلاف الطلاب', suc2: 'المتفوقين وابدأ التميز!', hero_btn: 'اكتشف دوراتنا', req: 'اطلب الآن', academy_name: 'منصة حصون', hero_pill_left: 'طريقك للتفوق', hero_pill_right_title: 'نخبة المعلمين', hero_pill_right_sub: 'شرح احترافي ومبسط', hero_quality: 'جودة في الشرح', success_student: 'الطالب المتميز', private_lesson_title: 'حصة خاصة', private_lesson_sub: 'انت الحين VIP اسأل وناقش مثل ما تبي', order_lesson: 'اطلب حصتك', live_students: 'الطلاب', live_teacher: 'المعلم', live_title: 'شرح مباشر مع نخبة من المعلمين', live_sub: 'شارك مع المعلم انت و ربعك' } }
 };
 
 window.getDialect = function (key, code) { return (RATES[code] && RATES[code].dialect[key]) ? RATES[code].dialect[key] : (RATES['EG'].dialect[key] || ''); };
@@ -231,6 +237,7 @@ window.injectCartModal = function () {
                             <option value="مصر">مصر</option>
                             <option value="الإمارات">الإمارات</option>
                             <option value="قطر">قطر</option>
+                            <option value="البحرين">البحرين</option>
                         </select>
                     </div>
                     <div style="margin-bottom:15px;">
@@ -329,6 +336,10 @@ window.injectCountryModal = function () {
                     <img src="https://flagcdn.com/eg.svg" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #eee;">
                     <div style="font-size:20px; font-weight:800; color:#132644;">مصر</div>
                 </div>
+                <div onclick="selectCountry('BH')" style="cursor:pointer; padding:20px; border:2px solid #f0f4f8; border-radius:20px; transition:0.3s;" onmouseover="this.style.borderColor='#12b8c5';this.style.background='#f0fcfd';" onmouseout="this.style.borderColor='#f0f4f8';this.style.background='#fff';">
+                    <img src="https://flagcdn.com/bh.svg" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid #eee;">
+                    <div style="font-size:20px; font-weight:800; color:#132644;">البحرين</div>
+                </div>
             </div>
         </div>
     `;
@@ -401,7 +412,8 @@ window.applyCountryRules = function () {
         'AE': 'flag_ae.jpg',
         'QA': 'https://flagcdn.com/qa.svg',
         'OM': 'https://flagcdn.com/om.svg',
-        'EG': 'https://flagcdn.com/eg.svg'
+        'EG': 'https://flagcdn.com/eg.svg',
+        'BH': 'https://flagcdn.com/bh.svg'
     };
     const mainFlag = document.querySelector('.country-flag img');
     if (mainFlag) mainFlag.src = flagImages[cCode] || flagImages['EG'];
@@ -710,17 +722,28 @@ window.finishRegister = async function (e) {
     let name = document.getElementById('reg-name').value;
     let phone = document.getElementById('reg-phone').value;
     let grade = document.getElementById('reg-grade').value;
+    let country = document.getElementById('reg-country') ? document.getElementById('reg-country').value : 'EG';
 
-    if (!code || !name || !phone || !grade) return alert("الرجاء إكمال كافة البيانات");
+    if (!code || !name || !phone || !grade || !country) return alert("الرجاء إكمال كافة البيانات");
 
-    let newUser = { code, name, phone, grade, id: Date.now() };
+    let newUser = { code, name, phone, grade, country, id: Date.now() };
 
-    if (window.fsData) {
-        await window.fsData.addUser(newUser);
-    } else {
-        let users = JSON.parse(localStorage.getItem('spedia_users') || '[]');
-        users.push(newUser);
-        localStorage.setItem('spedia_users', JSON.stringify(users));
+    if (window.fsData && window.fsData.addUser) {
+        try {
+            await window.fsData.addUser(newUser);
+        } catch (e) { }
+    }
+
+    // Always fallback to LocalStorage for offline usability
+    let users = JSON.parse(localStorage.getItem('spedia_users') || '[]');
+    users.push(newUser);
+    localStorage.setItem('spedia_users', JSON.stringify(users));
+
+    let codes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
+    let cIndex = codes.findIndex(c => c.code === code);
+    if (cIndex > -1) {
+        codes[cIndex].isUsed = true;
+        localStorage.setItem('spedia_codes', JSON.stringify(codes));
     }
 
     localStorage.setItem('spedia_currentUser', JSON.stringify(newUser));
@@ -1138,7 +1161,7 @@ window.loadStudentData = async function (user) {
     // Set attendance days count
     let attendance = [];
     if (window.fsData) {
-        attendance = await window.fsData.getAttendance();
+        try { attendance = await window.fsData.getAttendance(); } catch (e) { }
     } else {
         attendance = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
     }
@@ -1147,6 +1170,46 @@ window.loadStudentData = async function (user) {
     let attCard = document.getElementById('stat-attendance-days');
     if (attCard) {
         attCard.innerText = myAtt.length;
+    }
+
+    // Load Links
+    let lnkContainer = document.getElementById('student-links-container');
+    if (lnkContainer) {
+        let allLinks = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
+        let myLinks = allLinks.filter(l => l.grade === String(user.grade) || l.grade === "ALL");
+        if (myLinks.length) {
+            lnkContainer.innerHTML = myLinks.map(l => `
+                <div class="animate-on-scroll" style="background:#fff; border-right:5px solid var(--primary-color); border-radius:12px; padding:20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
+                    <div>
+                        <h4 style="font-weight:800; font-size:18px; color:var(--text-dark);">${l.title}</h4>
+                        <div style="font-size:14px; color:#888; font-weight:600;"><i class="far fa-calendar-alt"></i> ${l.date}</div>
+                    </div>
+                    <a href="${l.url}" target="_blank" class="btn-primary" style="padding:10px 20px; font-size:16px; border-radius:10px;">دخول الحصة <i class="fas fa-video"></i></a>
+                </div>
+            `).join('');
+        } else {
+            lnkContainer.innerHTML = '<p style="color:#888; font-weight:600;">لا توجد حصص مباشرة متاحة لك حالياً.</p>';
+        }
+    }
+
+    // Load Admin Files
+    let adminFilesCont = document.getElementById('admin-files-container');
+    if (adminFilesCont) {
+        let aFiles = JSON.parse(localStorage.getItem('spedia_admin_files') || '[]');
+        let myFiles = aFiles.filter(a => a.grade === String(user.grade));
+        if (myFiles.length) {
+            adminFilesCont.innerHTML = myFiles.map(f => `
+                <div class="animate-on-scroll" style="background:#f4f7fa; border:1px solid #ccc; border-radius:12px; padding:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h4 style="font-weight:700; color:#444;">${f.title}</h4>
+                        <span style="font-size:12px; color:#888;">${f.date}</span>
+                    </div>
+                    <a href="${f.url}" target="_blank" class="btn-primary" style="background:var(--primary-dark); padding:8px 15px; font-size:14px;"><i class="fas fa-download"></i> معاينة</a>
+                </div>
+            `).join('');
+        } else {
+            adminFilesCont.innerHTML = '<p style="color:#888; font-weight:600;">لا توجد ملفات جديدة من الإدارة.</p>';
+        }
     }
 }
 
@@ -1490,4 +1553,37 @@ window.uploadToCloudinary = async function (file) {
 
     const data = await response.json();
     return data.secure_url;
+};
+
+
+
+window.uploadStudentFile = async function (e) {
+    e.preventDefault();
+    let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
+    if (!user) return alert('خطأ في حسابك.');
+
+    const btn = document.getElementById('btn-sf-upload');
+    btn.innerText = 'جاري الرفع...';
+    try {
+        let file = document.getElementById('sf-file').files[0];
+        let fileUrl = await window.uploadToCloudinary(file);
+        let sFile = {
+            id: Date.now(),
+            studentCode: user.code,
+            studentName: user.name,
+            grade: user.grade,
+            title: document.getElementById('sf-title').value,
+            url: fileUrl,
+            date: new Date().toLocaleDateString('ar-EG')
+        };
+        let sFiles = JSON.parse(localStorage.getItem('spedia_student_files') || '[]');
+        sFiles.push(sFile);
+        localStorage.setItem('spedia_student_files', JSON.stringify(sFiles));
+
+        alert('تم إرسال الملف للإدارة بنجاح!');
+        e.target.reset();
+    } catch (err) {
+        alert('حدث خطأ في الرفع: ' + err.message);
+    }
+    btn.innerText = 'رفع وإرسال';
 };

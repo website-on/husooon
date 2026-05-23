@@ -174,6 +174,8 @@
             <button onclick="showSection('tab-content', this)">المحتوى والكورسات</button>
             <button onclick="showSection('tab-exams', this)">إضافة امتحانات</button>
             <button onclick="showSection('tab-results', this)">نتائج الاختبارات</button>
+            <button onclick="showSection('tab-links', this)">روابط الحصص</button>
+            <button onclick="showSection('tab-files', this)">إرسال المحتوى الورقي</button>
         </div>
 
         <!-- Sections Content (Same as before but with working forms) -->
@@ -251,6 +253,7 @@
                         <option value="QA">قطر</option>
                         <option value="OM">عمان</option>
                         <option value="EG">مصر</option>
+                        <option value="BH">البحرين</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -300,6 +303,11 @@
                         onchange="if(window.updateCountryStages) window.updateCountryStages('ex-country', 'ex-stage', 'ex-grade')">
                         <option value="EG">مصر</option>
                         <option value="KW">الكويت</option>
+                        <option value="SA">السعودية</option>
+                        <option value="AE">الإمارات</option>
+                        <option value="QA">قطر</option>
+                        <option value="OM">عمان</option>
+                        <option value="BH">البحرين</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -353,6 +361,94 @@
             <h2>سجل حلول الطلاب</h2>
             <table id="table-submitted-exams"></table>
         </div>
+
+        <div id="tab-links" class="admin-section">
+            <h2>إضافة رابط حصة أونلاين</h2>
+            <form onsubmit="window.addClassLink(event)">
+                <div class="form-group">
+                    <label>الدولة</label>
+                    <select id="lnk-country" required
+                        onchange="if(window.updateCountryStages) window.updateCountryStages('lnk-country', 'lnk-stage', 'lnk-grade')">
+                        <option value="ALL">جميع الدول</option>
+                        <option value="KW">الكويت</option>
+                        <option value="SA">السعودية</option>
+                        <option value="AE">الإمارات</option>
+                        <option value="QA">قطر</option>
+                        <option value="OM">عمان</option>
+                        <option value="EG">مصر</option>
+                        <option value="BH">البحرين</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المرحلة</label>
+                    <select id="lnk-stage"
+                        onchange="if(window.updateGrades) window.updateGrades('lnk-country', 'lnk-stage', 'lnk-grade')">
+                        <option value="ALL">الكل</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الصف</label>
+                    <select id="lnk-grade" required>
+                        <option value="ALL">الكل</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>عنوان الحصة</label>
+                    <input type="text" id="lnk-title" required placeholder="مثال: حصة رياضيات تفاعلية">
+                </div>
+                <div class="form-group">
+                    <label>رابط الحصة (Zoom, Meet, etc)</label>
+                    <input type="url" id="lnk-url" required>
+                </div>
+                <button type="submit" class="btn-primary w-100">حفظ ونشر الرابط</button>
+            </form>
+            <h3 class="mt-30">الروابط الحالية</h3>
+            <table id="table-links"></table>
+        </div>
+
+        <div id="tab-files" class="admin-section">
+            <h2>إرسال المحتوى الورقي والملفات للطلاب</h2>
+            <form onsubmit="window.sendAdminFile(event)">
+                <div class="form-group">
+                    <label>الدولة</label>
+                    <select id="af-country" required
+                        onchange="if(window.updateCountryStages) window.updateCountryStages('af-country', 'af-stage', 'af-grade')">
+                        <option value="ALL">جميع الدول</option>
+                        <option value="KW">الكويت</option>
+                        <option value="SA">السعودية</option>
+                        <option value="AE">الإمارات</option>
+                        <option value="QA">قطر</option>
+                        <option value="OM">عمان</option>
+                        <option value="EG">مصر</option>
+                        <option value="BH">البحرين</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المرحلة / السنة الدراسية</label>
+                    <select id="af-stage"
+                        onchange="if(window.updateGrades) window.updateGrades('af-country', 'af-stage', 'af-grade')">
+                        <option value="ALL">الكل</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الصف</label>
+                    <select id="af-grade" required>
+                        <option value="ALL">الكل</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>العنوان / الوصف</label>
+                    <input type="text" id="af-title" required>
+                </div>
+                <div class="form-group">
+                    <label>الملف المرفق</label>
+                    <input type="file" id="af-file" accept="image/*,.pdf" required>
+                </div>
+                <button type="submit" class="btn-primary w-100" id="btn-af-submit">إرسال الملف</button>
+            </form>
+            <h3 class="mt-30">ملفات واستجابات الطلاب (المستلمة)</h3>
+            <table id="table-student-files"></table>
+        </div>
     </div>
 
     <!-- Grading Modal -->
@@ -362,7 +458,8 @@
             style="background:#fff; width:90%; max-width:600px; border-radius:20px; padding:30px; max-height:80vh; overflow-y:auto;">
             <h3>تصحيح إجابات: <span id="grad-student-name"></span></h3>
             <div id="grad-questions-container"></div>
-            <button onclick="submitGrading()" class="btn-primary w-100" style="margin-top:20px;">اعتماد النتيجة</button>
+            <button onclick="window.submitGrading()" class="btn-primary w-100" style="margin-top:20px;">اعتماد
+                النتيجة</button>
             <button onclick="document.getElementById('grading-modal').style.display='none'" class="btn-primary w-100"
                 style="background:#888; margin-top:10px;">إلغاء</button>
         </div>
@@ -429,7 +526,7 @@
             if (tAtt) tAtt.innerHTML = `<tr><th>الكود</th><th>الاسم</th><th>التاريخ</th><th>الوقت</th></tr>` + att.map(a => `<tr><td>${a.code}</td><td>${a.name}</td><td>${a.date}</td><td>${a.time}</td></tr>`).join('');
 
             const tExams = document.getElementById('table-submitted-exams');
-            if (tExams) tExams.innerHTML = `<tr><th>الطالب</th><th>الامتحان</th><th>الحالة</th><th>تصحيح</th></tr>` + subs.map(s => `<tr><td>${s.name || s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px;">فتح</button></td></tr>`).join('');
+            if (tExams) tExams.innerHTML = `<tr><th>الطالب</th><th>الامتحان</th><th>الحالة</th><th>تصحيح</th></tr>` + subs.map(s => `<tr><td>${s.name || s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="window.openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px; background:var(--primary-color); border:none; color:#fff; border-radius:5px; cursor:pointer;">فتح</button></td></tr>`).join('');
 
             let contentList = [];
             if (window.fsData && window.fsData.getAllContent) {
@@ -453,7 +550,67 @@
                     </td>
                 </tr>`).join('');
             }
+
+            let links = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
+            const tLinks = document.getElementById('table-links');
+            if (tLinks) tLinks.innerHTML = '<tr><th>الدولة</th><th>الصف</th><th>العنوان</th><th>الرابط</th><th>حذف</th></tr>' + links.map(l => `<tr><td>${l.country === 'ALL' ? 'كل الدول' : l.country}</td><td>${l.grade}</td><td>${l.title}</td><td><a href="${l.url}" target="_blank">فتح الرابط</a></td><td><button onclick="window.deleteLink(${l.id})" style="background:#f44336; color:#fff; padding:5px; border-radius:5px; border:none; cursor:pointer;">حذف</button></td></tr>`).join('');
+
+            let sFiles = JSON.parse(localStorage.getItem('spedia_student_files') || '[]');
+            const tSFiles = document.getElementById('table-student-files');
+            if (tSFiles) tSFiles.innerHTML = '<tr><th>الطالب</th><th>الدولة</th><th>الصف</th><th>الوصف</th><th>تاريخ</th><th>الملف</th></tr>' + sFiles.map(f => `<tr><td>${f.studentName || f.studentCode}</td><td>${f.country || 'EG'}</td><td>${f.grade}</td><td>${f.title}</td><td>${f.date}</td><td><a href="${f.url}" target="_blank" style="color:var(--primary-color);">معاينة</a></td></tr>`).join('');
         }
+
+        window.deleteLink = function (id) {
+            if (!confirm('حذف الرابط؟')) return;
+            let links = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
+            links = links.filter(l => l.id !== id);
+            localStorage.setItem('spedia_class_links', JSON.stringify(links));
+            renderTables();
+        };
+
+        window.addClassLink = async function (e) {
+            e.preventDefault();
+            let lnk = {
+                id: Date.now(),
+                country: document.getElementById('lnk-country').value,
+                grade: document.getElementById('lnk-grade').value,
+                title: document.getElementById('lnk-title').value,
+                url: document.getElementById('lnk-url').value,
+                date: new Date().toLocaleDateString('ar-EG')
+            };
+            let links = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
+            links.push(lnk);
+            localStorage.setItem('spedia_class_links', JSON.stringify(links));
+            alert('تم نشر الرابط بنجاح!');
+            e.target.reset();
+            renderTables();
+        };
+
+        window.sendAdminFile = async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-af-submit');
+            btn.innerText = 'جاري الرفع... الرجاء الانتظار';
+            try {
+                let file = document.getElementById('af-file').files[0];
+                let fileUrl = await window.uploadToCloudinary(file);
+                let fItem = {
+                    id: Date.now(),
+                    country: document.getElementById('af-country').value,
+                    grade: document.getElementById('af-grade').value,
+                    title: document.getElementById('af-title').value,
+                    url: fileUrl,
+                    date: new Date().toLocaleDateString('ar-EG')
+                };
+                let aFiles = JSON.parse(localStorage.getItem('spedia_admin_files') || '[]');
+                aFiles.push(fItem);
+                localStorage.setItem('spedia_admin_files', JSON.stringify(aFiles));
+                alert('تم إرسال الملف للطلاب بنجاح!');
+                e.target.reset();
+            } catch (er) {
+                alert('حدث خطأ أثناء الرفع: ' + er.message);
+            }
+            btn.innerText = 'إرسال الملف';
+        };
 
         window.deleteContent = async function (id) {
             if (!confirm('هل أنت متأكد من الحذف؟')) return;
@@ -611,30 +768,78 @@
         }
 
         let currentSub = null;
-        async function openGrading(code, title) {
+        window.openGrading = async function (code, title) {
             let subs = window.fsData ? await window.fsData.getAllSubmissions() : JSON.parse(localStorage.getItem('spedia_submissions') || '[]');
             currentSub = subs.find(s => s.code === code && s.examTitle === title);
             document.getElementById('grad-student-name').innerText = currentSub.name || code;
-            document.getElementById('grad-questions-container').innerHTML = (currentSub.answers || []).map((a, i) => `
-                <div style="margin-top:10px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                    <p><b>س ${i + 1}:</b> ${a}</p>
-                    <label><input type="radio" name="grad_q${i}" value="1"> صح</label>
-                    <label><input type="radio" name="grad_q${i}" value="0"> خطأ</label>
-                </div>
-            `).join('');
+
+            let allExams = [];
+            if (window.fsData && window.fsData.getAllExams) {
+                try { allExams = await window.fsData.getAllExams(); } catch (e) { }
+            } else {
+                allExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+            }
+            let originalExam = allExams.find(e => e.title === title);
+            let qList = (originalExam && originalExam.questionsList) ? originalExam.questionsList : [];
+
+            let answersHtml = '';
+            let ansObj = currentSub.answers || {};
+            let total = Array.isArray(ansObj) ? ansObj.length : Object.keys(ansObj).length;
+
+            for (let i = 0; i < total; i++) {
+                let q = qList[i] || {};
+                let qText = q.text || (typeof q === 'string' ? q : 'سؤال محذوف/غير معروف');
+                let aText = ansObj[i] || 'لم تتم الإجابة';
+
+                answersHtml += `
+                <div style="margin-top:15px; border-bottom:1px solid #eee; padding-bottom:15px; background:#f9fbff; padding:15px; border-radius:10px;">
+                    <p style="font-weight:bold; color:var(--text-dark); margin-bottom:10px;"><b style="color:var(--primary-color);">السؤال ${i + 1}:</b> ${qText}</p>
+                    <p style="margin-bottom:10px; font-weight:bold;"><b>الإجابة:</b> <span style="color:#e91e63;">${aText}</span></p>
+                    <div style="display:flex; gap:15px; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
+                        <label style="cursor:pointer; font-weight:bold; color:#4caf50;"><input type="radio" name="grad_q${i}" value="1"> صح</label>
+                        <label style="cursor:pointer; font-weight:bold; color:#f44336;"><input type="radio" name="grad_q${i}" value="0"> خطأ</label>
+                    </div>
+                </div>`;
+            }
+
+            if (total === 0) {
+                answersHtml = '<p style="text-align:center; color:red; font-weight:bold;">لا توجد إجابات مخزنة لهذا الكود.</p>';
+            }
+
+            document.getElementById('grad-questions-container').innerHTML = answersHtml;
             document.getElementById('grading-modal').style.display = 'flex';
         }
 
-        async function submitGrading() {
-            let total = currentSub.answers ? currentSub.answers.length : 1;
+        window.submitGrading = async function () {
+            let ansObj = currentSub.answers || {};
+            let total = Array.isArray(ansObj) ? ansObj.length : Object.keys(ansObj).length;
+            total = total === 0 ? 1 : total;
             let ok = 0;
             for (let i = 0; i < total; i++) {
                 let sel = document.querySelector(`input[name="grad_q${i}"]:checked`);
                 if (sel && sel.value === "1") ok++;
             }
-            if (window.fsData) await window.fsData.addResult({ code: currentSub.code, examTitle: currentSub.examTitle, grade: `${ok}/${total}`, date: new Date().toLocaleDateString('ar-EG') });
+
+            // Save to Results
+            let newResult = { code: currentSub.code, examTitle: currentSub.examTitle, grade: `${ok}/${total}`, date: new Date().toLocaleDateString('ar-EG') };
+            let results = JSON.parse(localStorage.getItem('spedia_results') || '[]');
+            results.push(newResult);
+            localStorage.setItem('spedia_results', JSON.stringify(results));
+
+            if (window.fsData && window.fsData.addResult) {
+                try { await window.fsData.addResult(newResult); } catch (e) { }
+            }
+
+            // Update Submissions Status
+            let subs = JSON.parse(localStorage.getItem('spedia_submissions') || '[]');
+            let sIndex = subs.findIndex(s => s.code === currentSub.code && s.examTitle === currentSub.examTitle);
+            if (sIndex > -1) {
+                subs[sIndex].status = "تم التصحيح";
+                localStorage.setItem('spedia_submissions', JSON.stringify(subs));
+            }
+
             document.getElementById('grading-modal').style.display = 'none';
-            alert('تم التصحيح!');
+            alert('تم التصحيح بنجاح وإرسال النتيجة للطالب!');
             renderTables();
         }
 

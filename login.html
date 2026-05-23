@@ -100,7 +100,7 @@
             <h3 style="text-align:center; color:var(--primary-color); margin-bottom:20px;">استكمال البيانات</h3>
             <p style="text-align:center; margin-bottom:15px; font-size:14px; color:#555;">أهلاً بك! يرجى استكمال بياناتك
                 لفتح الحساب.</p>
-            <form onsubmit="completeRegister(event)">
+            <form onsubmit="window.finishRegister(event)">
                 <div class="form-group">
                     <label>الاسم الرباعي</label>
                     <input type="text" id="reg-name" required placeholder="أدخل اسمك الكامل">
@@ -110,13 +110,24 @@
                     <input type="tel" id="reg-phone" required placeholder="مثال: 01012345678">
                 </div>
                 <div class="form-group">
-                    <label>المرحلة الدراسية</label>
-                    <select id="reg-stage" onchange="updateRegisterGrades()">
-                        <option value="">اختر المرحلة</option>
-                        <option value="primary">المرحلة الابتدائية</option>
-                        <option value="middle">المرحلة المتوسطة / الإعدادية</option>
-                        <option value="secondary_scientific">المرحلة الثانوية - علمي</option>
-                        <option value="secondary_literary">المرحلة الثانوية - أدبي</option>
+                    <label>الدولة</label>
+                    <select id="reg-country" required
+                        onchange="if(window.updateCountryStages) window.updateCountryStages('reg-country', 'reg-stage', 'reg-grade')">
+                        <option value="">اختر الدولة</option>
+                        <option value="KW">الكويت</option>
+                        <option value="SA">السعودية</option>
+                        <option value="AE">الإمارات</option>
+                        <option value="QA">قطر</option>
+                        <option value="OM">عمان</option>
+                        <option value="EG">مصر</option>
+                        <option value="BH">البحرين</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المرحلة / السنة الدراسية</label>
+                    <select id="reg-stage" required
+                        onchange="if(window.updateGrades) window.updateGrades('reg-country', 'reg-stage', 'reg-grade')">
+                        <option value="">اختر الدولة أولاً</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -139,40 +150,7 @@
     <script type="module" src="firebase-data.js"></script>
     <script src="script.js"></script>
     <script>
-        const STAGE_MAP = {
-            'primary': [
-                { name: 'الصف الأول الابتدائي', val: '1' }, { name: 'الصف الثاني الابتدائي', val: '2' },
-                { name: 'الصف الثالث الابتدائي', val: '3' }, { name: 'الصف الرابع الابتدائي', val: '4' },
-                { name: 'الصف الخامس الابتدائي', val: '5' }, { name: 'الصف السادس الابتدائي', val: '6' }
-            ],
-            'middle': [
-                { name: 'الصف السادس (متوسط)', val: '6' }, { name: 'الصف السابع', val: '7' },
-                { name: 'الصف الثامن', val: '8' }, { name: 'الصف التاسع', val: '9' }
-            ],
-            'secondary_scientific': [
-                { name: 'الصف العاشر', val: '10' }, { name: 'الصف الحادي عشر - علمي', val: '11' },
-                { name: 'الصف الثاني عشر - علمي', val: '12' }
-            ],
-            'secondary_literary': [
-                { name: 'الصف العاشر (عام/أدبي)', val: '13' }, { name: 'الصف الحادي عشر - أدبي', val: '14' },
-                { name: 'الصف الثاني عشر - أدبي', val: '15' }
-            ]
-        };
-
-        function updateRegisterGrades() {
-            const stage = document.getElementById('reg-stage').value;
-            const gradeSelect = document.getElementById('reg-grade');
-            if (!gradeSelect) return;
-            gradeSelect.innerHTML = '<option value="">اختر الصف</option>';
-            if (stage && STAGE_MAP[stage]) {
-                STAGE_MAP[stage].forEach(g => {
-                    let opt = document.createElement('option');
-                    opt.value = g.val;
-                    opt.textContent = g.name;
-                    gradeSelect.appendChild(opt);
-                });
-            }
-        }
+        // Methods for fetching grades are loaded from script.js
     </script>
 </body>
 
