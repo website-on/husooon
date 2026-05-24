@@ -1649,91 +1649,32 @@ section {
 }
 
 /* =========================================
-   Global Typographic & UI Balance
-   ========================================= */
-
-/* 1. Make Headings Slightly Smaller */
-h1 {
-    font-size: 48px !important;
-}
-
-.hero-title-box h1 {
-    font-size: 52px !important;
-}
-
-.hero-title-box h1.highlight {
-    font-size: 60px !important;
-}
-
-h2,
-.section-split.large-split h2,
-.split-content h2,
-.hero-mid h2 {
-    font-size: 36px !important;
-}
-
-h3,
-.large-stat h3,
-.stat-info h3 {
-    font-size: 26px !important;
-}
-
-/* 2. Make Content & Icons Bigger */
-p,
-.split-content p,
-.hero-mid p,
-.stat-info p,
-.large-stat p,
-.subject-body p {
-    font-size: 24px !important;
-    line-height: 1.6;
-}
-
-.nav-actions span {
-    font-size: 18px !important;
-}
-
-i.fas,
-i.far,
-i.fab,
-.nav-icon-circle i {
-    transform: scale(1.2);
-    display: inline-block;
-}
-
-/* 3. Make Buttons Bigger */
-.btn-discover,
-.btn-login {
-    padding: 12px 30px !important;
-    font-size: 18px !important;
-}
-
-.ultra-btn,
-.ultra-btn-white {
-    padding: 20px 50px !important;
-    font-size: 24px !important;
-}
-
-.btn-primary {
-    padding: 18px 50px !important;
-    font-size: 22px !important;
-}
-
-.btn-join {
-    padding: 16px !important;
-    font-size: 20px !important;
-}
-
-.nav-icon-circle {
-    width: 50px !important;
-    height: 50px !important;
-}
-
-/* =========================================
    Mobile Visual Enlargement (Viewport 1200px Support)
    ========================================= */
 @media (pointer: coarse),
 (max-device-width: 991px) {
+
+    /* Slightly Enlarge Content Text exclusively for Mobile */
+    p {
+        font-size: 22px !important;
+    }
+
+    .split-content p,
+    .welcome-banner p {
+        font-size: 28px !important;
+    }
+
+    .hero-mid p {
+        font-size: 26px !important;
+    }
+
+    .stat-info p {
+        font-size: 22px !important;
+    }
+
+    .subject-body p {
+        font-size: 20px !important;
+    }
 
     /* Scale up all interactive buttons so they remain highly clickable and readable on mobile without breaking layout wrappers */
     .btn-discover,
