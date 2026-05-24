@@ -1676,7 +1676,22 @@ section {
         font-size: 20px !important;
     }
 
-    /* Scale up all interactive buttons so they remain highly clickable and readable on mobile without breaking layout wrappers */
+    /* Make overall content cards and internal pages feel closer */
+    .student-card,
+    .subject-card,
+    .book-card,
+    .stat-card,
+    .hero-content,
+    .admin-section,
+    .dashboard-body .container,
+    .split-content,
+    .admin-nav {
+        transform: scale(1.1);
+        transform-origin: center top;
+        margin-bottom: 25px;
+    }
+
+    /* Scale up all interactive buttons substantially */
     .btn-discover,
     .btn-login,
     .ultra-btn,
@@ -1684,24 +1699,34 @@ section {
     .btn-primary,
     .nav-icon-circle,
     .back-btn,
-    .btn-join {
-        transform: scale(1.6) !important;
+    .btn-join,
+    .theme-toggle,
+    #floating-admin-btn,
+    .scroll-top-btn {
+        transform: scale(1.8) !important;
         transform-origin: center center !important;
+    }
+
+    /* Ensure floating icons don't clip off screen when zoomed */
+    .theme-toggle,
+    #floating-admin-btn,
+    .scroll-top-btn {
+        margin: 20px !important;
     }
 
     /* Add spacing compensation for scaled buttons inside flex alignments */
     .ultra-btn,
     .ultra-btn-white,
     .btn-primary {
-        margin: 15px 30px !important;
+        margin: 20px 40px !important;
     }
 
     /* Specifically for navbar icons, adjust scale slightly less so they fit the top bar perfectly */
     .nav-actions .btn-discover,
     .nav-actions .btn-login,
     .nav-actions .nav-icon-circle {
-        transform: scale(1.4) !important;
+        transform: scale(1.6) !important;
         transform-origin: center center !important;
-        margin: 5px 15px !important;
+        margin: 8px 20px !important;
     }
 }
