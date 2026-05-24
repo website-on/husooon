@@ -1663,7 +1663,7 @@ section {
     .nav-icon-circle,
     .back-btn,
     .btn-join {
-        transform: scale(2.2) !important;
+        transform: scale(1.6) !important;
         transform-origin: center center !important;
     }
 
@@ -1671,36 +1671,15 @@ section {
     .ultra-btn,
     .ultra-btn-white,
     .btn-primary {
-        margin: 25px 50px !important;
+        margin: 15px 30px !important;
     }
 
     /* Specifically for navbar icons, adjust scale slightly less so they fit the top bar perfectly */
     .nav-actions .btn-discover,
     .nav-actions .btn-login,
     .nav-actions .nav-icon-circle {
-        transform: scale(1.8) !important;
+        transform: scale(1.4) !important;
         transform-origin: center center !important;
-        margin: 10px 25px !important;
-    }
-
-    /* Make images and their captions/stickers/comments larger */
-    img,
-    .student-card,
-    .book-card,
-    .edu-sticker,
-    .success-badge,
-    .huge-percent,
-    .student-card div,
-    .stat-card p,
-    .stat-card h3,
-    .split-content p,
-    .split-content h2,
-    .hero-title-box h1,
-    .large-stat h3,
-    .welcome-banner p,
-    .live-class-card p,
-    .subject-body p {
-        transform: scale(1.3) !important;
-        transform-origin: center center !important;
+        margin: 5px 15px !important;
     }
 }
