@@ -1649,14 +1649,14 @@ section {
 }
 
 /* =========================================
-   Mobile Visual Enlargement (Viewport 1200px Support)
+   Mobile Visual Layout Adjustments (900px Viewport)
    ========================================= */
 @media (pointer: coarse),
 (max-device-width: 991px) {
 
     /* Slightly Enlarge Content Text exclusively for Mobile */
     p {
-        font-size: 22px !important;
+        font-size: 24px !important;
     }
 
     .split-content p,
@@ -1669,64 +1669,49 @@ section {
     }
 
     .stat-info p {
-        font-size: 22px !important;
+        font-size: 24px !important;
     }
 
     .subject-body p {
-        font-size: 20px !important;
+        font-size: 22px !important;
     }
 
-    /* Make overall content cards and internal pages feel closer */
-    .student-card,
-    .subject-card,
-    .book-card,
-    .stat-card,
-    .hero-content,
-    .admin-section,
-    .dashboard-body .container,
-    .split-content,
-    .admin-nav {
-        transform: scale(1.1);
-        transform-origin: center top;
-        margin-bottom: 25px;
-    }
-
-    /* Scale up all interactive buttons substantially */
+    /* Increase real physical size of interactive buttons to avoid overlapping */
     .btn-discover,
-    .btn-login,
-    .ultra-btn,
-    .ultra-btn-white,
-    .btn-primary,
-    .nav-icon-circle,
-    .back-btn,
-    .btn-join,
-    .theme-toggle,
-    #floating-admin-btn,
-    .scroll-top-btn {
-        transform: scale(1.8) !important;
-        transform-origin: center center !important;
+    .btn-login {
+        padding: 16px 30px !important;
+        font-size: 22px !important;
     }
 
-    /* Ensure floating icons don't clip off screen when zoomed */
-    .theme-toggle,
-    #floating-admin-btn,
-    .scroll-top-btn {
-        margin: 20px !important;
-    }
-
-    /* Add spacing compensation for scaled buttons inside flex alignments */
     .ultra-btn,
     .ultra-btn-white,
     .btn-primary {
-        margin: 20px 40px !important;
+        padding: 24px 60px !important;
+        font-size: 28px !important;
     }
 
-    /* Specifically for navbar icons, adjust scale slightly less so they fit the top bar perfectly */
-    .nav-actions .btn-discover,
-    .nav-actions .btn-login,
-    .nav-actions .nav-icon-circle {
-        transform: scale(1.6) !important;
-        transform-origin: center center !important;
-        margin: 8px 20px !important;
+    .nav-icon-circle {
+        width: 65px !important;
+        height: 65px !important;
+        font-size: 26px !important;
+        margin: 5px 15px !important;
+    }
+
+    /* Floating action buttons physical scaling without layout breaking overlaps */
+    .theme-toggle,
+    #floating-admin-btn,
+    .scroll-top-btn,
+    .whatsapp-btn,
+    [href*="wa.me"] {
+        width: 75px !important;
+        height: 75px !important;
+        font-size: 32px !important;
+        padding: 15px !important;
+    }
+
+    .floating-wa img,
+    a[href*="wa.me"] img {
+        width: 50px !important;
+        height: 50px !important;
     }
 }
