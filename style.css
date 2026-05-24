@@ -1864,39 +1864,39 @@ section {
         top: 0 !important;
     }
 
-    /* Convert absolute positioned elements into flow layout */
-    div[style*="position: absolute"]:not(.edu-sticker):not([style*="top:-20px"]):not([style*="top: -20px"]):not([style*="border-radius:50%"]):not([class*="burger"]):not(.mega-menu),
-    div[style*="position:absolute"]:not(.edu-sticker):not([style*="top:-20px"]):not([style*="top: -20px"]):not([style*="border-radius:50%"]):not([class*="burger"]):not(.mega-menu) {
-        position: relative !important;
-        transform: none !important;
-        margin: 15px auto !important;
-        width: 100% !important;
-        left: auto !important;
-        right: auto !important;
-        bottom: auto !important;
-        top: auto !important;
-        text-align: center !important;
+    /* Keep absolute elements absolute but scale them down */
+    .edu-sticker {
+        transform: scale(0.6) !important;
+        transform-origin: center center !important;
     }
 
-    /* Make sure specific decorative glows stay hidden or behind */
-    div[style*="z-index:-1"],
-    div[style*="z-index: -1"],
-    div[style*="z-index:0"],
-    div[style*="z-index: 0"] {
-        display: none !important;
-    }
-
-    /* Hide gigantic icons */
+    /* Scale down gigantic icons instead of hiding them */
     i.fa-crown,
     i.fa-graduation-cap,
     i.fa-atom,
     i.fa-book-open,
     i.fa-pencil-ruler {
-        display: none !important;
+        transform: scale(0.5) !important;
+        transform-origin: center center !important;
     }
 
-    .edu-sticker {
-        display: none !important;
+    /* Target specific text to shrink but keep their absolute positions */
+    [style*="font-size: 280px"],
+    [style*="font-size:280px"] {
+        font-size: 150px !important;
+    }
+
+    [style*="font-size: 160px"],
+    [style*="font-size:160px"],
+    [style*="font-size: 140px"],
+    [style*="font-size:140px"] {
+        font-size: 70px !important;
+    }
+
+    /* Allow horizontal scrolling gracefully inside the container block or just let them clip gracefully without squishing the flexbox */
+    .success-section,
+    .huge-hero {
+        overflow: hidden !important;
     }
 
     /* Mega Menu fixed */
