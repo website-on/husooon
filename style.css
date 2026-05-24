@@ -1649,32 +1649,33 @@ section {
 }
 
 /* =========================================
-   Mobile Fixes & Scaling (1050px Viewport Core)
+   Mobile Professional Setup (900px High-Zoom Native Viewport)
    ========================================= */
 @media (max-width: 991px),
 (pointer: coarse) {
 
     /* Safe area at bottom so floating icons don't overlap text */
     body {
-        padding-bottom: 150px !important;
+        padding-bottom: 180px !important;
     }
 
-    /* Shrink the huge headings like "الخبرة مش رقم" on phone */
+    /* Make Headings a bit bigger as requested */
     h1 {
-        font-size: 40px !important;
+        font-size: 55px !important;
         line-height: 1.4 !important;
     }
 
     .hero-title-box h1.highlight,
     .hero-title-box h1 {
-        font-size: 45px !important;
+        font-size: 60px !important;
     }
 
-    h2,
-    .section-split.large-split h2,
-    .split-content h2,
-    .hero-mid h2 {
-        font-size: 32px !important;
+    /* Enlarge content (p tags) heavily to satisfy 'كبر المحتوى' */
+    p,
+    .subject-body p,
+    .stat-info p {
+        font-size: 26px !important;
+        line-height: 1.8 !important;
     }
 
     /* Ensures comments go under the picture ONLY, fixes overlapping */
@@ -1695,26 +1696,45 @@ section {
         margin: 5px 25px !important;
     }
 
-    /* Scale buttons up nicely but DO NOT make them overlap */
+    /* Standard buttons nicely big without overlap */
     .ultra-btn,
     .ultra-btn-white,
     .btn-primary:not(.nav-actions .btn-primary) {
-        transform: scale(1.5) !important;
+        transform: scale(1.4) !important;
         transform-origin: center center !important;
         margin: 30px 20px !important;
     }
 
-    /* Safely make floating icons bigger (Admin, Theme, WhatsApp) safely separated */
+    /* Safely make floating icons physically larger without CSS transforms that hide them */
     .theme-toggle,
     #floating-admin-btn,
     .scroll-top-btn,
     .whatsapp-btn,
+    .floating-wa,
     [href*="wa.me"] {
-        transform: scale(1.5) !important;
-        transform-origin: center center !important;
+        transform: none !important;
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 35px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
 
+    .floating-wa img,
+    a[href*="wa.me"] img {
+        width: 55px !important;
+        height: 55px !important;
+    }
+
+    /* Ensure they are separated on screen */
     .theme-toggle {
-        bottom: 120px !important;
+        bottom: 130px !important;
+        left: 20px !important;
+    }
+
+    #floating-admin-btn {
+        bottom: 30px !important;
+        left: 20px !important;
     }
 }
