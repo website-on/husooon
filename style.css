@@ -1647,3 +1647,55 @@ section {
         padding: 8px;
     }
 }
+
+/* =========================================
+   Mobile Visual Enlargement (Viewport 1200px Support)
+   ========================================= */
+@media (pointer: coarse),
+(max-device-width: 991px) {
+
+    /* Scale up all interactive buttons so they remain highly clickable and readable on mobile without breaking layout wrappers */
+    .btn-discover,
+    .btn-login,
+    .ultra-btn,
+    .ultra-btn-white,
+    .btn-primary,
+    .nav-icon-circle,
+    .back-btn,
+    .btn-join {
+        transform: scale(1.9) !important;
+        transform-origin: center center !important;
+    }
+
+    /* Add spacing compensation for scaled buttons inside flex alignments */
+    .ultra-btn,
+    .ultra-btn-white,
+    .btn-primary {
+        margin: 20px 40px !important;
+    }
+
+    /* Specifically for navbar icons, adjust scale slightly less so they fit the top bar perfectly */
+    .nav-actions .btn-discover,
+    .nav-actions .btn-login,
+    .nav-actions .nav-icon-circle {
+        transform: scale(1.6) !important;
+        transform-origin: center center !important;
+        margin: 8px 20px !important;
+    }
+
+    /* Make images and their captions/stickers/comments slightly larger */
+    img,
+    .student-card,
+    .book-card,
+    .edu-sticker,
+    .success-badge,
+    .huge-percent,
+    .student-card div,
+    .stat-card p,
+    .stat-card h3,
+    .split-content p,
+    .split-content h2 {
+        transform: scale(1.1) !important;
+        transform-origin: center center !important;
+    }
+}
