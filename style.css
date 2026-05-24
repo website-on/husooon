@@ -1657,7 +1657,46 @@ section {
         max-width: 100% !important;
     }
 
-    /* ONLY scale down gigantic fonts, do not change layout */
+    /* Force the Navbar to stay exactly like the computer version on one line */
+    .nav-container,
+    .nav-actions {
+        flex-wrap: nowrap !important;
+        gap: 5px !important;
+        justify-content: space-between !important;
+    }
+
+    .logo {
+        gap: 5px !important;
+    }
+
+    .logo img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    .logo-text .ar {
+        font-size: 16px !important;
+    }
+
+    .logo-text .en {
+        font-size: 12px !important;
+    }
+
+    /* Shrink the top Navbar buttons to perfectly fit one row */
+    .btn-discover,
+    .btn-login {
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+        gap: 3px !important;
+    }
+
+    .nav-icon-circle {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
+    }
+
+    /* Shrink ONLY gigantic fonts to fit */
     [style*="font-size: 60px"],
     [style*="font-size:60px"],
     [style*="font-size: 65px"],
@@ -1703,14 +1742,12 @@ section {
         height: auto !important;
     }
 
-    /* Buttons scaling appropriately without breaking their placement */
-    .btn-discover,
-    .btn-login,
+    /* General Big Buttons scaling appropriately */
     .ultra-btn,
     .ultra-btn-white,
     .btn-primary {
-        padding: 10px 15px !important;
-        font-size: 16px !important;
+        padding: 8px 18px !important;
+        font-size: 15px !important;
         max-width: 100% !important;
     }
 
@@ -1742,9 +1779,24 @@ section {
     [style*="width:800px"],
     [style*="width: 900px"],
     [style*="width:900px"] {
-        width: 100% !important;
         max-width: 100% !important;
+        width: 100% !important;
         box-sizing: border-box !important;
+    }
+
+    /* OVERRIDE ORIGINAL CSS STACKING to keep computer layout horizontal */
+    .section-split,
+    .live-class-section .section-split {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .split-content h2 {
+        font-size: 24px !important;
+    }
+
+    .split-content p {
+        font-size: 14px !important;
     }
 
     /* Mega Menu scaling without structure change */
