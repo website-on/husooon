@@ -1654,77 +1654,10 @@ section {
 @media (max-width: 991px) {
     body {
         overflow-x: hidden !important;
-        width: 100vw !important;
         max-width: 100% !important;
-        padding-bottom: 80px !important;
     }
 
-    /* Adjust page containers and sections */
-    section,
-    .section-padding {
-        padding-left: 15px !important;
-        padding-right: 15px !important;
-        max-width: 100vw !important;
-        box-sizing: border-box !important;
-        overflow: hidden !important;
-    }
-
-    .container,
-    .nav-container {
-        padding-left: 15px !important;
-        padding-right: 15px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        max-width: 100vw !important;
-    }
-
-    img {
-        max-width: 100% !important;
-        height: auto !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Navbar & Header */
-    .nav-container {
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 15px !important;
-        padding: 0 !important;
-    }
-
-    .nav-actions {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 10px !important;
-        width: 100% !important;
-    }
-
-    .country-container,
-    .discover-container {
-        width: 100% !important;
-        display: flex;
-        justify-content: center;
-    }
-
-    /* Buttons scaling */
-    .btn-discover,
-    .btn-login,
-    .ultra-btn,
-    .ultra-btn-white,
-    .btn-primary {
-        padding: 15px 20px !important;
-        font-size: 18px !important;
-        width: 100% !important;
-        max-width: 300px !important;
-        text-align: center !important;
-        justify-content: center !important;
-        margin: 5px auto !important;
-        box-sizing: border-box !important;
-        display: flex !important;
-    }
-
-    /* Text Resizing to prevent horizontal scroll */
+    /* ONLY scale down gigantic fonts, do not change layout */
     [style*="font-size: 60px"],
     [style*="font-size:60px"],
     [style*="font-size: 65px"],
@@ -1753,7 +1686,7 @@ section {
 
     [style*="font-size: 55px"],
     [style*="font-size:55px"] {
-        font-size: 28px !important;
+        font-size: 24px !important;
         line-height: 1.4 !important;
     }
 
@@ -1764,7 +1697,39 @@ section {
         font-size: 18px !important;
     }
 
-    /* Forcing flexible widths and heights */
+    /* Images responsiveness ONLY */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Buttons scaling appropriately without breaking their placement */
+    .btn-discover,
+    .btn-login,
+    .ultra-btn,
+    .ultra-btn-white,
+    .btn-primary {
+        padding: 10px 15px !important;
+        font-size: 16px !important;
+        max-width: 100% !important;
+    }
+
+    /* Keep icons proportional */
+    .edu-sticker {
+        transform: scale(0.6) !important;
+        transform-origin: center center !important;
+    }
+
+    i.fa-crown,
+    i.fa-graduation-cap,
+    i.fa-atom,
+    i.fa-book-open,
+    i.fa-pencil-ruler {
+        transform: scale(0.5) !important;
+        transform-origin: center center !important;
+    }
+
+    /* Ensure specific huge fixed-width wrappers can shrink organically */
     [style*="width: 450px"],
     [style*="width:450px"],
     [style*="width: 380px"],
@@ -1779,127 +1744,10 @@ section {
     [style*="width:900px"] {
         width: 100% !important;
         max-width: 100% !important;
-    }
-
-    [style*="min-width: 350px"],
-    [style*="min-width:350px"],
-    [style*="min-width: 300px"],
-    [style*="min-width:300px"] {
-        min-width: 0 !important;
-    }
-
-    [style*="height: 450px"],
-    [style*="height:450px"],
-    [style*="height: 410px"],
-    [style*="height:410px"],
-    [style*="height: 380px"],
-    [style*="height:380px"],
-    [style*="height: 600px"],
-    [style*="height:600px"],
-    [style*="height: 240px"],
-    [style*="height:240px"] {
-        height: auto !important;
-    }
-
-    /* Margins reduction */
-    [style*="margin-top: 200px"],
-    [style*="margin-top:200px"],
-    [style*="margin-top: 150px"],
-    [style*="margin-top:150px"],
-    [style*="margin-top: 130px"],
-    [style*="margin-top:130px"] {
-        margin-top: 60px !important;
-    }
-
-    /* Convert specific flex layouts into stacked layout */
-    div[style*="display: flex"],
-    div[style*="display:flex"] {
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-    }
-
-    /* Revert exceptions inside specific flex containers */
-    .student-card div,
-    .nav-actions a,
-    .logo,
-    .logo-text,
-    .subject-meta,
-    .live-header,
-    .stat-card,
-    .country-dropdown a,
-    .mega-column a {
-        flex-direction: row !important;
-    }
-
-    .student-card {
-        width: 90% !important;
-        max-width: 300px !important;
-        margin: 10px auto !important;
-    }
-
-    .book-card {
-        width: 70% !important;
-        max-width: 250px !important;
-        margin: 20px auto !important;
-    }
-
-    /* The "pill" shape behind teacher */
-    div[style*="border-radius:120px"],
-    div[style*="border-radius: 120px"] {
-        border-radius: 30px !important;
-        flex-direction: column !important;
-        padding: 20px !important;
-    }
-
-    div[style*="margin-left: -20px"],
-    div[style*="margin-left:-20px"],
-    div[style*="margin-right: -40px"],
-    div[style*="margin-right:-40px"] {
-        margin: 10px 0 !important;
-        border-radius: 20px !important;
-        width: 100% !important;
         box-sizing: border-box !important;
-        text-align: center !important;
-        top: 0 !important;
     }
 
-    /* Keep absolute elements absolute but scale them down */
-    .edu-sticker {
-        transform: scale(0.6) !important;
-        transform-origin: center center !important;
-    }
-
-    /* Scale down gigantic icons instead of hiding them */
-    i.fa-crown,
-    i.fa-graduation-cap,
-    i.fa-atom,
-    i.fa-book-open,
-    i.fa-pencil-ruler {
-        transform: scale(0.5) !important;
-        transform-origin: center center !important;
-    }
-
-    /* Target specific text to shrink but keep their absolute positions */
-    [style*="font-size: 280px"],
-    [style*="font-size:280px"] {
-        font-size: 150px !important;
-    }
-
-    [style*="font-size: 160px"],
-    [style*="font-size:160px"],
-    [style*="font-size: 140px"],
-    [style*="font-size:140px"] {
-        font-size: 70px !important;
-    }
-
-    /* Allow horizontal scrolling gracefully inside the container block or just let them clip gracefully without squishing the flexbox */
-    .success-section,
-    .huge-hero {
-        overflow: hidden !important;
-    }
-
-    /* Mega Menu fixed */
+    /* Mega Menu scaling without structure change */
     .mega-menu {
         width: 90vw !important;
         left: 50% !important;
