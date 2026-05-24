@@ -1649,69 +1649,62 @@ section {
 }
 
 /* =========================================
-   Mobile Visual Layout Adjustments (900px Viewport)
+   Mobile Visual Layout Adjustments (Device Responsive)
    ========================================= */
 @media (pointer: coarse),
 (max-device-width: 991px) {
 
-    /* Slightly Enlarge Content Text exclusively for Mobile */
-    p {
-        font-size: 24px !important;
+    /* Prevent horizontal scrolling on mobile native viewport */
+    html,
+    body {
+        overflow-x: hidden !important;
     }
 
-    .split-content p,
-    .welcome-banner p {
-        font-size: 28px !important;
+    img,
+    iframe,
+    section,
+    header,
+    footer,
+    .container,
+    .admin-section {
+        max-width: 100vw !important;
+        box-sizing: border-box;
     }
 
-    .hero-mid p {
-        font-size: 26px !important;
+    /* Ensure text doesn't overflow */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        word-wrap: break-word;
+        max-width: 100%;
     }
 
-    .stat-info p {
-        font-size: 24px !important;
-    }
-
-    .subject-body p {
-        font-size: 22px !important;
-    }
-
-    /* Increase real physical size of interactive buttons to avoid overlapping */
+    /* Scale up all interactive buttons safely without moving them */
     .btn-discover,
-    .btn-login {
-        padding: 16px 30px !important;
-        font-size: 22px !important;
-    }
-
+    .btn-login,
     .ultra-btn,
     .ultra-btn-white,
-    .btn-primary {
-        padding: 24px 60px !important;
-        font-size: 28px !important;
+    .btn-primary,
+    .btn-join {
+        transform: scale(1.2) !important;
+        transform-origin: center center !important;
+        margin: 15px !important;
     }
 
     .nav-icon-circle {
-        width: 65px !important;
-        height: 65px !important;
-        font-size: 26px !important;
+        transform: scale(1.2) !important;
         margin: 5px 15px !important;
     }
 
-    /* Floating action buttons physical scaling without layout breaking overlaps */
+    /* Safely make floating icons (Theme, Admin, WhatsApp) bigger without vanishing */
     .theme-toggle,
     #floating-admin-btn,
     .scroll-top-btn,
-    .whatsapp-btn,
     [href*="wa.me"] {
-        width: 75px !important;
-        height: 75px !important;
-        font-size: 32px !important;
-        padding: 15px !important;
-    }
-
-    .floating-wa img,
-    a[href*="wa.me"] img {
-        width: 50px !important;
-        height: 50px !important;
+        transform: scale(1.3) !important;
+        transform-origin: center center !important;
     }
 }
