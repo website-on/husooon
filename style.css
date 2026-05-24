@@ -1649,7 +1649,7 @@ section {
 }
 
 /* =========================================
-   Mobile Fixes & Scaling (1200px Viewport Core)
+   Mobile Fixes & Scaling (1050px Viewport Core)
    ========================================= */
 @media (max-width: 991px),
 (pointer: coarse) {
@@ -1657,6 +1657,24 @@ section {
     /* Safe area at bottom so floating icons don't overlap text */
     body {
         padding-bottom: 150px !important;
+    }
+
+    /* Shrink the huge headings like "الخبرة مش رقم" on phone */
+    h1 {
+        font-size: 40px !important;
+        line-height: 1.4 !important;
+    }
+
+    .hero-title-box h1.highlight,
+    .hero-title-box h1 {
+        font-size: 45px !important;
+    }
+
+    h2,
+    .section-split.large-split h2,
+    .split-content h2,
+    .hero-mid h2 {
+        font-size: 32px !important;
     }
 
     /* Ensures comments go under the picture ONLY, fixes overlapping */
@@ -1668,31 +1686,35 @@ section {
         gap: 20px !important;
     }
 
-    /* Navbar elements spacing */
+    /* Navbar elements spacing - Cleanly sized without overlap */
     .nav-actions .btn-discover,
     .nav-actions .btn-login,
     .nav-actions .nav-icon-circle {
-        transform: scale(1.6) !important;
+        transform: scale(1.4) !important;
         transform-origin: center center !important;
-        margin: 10px 25px !important;
+        margin: 5px 25px !important;
     }
 
-    /* Enlarge standard buttons immensely for 1200px constraint */
+    /* Scale buttons up nicely but DO NOT make them overlap */
     .ultra-btn,
     .ultra-btn-white,
     .btn-primary:not(.nav-actions .btn-primary) {
-        transform: scale(2.0) !important;
+        transform: scale(1.5) !important;
         transform-origin: center center !important;
-        margin: 25px 40px !important;
+        margin: 30px 20px !important;
     }
 
-    /* Safely make floating icons bigger */
+    /* Safely make floating icons bigger (Admin, Theme, WhatsApp) safely separated */
     .theme-toggle,
     #floating-admin-btn,
     .scroll-top-btn,
     .whatsapp-btn,
     [href*="wa.me"] {
-        transform: scale(1.6) !important;
+        transform: scale(1.5) !important;
         transform-origin: center center !important;
+    }
+
+    .theme-toggle {
+        bottom: 120px !important;
     }
 }
