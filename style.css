@@ -1646,28 +1646,61 @@ section {
         font-size: 12px;
         padding: 8px;
     }
+}
 
-    /* Global Responsive Limits to fix inline desktop styles */
+/* =========================================
+   Mobile Visual Enlargement (Viewport 1200px Support)
+   ========================================= */
+@media (pointer: coarse),
+(max-device-width: 991px) {
+
+    /* Scale up all interactive buttons so they remain highly clickable and readable on mobile without breaking layout wrappers */
+    .btn-discover,
+    .btn-login,
+    .ultra-btn,
+    .ultra-btn-white,
+    .btn-primary,
+    .nav-icon-circle,
+    .back-btn,
+    .btn-join {
+        transform: scale(2.2) !important;
+        transform-origin: center center !important;
+    }
+
+    /* Add spacing compensation for scaled buttons inside flex alignments */
+    .ultra-btn,
+    .ultra-btn-white,
+    .btn-primary {
+        margin: 25px 50px !important;
+    }
+
+    /* Specifically for navbar icons, adjust scale slightly less so they fit the top bar perfectly */
+    .nav-actions .btn-discover,
+    .nav-actions .btn-login,
+    .nav-actions .nav-icon-circle {
+        transform: scale(1.8) !important;
+        transform-origin: center center !important;
+        margin: 10px 25px !important;
+    }
+
+    /* Make images and their captions/stickers/comments larger */
     img,
-    iframe,
-    section,
-    header,
-    footer,
     .student-card,
     .book-card,
-    .huge-illustration {
-        max-width: 100% !important;
-        height: auto !important;
-    }
-
-    /* Prevent text explosion from inline styles on mobile */
-    h1,
-    h2,
-    h3 {
-        font-size: clamp(24px, 8vw, 42px) !important;
-    }
-
-    p {
-        font-size: clamp(16px, 5vw, 22px) !important;
+    .edu-sticker,
+    .success-badge,
+    .huge-percent,
+    .student-card div,
+    .stat-card p,
+    .stat-card h3,
+    .split-content p,
+    .split-content h2,
+    .hero-title-box h1,
+    .large-stat h3,
+    .welcome-banner p,
+    .live-class-card p,
+    .subject-body p {
+        transform: scale(1.3) !important;
+        transform-origin: center center !important;
     }
 }
