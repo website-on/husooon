@@ -1649,87 +1649,72 @@ section {
 }
 
 /* =========================================
-   Mobile Professional Setup (900px High-Zoom Native Viewport)
+   Mobile 1200px Fixed Viewport Ultimate Zoom Setup
    ========================================= */
 @media (max-width: 991px),
 (pointer: coarse) {
 
-    /* Safe area at bottom so floating icons don't overlap text */
-    body {
-        padding-bottom: 180px !important;
+    /* 1. "الصفحات الداخلية اكبر" and "زوم اكبر بكثير" -> Scale entire containers visually */
+    .container,
+    .admin-section,
+    .dashboard-body {
+        transform: scale(1.25);
+        transform-origin: top center;
+        margin-bottom: 50px;
     }
 
-    /* Make Headings a bit bigger as requested */
-    h1 {
-        font-size: 55px !important;
-        line-height: 1.4 !important;
-    }
-
-    .hero-title-box h1.highlight,
-    .hero-title-box h1 {
-        font-size: 60px !important;
-    }
-
-    /* Enlarge content (p tags) heavily to satisfy 'كبر المحتوى' */
-    p,
-    .subject-body p,
-    .stat-info p {
-        font-size: 26px !important;
-        line-height: 1.8 !important;
-    }
-
-    /* Ensures comments go under the picture ONLY, fixes overlapping */
+    /* 2. "والتعليقات ضعها تحت الصور" -> Stack layout cleanly */
     .split-content,
     .student-card,
     .success-student-wrapper div {
         flex-direction: column !important;
         text-align: center !important;
-        gap: 20px !important;
+        gap: 30px !important;
     }
 
-    /* Navbar elements spacing - Cleanly sized without overlap */
-    .nav-actions .btn-discover,
-    .nav-actions .btn-login,
-    .nav-actions .nav-icon-circle {
-        transform: scale(1.4) !important;
-        transform-origin: center center !important;
-        margin: 5px 25px !important;
-    }
-
-    /* Standard buttons nicely big without overlap */
+    /* 3. "حجم الازرار والايقونات اكبر" -> Massive isolated safe scaling */
     .ultra-btn,
     .ultra-btn-white,
     .btn-primary:not(.nav-actions .btn-primary) {
-        transform: scale(1.4) !important;
+        transform: scale(1.6) !important;
         transform-origin: center center !important;
-        margin: 30px 20px !important;
+        margin: 40px auto !important;
     }
 
-    /* Safely make floating icons physically larger without CSS transforms that hide them */
+    .nav-actions .btn-discover,
+    .nav-actions .btn-login,
+    .nav-actions .nav-icon-circle {
+        transform: scale(1.5) !important;
+        transform-origin: center center !important;
+        margin: 5px 20px !important;
+    }
+
+    /* 4. "واعد زر الالوان والادارة" -> Restore them perfectly and safely large */
     .theme-toggle,
     #floating-admin-btn,
     .scroll-top-btn,
     .whatsapp-btn,
-    .floating-wa,
     [href*="wa.me"] {
-        transform: none !important;
-        width: 80px !important;
-        height: 80px !important;
-        font-size: 35px !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
+        transform: scale(1.8) !important;
+        transform-origin: center center !important;
+        /* Reset any bad sizing from previous steps so they show natively */
+        width: 50px !important;
+        height: 50px !important;
+        padding: 0 !important;
     }
 
     .floating-wa img,
     a[href*="wa.me"] img {
-        width: 55px !important;
-        height: 55px !important;
+        width: 100% !important;
+        height: 100% !important;
     }
 
-    /* Ensure they are separated on screen */
+    body {
+        padding-bottom: 120px !important;
+    }
+
     .theme-toggle {
-        bottom: 130px !important;
+        bottom: 120px !important;
         left: 20px !important;
     }
 
