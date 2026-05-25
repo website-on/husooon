@@ -131,5 +131,68 @@ window.fsData = {
     getAttendance: async () => {
         const snap = await getDocs(collection(db, "attendance"));
         return snap.docs.map(doc => doc.data());
+    },
+
+    // CODES (Activation Codes for platform access)
+    addCode: async (codeObj) => {
+        return await addDoc(collection(db, "codes"), codeObj);
+    },
+    getAllCodes: async () => {
+        const snap = await getDocs(collection(db, "codes"));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+    updateCode: async (fsId, data) => {
+        return await updateDoc(doc(db, "codes", fsId), data);
+    },
+
+    // EVALS
+    addEval: async (evalObj) => {
+        return await addDoc(collection(db, "evals"), evalObj);
+    },
+    getAllEvals: async () => {
+        const snap = await getDocs(collection(db, "evals"));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+
+    // CLASS LINKS
+    addClassLink: async (linkObj) => {
+        return await addDoc(collection(db, "class_links"), linkObj);
+    },
+    getAllClassLinks: async () => {
+        const snap = await getDocs(collection(db, "class_links"));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+    deleteClassLink: async (id) => {
+        try {
+            if (!isNaN(parseInt(id))) {
+                const q = query(collection(db, "class_links"), where("id", "==", parseInt(id)));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    for (let document of snap.docs) {
+                        await deleteDoc(doc(db, "class_links", document.id));
+                    }
+                }
+            } else {
+                await deleteDoc(doc(db, "class_links", id.toString()));
+            }
+        } catch (e) { console.error("Firestore Delete Link Error:", e); }
+    },
+
+    // ADMIN FILES
+    addAdminFile: async (fileObj) => {
+        return await addDoc(collection(db, "admin_files"), fileObj);
+    },
+    getAllAdminFiles: async () => {
+        const snap = await getDocs(collection(db, "admin_files"));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+
+    // STUDENT FILES
+    addStudentFile: async (fileObj) => {
+        return await addDoc(collection(db, "student_files"), fileObj);
+    },
+    getAllStudentFiles: async () => {
+        const snap = await getDocs(collection(db, "student_files"));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
     }
 };

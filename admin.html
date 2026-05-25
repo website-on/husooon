@@ -484,6 +484,10 @@
             let note = document.getElementById('ev-note').value;
             let newUserEval = { code, note, date: new Date().toLocaleDateString('ar-EG') };
 
+            if (window.fsData && window.fsData.addEval) {
+                try { await window.fsData.addEval(newUserEval); } catch (er) { console.warn("Firebase Eval Add Error:", er); }
+            }
+
             let evals = JSON.parse(localStorage.getItem('spedia_evals') || '[]');
             evals.push(newUserEval);
             localStorage.setItem('spedia_evals', JSON.stringify(evals));
@@ -497,6 +501,15 @@
             let att = [];
             let subCodes = [];
             if (window.fsData) {
+                if (window.fsData.getAllCodes) {
+                    try {
+                        let fbCodes = await window.fsData.getAllCodes();
+                        if (fbCodes && fbCodes.length > 0) {
+                            codes = fbCodes;
+                            localStorage.setItem('spedia_codes', JSON.stringify(codes));
+                        }
+                    } catch (e) { }
+                }
                 users = await window.fsData.getAllUsers();
                 att = await window.fsData.getAttendance();
                 if (window.fsData.getAllSubscriptionCodes) subCodes = await window.fsData.getAllSubscriptionCodes();
@@ -552,19 +565,31 @@
             }
 
             let links = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
+            if (window.fsData && window.fsData.getAllClassLinks) {
+                try { links = await window.fsData.getAllClassLinks(); localStorage.setItem('spedia_class_links', JSON.stringify(links)); } catch (e) { }
+            }
             const tLinks = document.getElementById('table-links');
-            if (tLinks) tLinks.innerHTML = '<tr><th>الدولة</th><th>الصف</th><th>العنوان</th><th>الرابط</th><th>حذف</th></tr>' + links.map(l => `<tr><td>${l.country === 'ALL' ? 'كل الدول' : l.country}</td><td>${l.grade}</td><td>${l.title}</td><td><a href="${l.url}" target="_blank">فتح الرابط</a></td><td><button onclick="window.deleteLink(${l.id})" style="background:#f44336; color:#fff; padding:5px; border-radius:5px; border:none; cursor:pointer;">حذف</button></td></tr>`).join('');
+            if (tLinks) tLinks.innerHTML = '<tr><th>الدولة</th><th>الصف</th><th>العنوان</th><th>الرابط</th><th>حذف</th></tr>' + links.map(l => `<tr><td>${l.country === 'ALL' ? 'كل الدول' : l.country}</td><td>${l.grade}</td><td>${l.title}</td><td><a href="${l.url}" target="_blank">فتح الرابط</a></td><td><button onclick="window.deleteLink('${l.fsId ? l.fsId : l.id}')" style="background:#f44336; color:#fff; padding:5px; border-radius:5px; border:none; cursor:pointer;">حذف</button></td></tr>`).join('');
 
             let sFiles = JSON.parse(localStorage.getItem('spedia_student_files') || '[]');
+            if (window.fsData && window.fsData.getAllStudentFiles) {
+                try { sFiles = await window.fsData.getAllStudentFiles(); localStorage.setItem('spedia_student_files', JSON.stringify(sFiles)); } catch (e) { }
+            }
             const tSFiles = document.getElementById('table-student-files');
             if (tSFiles) tSFiles.innerHTML = '<tr><th>الطالب</th><th>الدولة</th><th>الصف</th><th>الوصف</th><th>تاريخ</th><th>الملف</th></tr>' + sFiles.map(f => `<tr><td>${f.studentName || f.studentCode}</td><td>${f.country || 'EG'}</td><td>${f.grade}</td><td>${f.title}</td><td>${f.date}</td><td><a href="${f.url}" target="_blank" style="color:var(--primary-color);">معاينة</a></td></tr>`).join('');
         }
 
-        window.deleteLink = function (id) {
+        window.deleteLink = async function (id) {
             if (!confirm('حذف الرابط؟')) return;
             let links = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
-            links = links.filter(l => l.id !== id);
+            let targetLnk = links.find(l => l.id.toString() === id.toString() || l.fsId === id.toString());
+            links = links.filter(l => l.id.toString() !== id.toString() && l.fsId !== id.toString());
             localStorage.setItem('spedia_class_links', JSON.stringify(links));
+
+            if (window.fsData && window.fsData.deleteClassLink) {
+                let dId = targetLnk && targetLnk.fsId ? targetLnk.fsId : id.toString();
+                try { await window.fsData.deleteClassLink(dId); } catch (e) { }
+            }
             renderTables();
         };
 
@@ -578,6 +603,11 @@
                 url: document.getElementById('lnk-url').value,
                 date: new Date().toLocaleDateString('ar-EG')
             };
+
+            if (window.fsData && window.fsData.addClassLink) {
+                try { await window.fsData.addClassLink(lnk); } catch (er) { }
+            }
+
             let links = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
             links.push(lnk);
             localStorage.setItem('spedia_class_links', JSON.stringify(links));
@@ -601,6 +631,11 @@
                     url: fileUrl,
                     date: new Date().toLocaleDateString('ar-EG')
                 };
+
+                if (window.fsData && window.fsData.addAdminFile) {
+                    try { await window.fsData.addAdminFile(fItem); } catch (er) { }
+                }
+
                 let aFiles = JSON.parse(localStorage.getItem('spedia_admin_files') || '[]');
                 aFiles.push(fItem);
                 localStorage.setItem('spedia_admin_files', JSON.stringify(aFiles));
@@ -627,12 +662,23 @@
             renderTables();
         };
 
-        window.generateCode = function () {
+        window.generateCode = async function () {
+            const btn = document.querySelector('button[onclick="generateCode()"]');
+            if (btn) btn.innerText = "جاري الإنشاء...";
             let rnd = Math.floor(1000 + Math.random() * 9000).toString();
+            let codeObj = { code: rnd, isUsed: false };
+
+            if (window.fsData && window.fsData.addCode) {
+                try {
+                    await window.fsData.addCode(codeObj);
+                } catch (e) { console.warn("Firebase save error", e); }
+            }
+
             let codes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
-            codes.push({ code: rnd, isUsed: false });
+            codes.push(codeObj);
             localStorage.setItem('spedia_codes', JSON.stringify(codes));
             renderTables();
+            if (btn) btn.innerText = "إنشاء كود";
         }
 
         window.addContent = async function (e) {
@@ -836,6 +882,9 @@
             if (sIndex > -1) {
                 subs[sIndex].status = "تم التصحيح";
                 localStorage.setItem('spedia_submissions', JSON.stringify(subs));
+            }
+            if (window.fsData && window.fsData.updateSubmission && currentSub.id) {
+                try { await window.fsData.updateSubmission(currentSub.id, { status: "تم التصحيح" }); } catch (e) { }
             }
 
             document.getElementById('grading-modal').style.display = 'none';

@@ -686,8 +686,8 @@ window.handleLogin = async function (e) {
     if (!code) return alert("الرجاء إدخال كود الاشتراك");
 
     let allUsers = [];
-    if (window.fsData) {
-        allUsers = await window.fsData.getAllUsers();
+    if (window.fsData && window.fsData.getAllUsers) {
+        try { allUsers = await window.fsData.getAllUsers(); } catch (e) { }
     }
     // Fallback to local
     if (!allUsers || allUsers.length === 0) {
@@ -696,11 +696,25 @@ window.handleLogin = async function (e) {
 
     let user = allUsers.find(u => u.code === code);
     if (!user) {
-        let allCodes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
+        let allCodes = [];
+        if (window.fsData && window.fsData.getAllCodes) {
+            try { allCodes = await window.fsData.getAllCodes(); } catch (e) { }
+        }
+        if (!allCodes || allCodes.length === 0) {
+            allCodes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
+        }
+
         let codeObj = allCodes.find(c => c.code === code);
         if (codeObj) {
-            document.getElementById('register-modal').style.display = 'flex';
-            document.getElementById('register-modal').dataset.code = code;
+            if (codeObj.isUsed) {
+                alert("للأسف، الكود مستخدم بالفعل وبيانات الحساب غير موجودة.");
+            } else {
+                document.getElementById('register-modal').style.display = 'flex';
+                document.getElementById('register-modal').dataset.code = code;
+                if (codeObj.fsId) {
+                    document.getElementById('register-modal').dataset.fsId = codeObj.fsId;
+                }
+            }
         } else {
             alert("كود الاشتراك غير صحيح أو غير مفعل. يرجى التواصل مع الإدارة.");
         }
@@ -726,12 +740,26 @@ window.finishRegister = async function (e) {
 
     if (!code || !name || !phone || !grade || !country) return alert("الرجاء إكمال كافة البيانات");
 
-    let newUser = { code, name, phone, grade, country, id: Date.now() };
+    let newUser = { code, name, phone, grade, country, id: Date.now(), role: 'student' };
 
     if (window.fsData && window.fsData.addUser) {
         try {
             await window.fsData.addUser(newUser);
         } catch (e) { }
+    }
+
+    // Mark code as used in Firebase
+    if (window.fsData && window.fsData.updateCode) {
+        let fsId = document.getElementById('register-modal').dataset.fsId;
+        if (fsId) {
+            try { await window.fsData.updateCode(fsId, { isUsed: true }); } catch (er) { }
+        } else {
+            try {
+                let allC = await window.fsData.getAllCodes();
+                let cObj = allC.find(c => c.code === code);
+                if (cObj && cObj.fsId) await window.fsData.updateCode(cObj.fsId, { isUsed: true });
+            } catch (er) { }
+        }
     }
 
     // Always fallback to LocalStorage for offline usability
@@ -1012,71 +1040,15 @@ window.finishQuiz = function (title) {
     }
 }
 
-/* LOGIN SYSTEM */
-window.handleLogin = function (e) {
-    e.preventDefault();
-    const codeInlet = document.getElementById('code-input').value.trim();
-    if (!codeInlet) return alert("يرجى إدخال الكود");
 
-    let codes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
-    let users = JSON.parse(localStorage.getItem('spedia_users') || '[]');
-
-    let theCode = codes.find(c => c.code === codeInlet);
-    if (theCode) {
-        if (theCode.isUsed) {
-            let theUser = users.find(u => u.code === codeInlet);
-            if (theUser) {
-                localStorage.setItem('spedia_currentUser', JSON.stringify(theUser));
-                window.location.href = 'dashboard.html';
-            } else {
-                alert("للأسف، الكود مستخدم بالفعل بيانات الحساب مفقودة.");
-            }
-        } else {
-            document.getElementById('register-modal').style.display = 'flex';
-            window.tempCode = codeInlet;
-        }
-    } else {
-        alert("رمز التفعيل خاطئ أو غير مُسجل في منصة حصون.");
-    }
-}
-
-window.closeRegisterModal = function () {
-    document.getElementById('register-modal').style.display = 'none';
-}
-
-window.completeRegister = function (e) {
-    e.preventDefault();
-    let name = document.getElementById('reg-name').value;
-    let phone = document.getElementById('reg-phone').value;
-    let grade = document.getElementById('reg-grade').value;
-
-    let users = JSON.parse(localStorage.getItem('spedia_users') || '[]');
-    let codes = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
-
-    let theCode = codes.find(c => c.code === window.tempCode);
-    if (theCode) {
-        theCode.isUsed = true;
-        localStorage.setItem('spedia_codes', JSON.stringify(codes));
-    }
-
-    let newUser = { code: window.tempCode, name, phone, grade, role: 'student' };
-    users.push(newUser);
-    localStorage.setItem('spedia_users', JSON.stringify(users));
-
-    localStorage.setItem('spedia_currentUser', JSON.stringify(newUser));
-    window.location.href = 'dashboard.html';
-}
-
-window.requestCode = function () {
-    sendWhatsApp("السلام عليكم، أريد طلب كود اشتراك جديد في منصة حصون التعليمية.");
-}
 
 /* DASHBOARD LOGIC */
 window.loadStudentData = async function (user) {
-    let profileImg = localStorage.getItem('spedia_profile_img_' + user.code);
+    let profileImg = user.profileImg || localStorage.getItem('spedia_profile_img_' + user.code);
     if (profileImg) {
         let sideImg = document.getElementById('sidebar-profile-img');
         if (sideImg) sideImg.src = profileImg;
+        localStorage.setItem('spedia_profile_img_' + user.code, profileImg);
     }
 
     const cCode = localStorage.getItem('spedia_country') || 'EG';
@@ -1139,7 +1111,14 @@ window.loadStudentData = async function (user) {
         }
     }
 
-    let evals = JSON.parse(localStorage.getItem('spedia_evaluations') || '[]');
+    let evals = [];
+    if (window.fsData && window.fsData.getAllEvals) {
+        try { evals = await window.fsData.getAllEvals(); localStorage.setItem('spedia_evals', JSON.stringify(evals)); } catch (e) { }
+    }
+    if (!evals || !evals.length) {
+        evals = JSON.parse(localStorage.getItem('spedia_evals') || localStorage.getItem('spedia_evaluations') || '[]');
+    }
+
     let myEvals = evals.filter(ev => ev.code == user.code);
     let listEvals = document.getElementById('student-evals');
     if (listEvals) {
@@ -1172,10 +1151,15 @@ window.loadStudentData = async function (user) {
         attCard.innerText = myAtt.length;
     }
 
-    // Load Links
     let lnkContainer = document.getElementById('student-links-container');
     if (lnkContainer) {
-        let allLinks = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
+        let allLinks = [];
+        if (window.fsData && window.fsData.getAllClassLinks) {
+            try { allLinks = await window.fsData.getAllClassLinks(); localStorage.setItem('spedia_class_links', JSON.stringify(allLinks)); } catch (e) { }
+        }
+        if (!allLinks || !allLinks.length) {
+            allLinks = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
+        }
         let myLinks = allLinks.filter(l => l.grade === String(user.grade) || l.grade === "ALL");
         if (myLinks.length) {
             lnkContainer.innerHTML = myLinks.map(l => `
@@ -1192,10 +1176,15 @@ window.loadStudentData = async function (user) {
         }
     }
 
-    // Load Admin Files
     let adminFilesCont = document.getElementById('admin-files-container');
     if (adminFilesCont) {
-        let aFiles = JSON.parse(localStorage.getItem('spedia_admin_files') || '[]');
+        let aFiles = [];
+        if (window.fsData && window.fsData.getAllAdminFiles) {
+            try { aFiles = await window.fsData.getAllAdminFiles(); localStorage.setItem('spedia_admin_files', JSON.stringify(aFiles)); } catch (e) { }
+        }
+        if (!aFiles || !aFiles.length) {
+            aFiles = JSON.parse(localStorage.getItem('spedia_admin_files') || '[]');
+        }
         let myFiles = aFiles.filter(a => a.grade === String(user.grade));
         if (myFiles.length) {
             adminFilesCont.innerHTML = myFiles.map(f => `
@@ -1233,22 +1222,26 @@ window.registerAttendance = async function () {
         time: new Date().toLocaleTimeString('ar-EG')
     };
 
+    let attendance = [];
     if (window.fsData) {
-        let allAtt = await window.fsData.getAttendance();
-        if (allAtt.find(a => a.code === user.code && a.date === todayDate)) {
-            alert("تم تسجيل حضورك مسبقاً لهذا اليوم. استمر في المذاكرة! 👍");
-            return;
+        try { attendance = await window.fsData.getAttendance(); } catch (e) {
+            attendance = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
         }
-        await window.fsData.addAttendance(attObj);
     } else {
-        let attendance = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
-        if (attendance.find(a => a.code === user.code && a.date === todayDate)) {
-            alert("تم تسجيل حضورك مسبقاً لهذا اليوم. استمر في المذاكرة! 👍");
-            return;
-        }
-        attendance.push(attObj);
-        localStorage.setItem('spedia_attendance', JSON.stringify(attendance));
+        attendance = JSON.parse(localStorage.getItem('spedia_attendance') || '[]');
     }
+
+    if (attendance.find(a => a.code === user.code && a.date === todayDate)) {
+        alert("تم تسجيل حضورك مسبقاً لهذا اليوم. استمر في المذاكرة! 👍");
+        return;
+    }
+
+    if (window.fsData && window.fsData.addAttendance) {
+        try { await window.fsData.addAttendance(attObj); } catch (e) { }
+    }
+
+    attendance.push(attObj);
+    localStorage.setItem('spedia_attendance', JSON.stringify(attendance));
     alert("ممتاز! تم تسجيل حضورك بنجاح في سجلات منصة حصون للإدارة 🎓");
 }
 
@@ -1315,6 +1308,13 @@ window.updateProfileImg = async function (input) {
         try {
             let imgUrl = await window.uploadToCloudinary(file);
             localStorage.setItem('spedia_profile_img_' + user.code, imgUrl);
+            user.profileImg = imgUrl; // Update local user object
+            localStorage.setItem('spedia_currentUser', JSON.stringify(user));
+
+            if (window.fsData && window.fsData.addUser) {
+                try { await window.fsData.addUser(user); } catch (e) { }
+            }
+
             document.getElementById('sidebar-profile-img').src = imgUrl;
         } catch (e) {
             alert('خطأ أثناء رفع الصورة: ' + e.message);
@@ -1576,6 +1576,11 @@ window.uploadStudentFile = async function (e) {
             url: fileUrl,
             date: new Date().toLocaleDateString('ar-EG')
         };
+
+        if (window.fsData && window.fsData.addStudentFile) {
+            try { await window.fsData.addStudentFile(sFile); } catch (er) { }
+        }
+
         let sFiles = JSON.parse(localStorage.getItem('spedia_student_files') || '[]');
         sFiles.push(sFile);
         localStorage.setItem('spedia_student_files', JSON.stringify(sFiles));
