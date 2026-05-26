@@ -176,6 +176,7 @@
             <button onclick="showSection('tab-results', this)">نتائج الاختبارات</button>
             <button onclick="showSection('tab-links', this)">روابط الحصص</button>
             <button onclick="showSection('tab-files', this)">إرسال المحتوى الورقي</button>
+            <button onclick="showSection('tab-custom', this)">إرسال محتوى لمستخدم</button>
         </div>
 
         <!-- Sections Content (Same as before but with working forms) -->
@@ -449,6 +450,40 @@
             <h3 class="mt-30">ملفات واستجابات الطلاب (المستلمة)</h3>
             <table id="table-student-files"></table>
         </div>
+
+        <div id="tab-custom" class="admin-section">
+            <h2>إرسال محتوى مخصص لطالب (حسب كوده)</h2>
+            <form onsubmit="window.sendCustomContent(event)">
+                <div class="form-group">
+                    <label>كود الطالب</label>
+                    <input type="text" id="cc-code" required placeholder="أدخل كود الطالب هنا">
+                </div>
+                <div class="form-group">
+                    <label>نوع المحتوى</label>
+                    <select id="cc-type" required>
+                        <option value="رابط حصة">رابط حصة</option>
+                        <option value="واجب">واجب</option>
+                        <option value="اختبار">اختبار</option>
+                        <option value="اختبار قصير">اختبار قصير</option>
+                        <option value="محتوى ورقي">محتوى ورقي</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>عنوان المحتوى / الوصف</label>
+                    <input type="text" id="cc-title" required placeholder="مثال: واجب الرياضيات للأسبوع الثاني">
+                </div>
+                <div class="form-group">
+                    <label>النص أو الرابط (إن وجد)</label>
+                    <input type="text" id="cc-url" placeholder="أدخل هنا رابط الاختبار/الحصة أو أي ملاحظة نصية">
+                </div>
+                <div class="form-group">
+                    <label>ملف مرفق (إن وجد)</label>
+                    <input type="file" id="cc-file" accept="image/*,.pdf">
+                </div>
+                <button type="submit" class="btn-primary w-100" id="btn-cc-submit">إرسال المحتوى</button>
+            </form>
+        </div>
     </div>
 
     <!-- Grading Modal -->
@@ -645,6 +680,48 @@
                 alert('حدث خطأ أثناء الرفع: ' + er.message);
             }
             btn.innerText = 'إرسال الملف';
+        };
+
+        window.sendCustomContent = async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-cc-submit');
+            btn.innerText = 'جاري الإرسال... الرجاء الانتظار';
+            try {
+                let code = document.getElementById('cc-code').value;
+                let type = document.getElementById('cc-type').value;
+                let title = document.getElementById('cc-title').value;
+                let url = document.getElementById('cc-url').value;
+
+                let file = document.getElementById('cc-file').files[0];
+                let fileUrl = '';
+                if (file) {
+                    fileUrl = await window.uploadToCloudinary(file);
+                }
+
+                let cItem = {
+                    id: Date.now(),
+                    studentCode: code,
+                    type: type,
+                    title: title,
+                    url: url,
+                    fileUrl: fileUrl,
+                    date: new Date().toLocaleDateString('ar-EG')
+                };
+
+                if (window.fsData && window.fsData.addCustomContent) {
+                    try { await window.fsData.addCustomContent(cItem); } catch (er) { console.warn(er); }
+                }
+
+                let ccLocal = JSON.parse(localStorage.getItem('spedia_custom_content') || '[]');
+                ccLocal.push(cItem);
+                localStorage.setItem('spedia_custom_content', JSON.stringify(ccLocal));
+
+                alert('تم إرسال المحتوى المخصص للطالب بنجاح!');
+                e.target.reset();
+            } catch (er) {
+                alert('حدث خطأ أثناء الإرسال: ' + er.message);
+            }
+            btn.innerText = 'إرسال المحتوى';
         };
 
         window.deleteContent = async function (id) {

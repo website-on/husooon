@@ -1200,6 +1200,34 @@ window.loadStudentData = async function (user) {
             adminFilesCont.innerHTML = '<p style="color:#888; font-weight:600;">لا توجد ملفات جديدة من الإدارة.</p>';
         }
     }
+
+    // Custom Content (Directed to user code)
+    let customCont = document.getElementById('student-custom-container');
+    if (customCont) {
+        let cFiles = [];
+        if (window.fsData && window.fsData.getCustomContentByUser) {
+            try { cFiles = await window.fsData.getCustomContentByUser(user.code); } catch (e) { }
+        }
+        if (!cFiles || !cFiles.length) {
+            let localCC = JSON.parse(localStorage.getItem('spedia_custom_content') || '[]');
+            cFiles = localCC.filter(c => c.studentCode === user.code);
+        }
+        if (cFiles.length) {
+            customCont.innerHTML = cFiles.map(c => `
+                <div class="animate-on-scroll" style="background:#fff; border-right:5px solid #12b8c5; border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:10px; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h4 style="font-weight:800; font-size:18px; color:#121e33;">${c.title}</h4>
+                        <span style="font-size:12px; background:#e8fbff; color:#12b8c5; padding:5px 10px; border-radius:5px; font-weight:bold;">${c.type}</span>
+                    </div>
+                    ${c.url ? (c.url.includes('http') || c.url.includes('www.') || c.url.includes('.com') ? `<a href="${c.url.startsWith('http') ? c.url : 'https://' + c.url}" target="_blank" style="color:#f44336; font-weight:bold; text-decoration:underline; font-size:14px;"><i class="fas fa-external-link-alt"></i> فتح الرابط المرفق</a>` : `<p style="font-size:15px; color:#444; background:#f4f7fa; padding:10px; border-radius:8px; border-right:3px solid #ff9800; font-weight:bold;">${c.url}</p>`) : ''}
+                    ${c.fileUrl ? `<a href="${c.fileUrl}" target="_blank" class="btn-primary" style="align-self:flex-start; padding:8px 15px; font-size:14px;"><i class="fas fa-download"></i> تحميل المرفق</a>` : ''}
+                    <div style="font-size:12px; color:#888; font-weight:bold; margin-top:5px;"><i class="far fa-calendar-alt"></i> ${c.date}</div>
+                </div>
+            `).join('');
+        } else {
+            customCont.innerHTML = '<p style="color:#888; font-weight:600;">لا يوجد محتوى مخصص لك حالياً.</p>';
+        }
+    }
 }
 
 window.showDashTab = function (tabId, el) {

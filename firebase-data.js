@@ -194,5 +194,15 @@ window.fsData = {
     getAllStudentFiles: async () => {
         const snap = await getDocs(collection(db, "student_files"));
         return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+
+    // CUSTOM CONTENT (Directed to a specific user code)
+    addCustomContent: async (contentObj) => {
+        return await addDoc(collection(db, "custom_content"), contentObj);
+    },
+    getCustomContentByUser: async (code) => {
+        const q = query(collection(db, "custom_content"), where("studentCode", "==", code));
+        const snap = await getDocs(q);
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
     }
 };
