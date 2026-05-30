@@ -580,7 +580,7 @@ section {
 }
 
 /* Responsive */
-@media (max-width: 991px) {
+@media (max-width: 400px) {
 
     .section-split,
     .live-class-section .section-split {
@@ -1390,7 +1390,7 @@ section {
 }
 
 /* Responsive Dashboard */
-@media (max-width: 991px) {
+@media (max-width: 400px) {
     .sidebar {
         transform: translateX(100%);
     }
@@ -1584,7 +1584,7 @@ section {
 }
 
 /* Mobile Responsive Enhancements */
-@media (max-width: 768px) {
+@media (max-width: 300px) {
     .dashboard-layout {
         flex-direction: column;
     }
