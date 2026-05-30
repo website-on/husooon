@@ -1408,7 +1408,7 @@ section {
     }
 
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .two-columns {
@@ -1585,20 +1585,6 @@ section {
 
 /* Mobile Responsive Enhancements */
 @media (max-width: 768px) {
-    .dashboard-layout {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        position: static;
-        height: auto;
-        min-height: unset;
-        border-right: none;
-        border-bottom: 2px solid #eef1f5;
-        margin-bottom: 20px;
-    }
-
     .two-columns {
         flex-direction: column;
         gap: 15px !important;
@@ -1621,22 +1607,27 @@ section {
     }
 
     .stat-card {
-        width: 100%;
+        padding: 15px;
     }
 
-    .stats-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 15px;
+    .stat-card .icon {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    .stat-card .details h3 {
+        font-size: 20px;
     }
 
     .welcome-banner {
         flex-direction: column;
         text-align: center;
+        padding: 20px;
     }
 
     .subject-cover {
-        height: 140px;
+        height: 120px;
     }
 
     .table,
@@ -1645,5 +1636,36 @@ section {
     table td {
         font-size: 12px;
         padding: 8px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 15px;
+    }
+
+    .subjects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+    }
+
+    .subject-body {
+        padding: 12px;
+    }
+
+    .subject-body h3 {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .subject-body p {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    .subject-meta {
+        font-size: 11px;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
     }
 }
