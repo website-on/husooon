@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=950">
+    <meta name="viewport" content="width=800">
     <title>اكتشف المواد - حصون</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap"
@@ -311,7 +311,7 @@
         <div class="nav-container">
             <a href="index.html" class="logo text-dark"
                 style="display:flex; align-items:center; gap:10px; text-decoration:none;">
-                <img src="media__1778617038143.jpg" alt="Logo"
+                <img src="image_1778255598103.png" alt="Logo"
                     style="width: 50px; height: 50px; border-radius: 50%; object-fit:cover;">
                 <div class="logo-text" style="display:flex; flex-direction:column; line-height:1;">
                     <span class="ar" style="font-size:28px; font-weight:900; color:var(--primary-color);">حصون</span>
@@ -320,35 +320,34 @@
             </a>
 
             <div class="nav-actions">
-                <!-- Discover -->
                 <div class="discover-container">
-                    <a href="explore.html" class="btn-discover"
-                        style="padding:12px 25px; font-size:18px; text-decoration:none;">
+                    <a href="explore.html" class="btn-discover" style="padding:12px 25px; font-size:18px;">
                         <i class="fas fa-th-large"></i> <span data-i18n="discover">اكتشف المواد</span>
                     </a>
-                    <div class="mega-menu" id="mega-menu-main"
+                    <div class="mega-menu"
                         style="border-radius:20px; box-shadow:0 30px 60px rgba(0,0,0,0.15); padding:30px;">
                         <div class="mega-menu-grid"></div>
                     </div>
                 </div>
-
-                <!-- Country -->
-                <div class="country-container" style="position:relative; z-index:1100;">
-                    <a href="javascript:void(0)" class="nav-icon-circle country-flag"
-                        onclick="window.openCountryModal(event)"
-                        style="border:2px solid var(--primary-color); padding:2px; overflow:hidden; width:45px; height:45px; box-shadow:0 10px 20px rgba(0,0,0,0.05); display:flex; justify-content:center; align-items:center; cursor:pointer; text-decoration:none;">
-                        <img src="" alt="Flag" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                <div class="country-container">
+                    <a href="#" class="nav-icon-circle country-flag"
+                        style="border:3px solid var(--primary-color); padding:3px; overflow:hidden; width:50px; height:50px;">
+                        <img src="" alt="Country" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
                     </a>
+                    <div class="country-dropdown" style="border-radius:15px; padding:10px;">
+                        <a href="#" data-code="KW"><img src="https://flagcdn.com/kw.svg" alt="Kuwait"> الكويت</a>
+                        <a href="#" data-code="SA"><img src="https://flagcdn.com/sa.svg" alt="KSA"> السعودية</a>
+                        <a href="#" data-code="AE"><img src="https://flagcdn.com/ae.svg" alt="UAE"> الإمارات</a>
+                        <a href="#" data-code="QA"><img src="https://flagcdn.com/qa.svg" alt="Qatar"> قطر</a>
+                        <a href="#" data-code="OM"><img src="https://flagcdn.com/om.svg" alt="Oman"> سلطنة عمان</a>
+                        <a href="#" data-code="EG"><img src="https://flagcdn.com/eg.svg" alt="Egypt"> مصر</a>
+                    </div>
                 </div>
-
-                <!-- Cart -->
                 <a href="#" class="nav-icon-circle cart-icon" onclick="openCart(event)"
-                    style="width:45px; height:45px; background:#f4f7fa; color:#12b8c5; font-size:20px; box-shadow:0 4px 10px rgba(0,0,0,0.05); text-decoration:none; display:flex; justify-content:center; align-items:center;">
+                    style="width:50px; height:50px; background:#f4f7fa; color:#121e33;">
                     <i class="fas fa-shopping-cart"></i>
                 </a>
-
-                <!-- Login -->
-                <a href="login.html" class="btn-login" style="padding:12px 30px; font-size:18px; text-decoration:none;">
+                <a href="login.html" class="btn-login" style="padding:12px 30px; font-size:18px;">
                     <span data-i18n="login">تسجيل دخول</span>
                 </a>
             </div>
@@ -396,16 +395,18 @@
 
 
     <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script type="module" src="firebase-init.js"></script>
     <script type="module" src="firebase-data.js"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=6"></script>
     <script>
         // Use mapping for grades numerical representation
         const numMapping = {
             1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6",
             7: "7", 8: "8", 9: "9", 10: "10", 11: "11", 12: "12"
         };
-        const titleExtractRegex = /الصف\s+(?:الحادي\s+عشر|الثاني\s+عشر|الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر)|الحادي\s+عشر|الثاني\s+عشر|الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر/;
+        const titleExtractRegex = /الصف\s+(?:الحادي\s*عشر|الثاني\s*عشر|الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر)|الحادي\s*عشر|الثاني\s*عشر|الأول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر/;
 
         document.addEventListener('DOMContentLoaded', () => {
             renderStages();
@@ -465,22 +466,6 @@
 
         function goToGrade(val, name) {
             window.location.href = `grade.html?g=${val}&name=${encodeURIComponent(name)}`;
-        }
-
-        // Failsafe for UI toggles
-        window.toggleCountryMenu = window.toggleCountryMenu || function (e) {
-            if (e) e.preventDefault();
-            const menu = document.getElementById('country-dropdown-main');
-            if (menu) {
-                const isVisible = menu.style.display === 'block';
-                menu.style.display = isVisible ? 'none' : 'block';
-            }
-        };
-
-        function openCart(e) {
-            if (e) e.preventDefault();
-            const modal = document.getElementById('cart-modal');
-            if (modal) modal.style.display = 'flex';
         }
     </script>
 
