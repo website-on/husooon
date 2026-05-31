@@ -1558,11 +1558,14 @@ section {
         line-height: 1.6 !important;
     }
 
-    /* تكبير الازرار التي في الاعلى */
+    /* الازرار التي في الاعلى (اصغر ومتناسقة) */
     .nav-actions {
-        transform: scale(1.25) !important;
+        transform: scale(0.95) !important;
         transform-origin: center center !important;
-        margin-left: 20px;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        margin: 5px auto !important;
     }
 
     .logo img {
@@ -1575,27 +1578,59 @@ section {
     }
 
     /* ازرار الادارة و الالوان و الواتساب */
+    #floating-admin-btn,
     button[id*="admin-btn"],
     a[title*="الإدارة"],
     [id*="floating-admin"],
     button[title*="الإدارة"] {
-        transform: scale(1.5) !important;
+        transform: scale(1.3) !important;
         transform-origin: bottom left !important;
     }
 
+    #whatsapp-floating-btn,
     a[href*="wa.me"],
     .whatsapp,
     [class*="whatsapp"],
     img[src*="whatsapp"] {
-        transform: scale(1.5) !important;
+        transform: scale(1.3) !important;
         transform-origin: bottom right !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-decoration: none !important;
+        padding: 0 !important;
     }
 
+    #whatsapp-floating-btn i {
+        margin: auto !important;
+        line-height: normal !important;
+    }
+
+    #theme-toggle-btn,
     #color-toggle,
     .color-toggle,
     [onclick*="toggle"],
     [id*="color"] {
-        transform: scale(1.5) !important;
+        transform: scale(1.3) !important;
         transform-origin: bottom right !important;
+        bottom: 125px !important;
+        /* ارفع الزر قليلاً */
+    }
+
+    /* زوم الصفحات الداخلية (الإدارة، تسجيل الدخول، والمحتوى الداخلي) */
+    .login-wrapper {
+        zoom: 1.35 !important;
+    }
+
+    .admin-nav,
+    .admin-section,
+    body.dashboard-body .container {
+        zoom: 1.25 !important;
+    }
+
+    .content-area,
+    #grades-view,
+    #stages-view {
+        zoom: 1.15 !important;
     }
 }
