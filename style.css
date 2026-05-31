@@ -1560,8 +1560,8 @@ section {
 
     /* الازرار التي في الاعلى (اصغر ومتناسقة) */
     .nav-actions {
-        transform: scale(1.1) !important;
-        /* اكبر قليلا بناء على طلب المستخدم */
+        transform: scale(1.15) !important;
+        /* تم النكبير قليلا ثانية بناء على طلب المستخدم */
         transform-origin: center center !important;
         justify-content: center !important;
         flex-wrap: wrap !important;
@@ -1613,16 +1613,17 @@ section {
         text-decoration: none !important;
         padding: 0 !important;
         border-radius: 50% !important;
-        /* لضمان شكله الدائري */
-        overflow: hidden !important;
     }
 
     #whatsapp-floating-btn i {
-        margin: auto !important;
-        line-height: 1 !important;
-        /* لاصلاح شكل الايقونة */
-        font-size: 35px !important;
+        display: inline-block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: normal !important;
         text-align: center !important;
+        font-size: 38px !important;
+        transform: translate(1px, -1px) !important;
+        /* لتوسيط رمز الواتساب الأبيض بصرياً بتجاهل ذيله */
     }
 
     /* زوم الصفحات الداخلية (الإدارة، تسجيل الدخول، والمحتوى الداخلي) */
