@@ -167,7 +167,7 @@
                 للرئيسية</button>
         </div>
 
-        <div class="admin-nav">
+        <div class="admin-nav" id="main-admin-nav">
             <button class="active" onclick="showSection('tab-codes', this)">إدارة الأكواد</button>
             <button onclick="showSection('tab-users', this)">الطلاب المسجلين</button>
             <button onclick="showSection('tab-attendance', this)">الحضور والتقييمات</button>
@@ -177,6 +177,20 @@
             <button onclick="showSection('tab-links', this)">روابط الحصص</button>
             <button onclick="showSection('tab-files', this)">إرسال المحتوى الورقي</button>
             <button onclick="showSection('tab-custom', this)">إرسال محتوى لمستخدم</button>
+        </div>
+
+        <div class="restricted-nav" id="restricted-nav"
+            style="display:none; gap: 30px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap;">
+            <div onclick="showSection('tab-re-send', this)"
+                style="background: linear-gradient(135deg, #12b8c5, #1e3c72); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(18,184,197,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
+                <i class="fas fa-paper-plane" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
+                إرسال محتوى
+            </div>
+            <div onclick="showSection('tab-re-results', this)"
+                style="background: linear-gradient(135deg, #f44336, #e91e63); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(244,67,54,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
+                <i class="fas fa-poll" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
+                النتائج
+            </div>
         </div>
 
         <!-- Sections Content (Same as before but with working forms) -->
@@ -356,6 +370,11 @@
                 </div>
                 <button type="submit" class="btn-primary w-100 mt-20">نشر الامتحان</button>
             </form>
+
+            <h3 class="mt-30">الامتحانات الحالية</h3>
+            <div style="overflow-x:auto;">
+                <table id="table-exams-manager"></table>
+            </div>
         </div>
 
         <div id="tab-results" class="admin-section">
@@ -483,6 +502,56 @@
                 </div>
                 <button type="submit" class="btn-primary w-100" id="btn-cc-submit">إرسال المحتوى</button>
             </form>
+
+            <h3 class="mt-30">المحتويات المرسلة مسبقاً</h3>
+            <div style="overflow-x:auto;">
+                <table id="table-custom-content"></table>
+            </div>
+        </div>
+
+        <div id="tab-re-send" class="admin-section">
+            <h2 style="color:#12b8c5;">إرسال محتوى (مخصص للأدمن الثاني)</h2>
+            <form onsubmit="window.sendRestrictedContent(event)">
+                <div class="form-group">
+                    <label>كود الطالب (سيصل المحتوى لهذا الكود فقط)</label>
+                    <input type="text" id="re-code" required placeholder="أدخل كود الطالب هنا">
+                </div>
+                <div class="form-group">
+                    <label>نوع المحتوى</label>
+                    <select id="re-type" required>
+                        <option value="محتوى ورقي">محتوى ورقي</option>
+                        <option value="امتحانات">امتحانات</option>
+                        <option value="تسميعات">تسميعات</option>
+                        <option value="واجبات">واجبات</option>
+                        <option value="رابط خارجي">روابط خارجية</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>عنوان المحتوى / الوصف</label>
+                    <input type="text" id="re-title" required placeholder="مثال: الواجب الأول">
+                </div>
+                <div class="form-group">
+                    <label>الرابط (إن وجد)</label>
+                    <input type="text" id="re-url" placeholder="رابط خارجي إن وجد">
+                </div>
+                <div class="form-group">
+                    <label>ملف مرفق (إن وجد)</label>
+                    <input type="file" id="re-file" accept="image/*,.pdf">
+                </div>
+                <button type="submit" class="btn-primary w-100" id="btn-re-submit"
+                    style="font-size:20px; padding:15px;">إرسال</button>
+            </form>
+        </div>
+
+        <div id="tab-re-results" class="admin-section">
+            <h2 style="color:#12b8c5;">النتائج / الملفات المستلمة</h2>
+            <div style="overflow-x:auto;">
+                <table id="table-re-results"></table>
+            </div>
+            <h3 class="mt-30">حلول الاختبارات المستلمة</h3>
+            <div style="overflow-x:auto;">
+                <table id="table-re-exams"></table>
+            </div>
         </div>
     </div>
 
@@ -562,19 +631,59 @@
             let adminType = sessionStorage.getItem('adminType');
 
             const tCodes = document.getElementById('table-codes');
-            if (tCodes) tCodes.innerHTML = `<tr><th>الكود</th><th>مستخدم؟</th></tr>` + codes.map(c => `<tr><td>${c.code}</td><td style="color:${c.isUsed ? 'red' : 'green'}">${c.isUsed ? 'مستخدم' : 'متاح'}</td></tr>`).join('');
+            if (tCodes) {
+                let ths = `<th>الكود</th><th>مستخدم؟</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tCodes.innerHTML = `<tr>${ths}</tr>` + codes.map(c => {
+                    let tr = `<td>${c.code}</td><td style="color:${c.isUsed ? 'red' : 'green'}">${c.isUsed ? 'مستخدم' : 'متاح'}</td>`;
+                    if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('codes', '${c.fsId || c.code}', 'spedia_codes', 'code')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                    return `<tr>${tr}</tr>`;
+                }).join('');
+            }
 
             const tSubCodes = document.getElementById('table-sub-codes');
-            if (tSubCodes) tSubCodes.innerHTML = `<tr><th>الكود</th><th>النوع</th><th>العنوان</th><th>التاريخ</th></tr>` + subCodes.map(c => `<tr><td>${c.code}</td><td>${c.type === 'course' ? 'كورس' : 'كتاب'}</td><td>${c.title}</td><td>${c.date || ''}</td></tr>`).join('');
+            if (tSubCodes) {
+                let ths = `<th>الكود</th><th>النوع</th><th>العنوان</th><th>التاريخ</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tSubCodes.innerHTML = `<tr>${ths}</tr>` + subCodes.map(c => {
+                    let tr = `<td>${c.code}</td><td>${c.type === 'course' ? 'كورس' : 'كتاب'}</td><td>${c.title}</td><td>${c.date || ''}</td>`;
+                    if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('subscription_codes', '${c.fsId || c.code}', 'spedia_sub_codes', 'code')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                    return `<tr>${tr}</tr>`;
+                }).join('');
+            }
 
             const tUsers = document.getElementById('table-users');
-            if (tUsers) tUsers.innerHTML = `<tr><th>الكود</th><th>الاسم</th><th>الهاتف</th><th>الصف</th></tr>` + users.map(u => `<tr><td>${u.code}</td><td>${u.name}</td><td>${adminType === 'restricted' ? '********' : u.phone}</td><td>${u.grade}</td></tr>`).join('');
+            if (tUsers) {
+                let ths = `<th>الكود</th><th>الاسم</th><th>الهاتف</th><th>الصف</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tUsers.innerHTML = `<tr>${ths}</tr>` + users.map(u => {
+                    let tr = `<td>${u.code}</td><td>${u.name}</td><td>${adminType === 'restricted' ? '********' : u.phone}</td><td>${u.grade}</td>`;
+                    if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('users', '${u.fsId || u.code}', 'spedia_users', 'code')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                    return `<tr>${tr}</tr>`;
+                }).join('');
+            }
 
             const tAtt = document.getElementById('table-attendance');
-            if (tAtt) tAtt.innerHTML = `<tr><th>الكود</th><th>الاسم</th><th>التاريخ</th><th>الوقت</th></tr>` + att.map(a => `<tr><td>${a.code}</td><td>${a.name}</td><td>${a.date}</td><td>${a.time}</td></tr>`).join('');
+            if (tAtt) {
+                let ths = `<th>الكود</th><th>الاسم</th><th>التاريخ</th><th>الوقت</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tAtt.innerHTML = `<tr>${ths}</tr>` + att.map(a => {
+                    let tr = `<td>${a.code}</td><td>${a.name}</td><td>${a.date}</td><td>${a.time}</td>`;
+                    if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('attendance', '${a.fsId || a.code}', 'spedia_attendance', 'code')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                    return `<tr>${tr}</tr>`;
+                }).join('');
+            }
 
             const tExams = document.getElementById('table-submitted-exams');
-            if (tExams) tExams.innerHTML = `<tr><th>الطالب</th><th>الامتحان</th><th>الحالة</th><th>تصحيح</th></tr>` + subs.map(s => `<tr><td>${s.name || s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="window.openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px; background:var(--primary-color); border:none; color:#fff; border-radius:5px; cursor:pointer;">فتح</button></td></tr>`).join('');
+            if (tExams) {
+                let ths = `<th>الطالب</th><th>الامتحان</th><th>الحالة</th><th>تصحيح</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tExams.innerHTML = `<tr>${ths}</tr>` + subs.map(s => {
+                    let tr = `<td>${s.name || s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="window.openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px; background:var(--primary-color); border:none; color:#fff; border-radius:5px; cursor:pointer;">فتح</button></td>`;
+                    if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('submissions', '${s.fsId || s.id || s.code}', 'spedia_submissions', 'id')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                    return `<tr>${tr}</tr>`;
+                }).join('');
+            }
 
             let contentList = [];
             if (window.fsData && window.fsData.getAllContent) {
@@ -611,8 +720,82 @@
                 try { sFiles = await window.fsData.getAllStudentFiles(); localStorage.setItem('spedia_student_files', JSON.stringify(sFiles)); } catch (e) { }
             }
             const tSFiles = document.getElementById('table-student-files');
-            if (tSFiles) tSFiles.innerHTML = '<tr><th>الطالب</th><th>الدولة</th><th>الصف</th><th>الوصف</th><th>تاريخ</th><th>الملف</th></tr>' + sFiles.map(f => `<tr><td>${f.studentName || f.studentCode}</td><td>${f.country || 'EG'}</td><td>${f.grade}</td><td>${f.title}</td><td>${f.date}</td><td><a href="${f.url}" target="_blank" style="color:var(--primary-color);">معاينة</a></td></tr>`).join('');
+            if (tSFiles) {
+                let ths = `<th>الطالب</th><th>الدولة</th><th>الصف</th><th>الوصف</th><th>تاريخ</th><th>الملف</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tSFiles.innerHTML = `<tr>${ths}</tr>` + sFiles.map(f => {
+                    let tr = `<td>${f.studentName || f.studentCode}</td><td>${f.country || 'EG'}</td><td>${f.grade}</td><td>${f.title}</td><td>${f.date}</td><td><a href="${f.url}" target="_blank" style="color:var(--primary-color);">معاينة</a></td>`;
+                    if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('student_files', '${f.fsId || f.id || f.studentCode}', 'spedia_student_files', 'id')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                    return `<tr>${tr}</tr>`;
+                }).join('');
+            }
+
+            let allCreatedExams = [];
+            if (window.fsData && window.fsData.getAllExams) {
+                try { allCreatedExams = await window.fsData.getAllExams(); } catch (e) { }
+            } else {
+                allCreatedExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+            }
+            const tExamsManager = document.getElementById('table-exams-manager');
+            if (tExamsManager) {
+                let ths = `<th>الدولة</th><th>الصف</th><th>العنوان</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tExamsManager.innerHTML = `<tr>${ths}</tr>` + allCreatedExams.map(ex => {
+                    let tr = `<td>${ex.country}</td><td>${ex.grade}</td><td>${ex.title}</td>`;
+                    if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('exams', '${ex.fsId || ex.id || ex.title}', 'spedia_exams', 'id')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                    return `<tr>${tr}</tr>`;
+                }).join('');
+            }
+
+            const tCustomContent = document.getElementById('table-custom-content');
+            if (tCustomContent) {
+                let ccLocal = JSON.parse(localStorage.getItem('spedia_custom_content') || '[]');
+                let ccListId = [];
+                if (window.fsData && window.fsData.getCustomContentByUser) {
+                    try {
+                        // It gets all custom content if there's a getter. Since there's no getAllCustomContent, we just rely on local storage for admin.
+                        // Or we can just use localStorage which is populated when Admin sends it.
+                    } catch (e) { }
+                }
+                let ths = `<th>كود الطالب</th><th>النوع</th><th>العنوان</th><th>تاريخ</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tCustomContent.innerHTML = `<tr>${ths}</tr>` + ccLocal.map(c => {
+                    let tr = `<td>${c.studentCode}</td><td>${c.type}</td><td>${c.title}</td><td>${c.date}</td>`;
+                    if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('custom_content', '${c.fsId || c.id}', 'spedia_custom_content', 'id')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                    return `<tr>${tr}</tr>`;
+                }).join('');
+            }
+
+            if (adminType === 'restricted') {
+                const tReRes = document.getElementById('table-re-results');
+                if (tReRes) {
+                    tReRes.innerHTML = '<tr><th>الكود</th><th>الوصف</th><th>تاريخ</th><th>الملف المستلم</th></tr>' +
+                        sFiles.map(f => `<tr><td>${f.studentCode}</td><td>${f.title}</td><td>${f.date}</td><td><a href="${f.url}" target="_blank" style="color:#12b8c5;">فتح الملف</a></td></tr>`).join('');
+                }
+                const tReExams = document.getElementById('table-re-exams');
+                if (tReExams) {
+                    tReExams.innerHTML = `<tr><th>الكود</th><th>الامتحان</th><th>الحالة</th><th>تصحيح</th></tr>` +
+                        subs.map(s => `<tr><td>${s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="window.openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px; background:var(--primary-color); border:none; color:#fff; border-radius:5px; cursor:pointer;">فتح</button></td></tr>`).join('');
+                }
+            }
         }
+
+        window.deleteItemGeneric = async function (collection, idVal, lsKey, idProp) {
+            if (!confirm('هل تأكد حذف هذا العنصر نهائياً؟')) return;
+
+            let arr = JSON.parse(localStorage.getItem(lsKey) || '[]');
+            arr = arr.filter(item => {
+                if (item.fsId === idVal) return false;
+                if (item[idProp] && item[idProp].toString() === idVal.toString()) return false;
+                return true;
+            });
+            localStorage.setItem(lsKey, JSON.stringify(arr));
+
+            if (window.fsData && window.fsData.deleteGeneric) {
+                try { await window.fsData.deleteGeneric(collection, idVal, idProp); } catch (e) { console.warn(e); }
+            }
+            renderTables();
+        };
 
         window.deleteLink = async function (id) {
             if (!confirm('حذف الرابط؟')) return;
@@ -722,6 +905,49 @@
                 alert('حدث خطأ أثناء الإرسال: ' + er.message);
             }
             btn.innerText = 'إرسال المحتوى';
+        };
+
+        window.sendRestrictedContent = async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-re-submit');
+            btn.innerText = 'جاري الإرسال... الرجاء الانتظار';
+            try {
+                let code = document.getElementById('re-code').value;
+                let type = document.getElementById('re-type').value;
+                let title = document.getElementById('re-title').value;
+                let url = document.getElementById('re-url').value;
+
+                let file = document.getElementById('re-file').files[0];
+                let fileUrl = '';
+                if (file) {
+                    fileUrl = await window.uploadToCloudinary(file);
+                }
+
+                let cItem = {
+                    id: Date.now(),
+                    studentCode: code,
+                    type: type,
+                    title: title,
+                    url: url,
+                    fileUrl: fileUrl,
+                    date: new Date().toLocaleDateString('ar-EG'),
+                    sender: 'restricted'
+                };
+
+                if (window.fsData && window.fsData.addCustomContent) {
+                    try { await window.fsData.addCustomContent(cItem); } catch (er) { console.warn(er); }
+                }
+
+                let ccLocal = JSON.parse(localStorage.getItem('spedia_custom_content') || '[]');
+                ccLocal.push(cItem);
+                localStorage.setItem('spedia_custom_content', JSON.stringify(ccLocal));
+
+                alert('تم إرسال المحتوى للطالب بنجاح! سيتمكن من رؤيته في لوحته.');
+                e.target.reset();
+            } catch (er) {
+                alert('حدث خطأ أثناء الإرسال: ' + er.message);
+            }
+            btn.innerText = 'إرسال';
         };
 
         window.deleteContent = async function (id) {
@@ -970,8 +1196,21 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('isAdmin') !== 'yes') window.location.href = 'index.html';
-            else renderTables();
+            if (sessionStorage.getItem('isAdmin') !== 'yes') {
+                window.location.href = 'index.html';
+                return;
+            }
+            let adminType = sessionStorage.getItem('adminType');
+            if (adminType === 'restricted') {
+                document.getElementById('main-admin-nav').style.display = 'none';
+                document.getElementById('restricted-nav').style.display = 'flex';
+                showSection('tab-re-send');
+            } else {
+                document.getElementById('main-admin-nav').style.display = 'flex';
+                document.getElementById('restricted-nav').style.display = 'none';
+                showSection('tab-codes');
+            }
+            renderTables();
         });
     </script>
 </body>

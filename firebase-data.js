@@ -98,7 +98,7 @@ window.fsData = {
     },
     getAllSubmissions: async () => {
         const snap = await getDocs(collection(db, "submissions"));
-        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snap.docs.map(doc => ({ id: doc.id, fsId: doc.id, ...doc.data() }));
     },
     updateSubmission: async (id, data) => {
         return await updateDoc(doc(db, "submissions", id), data);
@@ -121,7 +121,7 @@ window.fsData = {
     },
     getAllUsers: async () => {
         const snap = await getDocs(collection(db, "users"));
-        return snap.docs.map(doc => doc.data());
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
     },
 
     // ATTENDANCE
@@ -130,7 +130,7 @@ window.fsData = {
     },
     getAttendance: async () => {
         const snap = await getDocs(collection(db, "attendance"));
-        return snap.docs.map(doc => doc.data());
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
     },
 
     // CODES (Activation Codes for platform access)
@@ -204,5 +204,21 @@ window.fsData = {
         const q = query(collection(db, "custom_content"), where("studentCode", "==", code));
         const snap = await getDocs(q);
         return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+    deleteGeneric: async (colName, idToQuery, matchField = 'id') => {
+        try {
+            await deleteDoc(doc(db, colName, idToQuery.toString()));
+            let qStr = matchField === 'id' ? parseInt(idToQuery) : idToQuery;
+            if (matchField === 'id' && isNaN(qStr)) qStr = idToQuery;
+            const q = query(collection(db, colName), where(matchField, "==", qStr));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                for (let document of snap.docs) {
+                    await deleteDoc(doc(db, colName, document.id));
+                }
+            }
+        } catch (e) {
+            console.warn("deleteGeneric error", e);
+        }
     }
 };
