@@ -82,6 +82,9 @@ window.fsData = {
             console.error("Firestore Delete Error:", e);
         }
     },
+    updateContent: async (id, data) => {
+        return await updateDoc(doc(db, "content", id), data);
+    },
 
     // EXAMS
     addExam: async (exam) => {
