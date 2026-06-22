@@ -186,6 +186,11 @@
                 <i class="fas fa-paper-plane" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
                 إرسال محتوى
             </div>
+            <div onclick="showSection('tab-exams', this)"
+                style="background: linear-gradient(135deg, #4caf50, #2e7d32); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(76,175,80,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
+                <i class="fas fa-edit" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
+                إضافة امتحان/واجب
+            </div>
             <div onclick="showSection('tab-re-results', this)"
                 style="background: linear-gradient(135deg, #f44336, #e91e63); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(244,67,54,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
                 <i class="fas fa-poll" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
@@ -345,6 +350,8 @@
                     <select id="ex-type">
                         <option value="exam">امتحان</option>
                         <option value="quiz">اختبار قصير</option>
+                        <option value="assignment">واجب</option>
+                        <option value="recitation">تسميع</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1201,6 +1208,11 @@
                     grade: document.getElementById('ex-grade').value,
                     country: document.getElementById('ex-country').value,
                     time: document.getElementById('ex-time').value,
+                    durationMinutes: document.getElementById('ex-time').value,
+                    type: document.getElementById('ex-type').value,
+                    typeName: document.getElementById('ex-type').options[document.getElementById('ex-type').selectedIndex].text,
+                    startDate: document.getElementById('ex-start').value,
+                    endDate: document.getElementById('ex-end').value,
                     questionsList: qs
                 };
                 if (window.fsData) await window.fsData.addExam(exam);
