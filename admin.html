@@ -371,6 +371,11 @@
                     <label>تاريخ الانتهاء</label>
                     <input type="datetime-local" id="ex-end" required>
                 </div>
+                <!-- حقل كود الطالب -->
+                <div class="form-group">
+                    <label>كود الطالب (اختياري - أضف كود الطالب لإرسال المحتوى له خصيصاً)</label>
+                    <input type="text" id="ex-student-code" placeholder="أدخل كود الطالب أو اتركه فارغاً للجميع">
+                </div>
                 <div id="dynamic-questions-container"></div>
                 <div style="display:flex; gap:10px; margin-top:10px;">
                     <button type="button" onclick="addQuestionField('mcq')" class="btn-primary" style="flex:1;">+ اختيار
@@ -431,6 +436,11 @@
                 <div class="form-group">
                     <label>رابط الحصة (Zoom, Meet, etc)</label>
                     <input type="url" id="lnk-url" required>
+                </div>
+                <!-- حقل كود الطالب -->
+                <div class="form-group">
+                    <label>كود الطالب (اختياري - لإرسال الرابط لطالب محدد)</label>
+                    <input type="text" id="lnk-student-code" placeholder="أدخل كود الطالب أو اتركه فارغاً للجميع">
                 </div>
                 <button type="submit" class="btn-primary w-100">حفظ ونشر الرابط</button>
             </form>
@@ -770,7 +780,13 @@
                 try { links = await window.fsData.getAllClassLinks(); localStorage.setItem('spedia_class_links', JSON.stringify(links)); } catch (e) { }
             }
             const tLinks = document.getElementById('table-links');
-            if (tLinks) tLinks.innerHTML = '<tr><th>الدولة</th><th>الصف</th><th>العنوان</th><th>الرابط</th><th>حذف</th></tr>' + links.map(l => `<tr><td>${l.country === 'ALL' ? 'كل الدول' : l.country}</td><td>${l.grade}</td><td>${l.title}</td><td><a href="${l.url}" target="_blank">فتح الرابط</a></td><td><button onclick="window.deleteLink('${l.fsId ? l.fsId : l.id}')" style="background:#f44336; color:#fff; padding:5px; border-radius:5px; border:none; cursor:pointer;">حذف</button></td></tr>`).join('');
+            if (tLinks) {
+                let ths = `<th>الدولة/الطالب</th><th>الصف</th><th>العنوان</th><th>الرابط</th><th>حذف</th>`;
+                tLinks.innerHTML = `<tr>${ths}</tr>` + links.map(l => {
+                    let targetText = l.studentCode ? `كود: ${l.studentCode}` : (l.country === 'ALL' ? 'كل الدول' : l.country);
+                    return `<tr><td>${targetText}</td><td>${l.grade}</td><td>${l.title}</td><td><a href="${l.url}" target="_blank">فتح الرابط</a></td><td><button onclick="window.deleteLink('${l.fsId ? l.fsId : l.id}')" style="background:#f44336; color:#fff; padding:5px; border-radius:5px; border:none; cursor:pointer;">حذف</button></td></tr>`;
+                }).join('');
+            }
 
             let sFiles = JSON.parse(localStorage.getItem('spedia_student_files') || '[]');
             if (window.fsData && window.fsData.getAllStudentFiles) {
@@ -795,10 +811,11 @@
             }
             const tExamsManager = document.getElementById('table-exams-manager');
             if (tExamsManager) {
-                let ths = `<th>الدولة</th><th>الصف</th><th>العنوان</th>`;
+                let ths = `<th>الدولة/الطالب</th><th>الصف</th><th>العنوان</th>`;
                 if (adminType === 'full') ths += `<th>حذف</th>`;
                 tExamsManager.innerHTML = `<tr>${ths}</tr>` + allCreatedExams.map(ex => {
-                    let tr = `<td>${ex.country}</td><td>${ex.grade}</td><td>${ex.title}</td>`;
+                    let targetText = ex.studentCode ? `كود: ${ex.studentCode}` : (ex.country === 'ALL' ? 'كل الدول' : ex.country);
+                    let tr = `<td>${targetText}</td><td>${ex.grade}</td><td>${ex.title}</td>`;
                     if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('exams', '${ex.fsId || ex.id || ex.title}', 'spedia_exams', 'id')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
                     return `<tr>${tr}</tr>`;
                 }).join('');
@@ -876,7 +893,8 @@
                 grade: document.getElementById('lnk-grade').value,
                 title: document.getElementById('lnk-title').value,
                 url: document.getElementById('lnk-url').value,
-                date: new Date().toLocaleDateString('ar-EG')
+                date: new Date().toLocaleDateString('ar-EG'),
+                studentCode: document.getElementById('lnk-student-code') ? document.getElementById('lnk-student-code').value.trim() : ''
             };
 
             if (window.fsData && window.fsData.addClassLink) {
@@ -1218,7 +1236,8 @@
                     typeName: document.getElementById('ex-type').options[document.getElementById('ex-type').selectedIndex].text,
                     startDate: document.getElementById('ex-start').value,
                     endDate: document.getElementById('ex-end').value,
-                    questionsList: qs
+                    questionsList: qs,
+                    studentCode: document.getElementById('ex-student-code') ? document.getElementById('ex-student-code').value.trim() : ''
                 };
                 if (window.fsData) await window.fsData.addExam(exam);
                 else {

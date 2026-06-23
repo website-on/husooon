@@ -1060,7 +1060,12 @@ window.loadStudentData = async function (user) {
         exams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
     }
 
-    let myExams = exams.filter(ex => String(ex.grade) === String(user.grade) && (!ex.country || ex.country === 'ALL' || ex.country === cCode));
+    let myExams = exams.filter(ex => {
+        if (ex.studentCode && ex.studentCode.trim() !== "") {
+            return ex.studentCode === user.code;
+        }
+        return String(ex.grade) === String(user.grade) && (!ex.country || ex.country === 'ALL' || ex.country === cCode);
+    });
     let listExams = document.getElementById('student-exams');
     if (listExams) {
         if (myExams.length) {
@@ -1160,7 +1165,12 @@ window.loadStudentData = async function (user) {
         if (!allLinks || !allLinks.length) {
             allLinks = JSON.parse(localStorage.getItem('spedia_class_links') || '[]');
         }
-        let myLinks = allLinks.filter(l => l.grade === String(user.grade) || l.grade === "ALL");
+        let myLinks = allLinks.filter(l => {
+            if (l.studentCode && l.studentCode.trim() !== "") {
+                return l.studentCode === user.code;
+            }
+            return l.grade === String(user.grade) || l.grade === "ALL";
+        });
         if (myLinks.length) {
             lnkContainer.innerHTML = myLinks.map(l => `
                 <div class="animate-on-scroll" style="background:#fff; border-right:5px solid var(--primary-color); border-radius:12px; padding:20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
