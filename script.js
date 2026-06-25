@@ -871,11 +871,21 @@ window.injectMySubscriptionsBtn = function () {
     }
 };
 
-window.submitExam = function (title) {
+window.submitExam = async function (title) {
     let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
     if (!user) return alert("الرجاء تسجيل الدخول أولاً");
 
-    let allExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+    let allExams = [];
+    if (window.fsData && window.fsData.getAllExams) {
+        try {
+            allExams = await window.fsData.getAllExams();
+        } catch (e) {
+            allExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+        }
+    } else {
+        allExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+    }
+
     let currentExam = allExams.find(ex => ex.title === title);
 
     // Fallback if exam object not found
@@ -993,11 +1003,21 @@ window.closeQuizSystem = function () {
     }
 }
 
-window.finishQuiz = function (title) {
+window.finishQuiz = async function (title) {
     let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
     if (!user) return;
 
-    let allExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+    let allExams = [];
+    if (window.fsData && window.fsData.getAllExams) {
+        try {
+            allExams = await window.fsData.getAllExams();
+        } catch (e) {
+            allExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+        }
+    } else {
+        allExams = JSON.parse(localStorage.getItem('spedia_exams') || '[]');
+    }
+
     let currentExam = allExams.find(ex => ex.title === title);
     let answers = {};
     if (currentExam && currentExam.questionsList) {
