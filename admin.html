@@ -162,9 +162,25 @@
                 <img src="media__1778617038143.jpg" alt="Logo" style="width:40px; height:40px; border-radius:50%;">
                 <span>حصون - لوحة الإدارة العامة</span>
             </h1>
-            <button onclick="window.location.href='index.html'" class="btn-primary"
-                style="background:#f44336; padding: 10px 20px; font-size: 16px;">خروج
-                للرئيسية</button>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <div style="position: relative; display: inline-block;">
+                    <button id="admin-noti-btn" onclick="toggleNotifications(event, 'admin')"
+                        style="background:transparent; border:none; font-size:24px; position:relative; cursor:pointer;"
+                        title="الإشعارات">
+                        <i class="fas fa-bell" style="color:#6a7c92;"></i>
+                        <span id="admin-noti-badge"
+                            style="display:none; position:absolute; top:-5px; right:-5px; background:#f44336; color:#fff; font-size:12px; padding:2px 6px; border-radius:10px; font-weight:bold;">0</span>
+                    </button>
+                    <div id="admin-noti-dropdown"
+                        style="display:none; position:absolute; top:40px; left:0; width:300px; background:#fff; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.1); z-index:1000; overflow:hidden;">
+                        <div style="padding:15px; background:#12b8c5; color:#fff; font-weight:bold;">الإشعارات (ردود
+                            الطلاب وغيرها)</div>
+                        <div id="admin-noti-list" style="max-height:300px; overflow-y:auto; padding:10px;"></div>
+                    </div>
+                </div>
+                <button onclick="window.location.href='index.html'" class="btn-primary"
+                    style="background:#f44336; padding: 10px 20px; font-size: 16px;">خروج للرئيسية</button>
+            </div>
         </div>
 
         <div class="admin-nav" id="main-admin-nav">
@@ -177,6 +193,9 @@
             <button onclick="showSection('tab-links', this)">روابط الحصص</button>
             <button onclick="showSection('tab-files', this)">إرسال المحتوى الورقي</button>
             <button onclick="showSection('tab-custom', this)">إرسال محتوى لمستخدم</button>
+            <button onclick="showSection('tab-re-chat', this)">نظام التواصل</button>
+            <button onclick="showSection('tab-monthly-reports', this)">التقارير الشهرية</button>
+            <button onclick="showSection('tab-teacher-reports', this)">تقارير الحصص</button>
         </div>
 
         <div class="restricted-nav" id="restricted-nav"
@@ -200,6 +219,21 @@
                 style="background: linear-gradient(135deg, #f44336, #e91e63); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(244,67,54,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
                 <i class="fas fa-poll" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
                 النتائج
+            </div>
+            <div onclick="showSection('tab-re-chat', this)"
+                style="background: linear-gradient(135deg, #9c27b0, #673ab7); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(156,39,176,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
+                <i class="fas fa-comments" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
+                التواصل مع الطلاب
+            </div>
+            <div onclick="showSection('tab-monthly-reports', this)"
+                style="background: linear-gradient(135deg, #009688, #00796b); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(0,150,136,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
+                <i class="fas fa-file-invoice" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
+                التقارير الشهرية
+            </div>
+            <div onclick="showSection('tab-teacher-reports', this)"
+                style="background: linear-gradient(135deg, #795548, #5d4037); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(121,85,72,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
+                <i class="fas fa-chalkboard-teacher" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
+                تقارير الحصص المشروحة
             </div>
         </div>
 
@@ -582,6 +616,87 @@
                 <table id="table-re-exams"></table>
             </div>
         </div>
+
+        <!-- 1. Communication System Tab -->
+        <div id="tab-re-chat" class="admin-section">
+            <h2 style="color:#9c27b0;">إرسال رسالة للطالب (نظام التواصل)</h2>
+            <form onsubmit="window.sendChatMessage(event)">
+                <div class="form-group">
+                    <label>كود الطالب</label>
+                    <input type="text" id="chat-code" required placeholder="أدخل كود الطالب">
+                </div>
+                <div class="form-group">
+                    <label>اسم المدرس</label>
+                    <input type="text" id="chat-teacher-name" required placeholder="اكتب اسم المدرس">
+                </div>
+                <div class="form-group">
+                    <label>الرسالة</label>
+                    <textarea id="chat-message" rows="4" required
+                        placeholder="اكتب الرسالة التي تريد إرسالها للطالب هنا..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-100"
+                    style="background:#9c27b0; font-size:20px; padding:15px;">إرسال الرسالة</button>
+            </form>
+
+            <h3 class="mt-30">قائمة الرسائل والردود</h3>
+            <div style="overflow-x:auto;">
+                <table id="table-chat-messages"></table>
+            </div>
+        </div>
+
+        <!-- 2. Monthly Reports Tab -->
+        <div id="tab-monthly-reports" class="admin-section">
+            <h2 style="color:#009688;">إرسال تقرير شهري للطالب</h2>
+            <form onsubmit="window.sendMonthlyReport(event)">
+                <div class="form-group">
+                    <label>كود الطالب</label>
+                    <input type="text" id="mr-code" required placeholder="أدخل كود الطالب">
+                </div>
+                <div class="form-group">
+                    <label>عنوان التقرير (أو اسم الشهر)</label>
+                    <input type="text" id="mr-title" required placeholder="مثال: تقرير شهر أكتوبر">
+                </div>
+                <div class="form-group">
+                    <label>التقييم العام</label>
+                    <select id="mr-evaluation" required>
+                        <option value="ممتاز">ممتاز</option>
+                        <option value="جيد جداً">جيد جداً</option>
+                        <option value="جيد">جيد</option>
+                        <option value="مقبول">مقبول</option>
+                        <option value="ضعيف">ضعيف</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>تفاصيل التقرير / ملاحظات</label>
+                    <textarea id="mr-details" rows="5" required
+                        placeholder="اكتب تفاصيل التقرير ومستوى الطالب..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-100"
+                    style="background:#009688; font-size:20px; padding:15px;">إرسال التقرير الشهري</button>
+            </form>
+        </div>
+
+        <!-- 3. Teacher Log Reports Tab -->
+        <div id="tab-teacher-reports" class="admin-section">
+            <h2 style="color:#795548;">كتابة تقرير الحصة المشروحة (للأدمن الثانوي)</h2>
+            <form onsubmit="window.addTeacherReport(event)">
+                <div class="form-group">
+                    <label>اسمك (اسم المدرس أو الأدمن الثانوي)</label>
+                    <input type="text" id="tr-name" required placeholder="مثال: أ. محمد أحمد">
+                </div>
+                <div class="form-group">
+                    <label>عنوان الحصة التي تم شرحها</label>
+                    <input type="text" id="tr-lesson" required placeholder="مثال: الباب الأول - الفيزياء الكلاسيكية">
+                </div>
+                <button type="submit" class="btn-primary w-100"
+                    style="background:#795548; font-size:20px; padding:15px;">حفظ التقرير في الجدول</button>
+            </form>
+
+            <h3 class="mt-30">جدول التقارير المسجلة</h3>
+            <div style="overflow-x:auto;">
+                <table id="table-teacher-reports"></table>
+            </div>
+        </div>
     </div>
 
     <!-- Edit Content Modal -->
@@ -851,6 +966,23 @@
                     tReExams.innerHTML = `<tr><th>الكود</th><th>الامتحان</th><th>الحالة</th><th>تصحيح</th></tr>` +
                         subs.map(s => `<tr><td>${s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="window.openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px; background:var(--primary-color); border:none; color:#fff; border-radius:5px; cursor:pointer;">فتح</button></td></tr>`).join('');
                 }
+            }
+
+            const chatTable = document.getElementById('table-chat-messages');
+            if (chatTable) {
+                let chats = JSON.parse(localStorage.getItem('spedia_chat') || '[]');
+                chatTable.innerHTML = `<tr><th>كود الطالب</th><th>المرسل / المدرس</th><th>الرسالة</th><th>التاريخ</th></tr>` +
+                    chats.map(c => {
+                        let senderLabel = c.sender === 'admin' ? `الإدارة (${c.teacher || ''})` : `الطالب (إلى: ${c.teacher || ''})`;
+                        return `<tr><td>${c.studentCode}</td><td>${senderLabel}</td><td>${c.message}</td><td>${c.date}</td></tr>`;
+                    }).join('');
+            }
+
+            const tReportTable = document.getElementById('table-teacher-reports');
+            if (tReportTable) {
+                let treports = JSON.parse(localStorage.getItem('spedia_teacher_reports') || '[]');
+                tReportTable.innerHTML = `<tr><th>اسم المدرس / الأدمن</th><th>عنوان الحصة</th><th>التاريخ</th></tr>` +
+                    treports.map(t => `<tr><td>${t.teacherName}</td><td>${t.lesson}</td><td>${t.date}</td></tr>`).join('');
             }
         }
 
@@ -1348,7 +1480,78 @@
                 showSection('tab-codes');
             }
             renderTables();
+
+            setTimeout(() => {
+                if (window.loadNotifications) window.loadNotifications('admin');
+            }, 300);
         });
+
+        window.sendChatMessage = async function (e) {
+            e.preventDefault();
+            let code = document.getElementById('chat-code').value.trim();
+            let teacher = document.getElementById('chat-teacher-name').value.trim();
+            let msg = document.getElementById('chat-message').value.trim();
+
+            let chatMsg = { id: Date.now(), studentCode: code, teacher: teacher, message: msg, date: new Date().toLocaleDateString('ar-EG'), sender: 'admin' };
+            let chats = JSON.parse(localStorage.getItem('spedia_chat') || '[]');
+            chats.push(chatMsg);
+            localStorage.setItem('spedia_chat', JSON.stringify(chats));
+
+            if (window.fsData && window.fsData.addChatMessage) {
+                try { await window.fsData.addChatMessage(chatMsg); } catch (er) { }
+            }
+
+            let notifs = JSON.parse(localStorage.getItem('spedia_notifications') || '[]');
+            notifs.push({ code: code, text: `رسالة جديدة من ${teacher}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+            localStorage.setItem('spedia_notifications', JSON.stringify(notifs));
+
+            alert('تم إرسال الرسالة بنجاح.');
+            e.target.reset();
+            renderTables();
+        };
+
+        window.sendMonthlyReport = async function (e) {
+            e.preventDefault();
+            let code = document.getElementById('mr-code').value.trim();
+            let title = document.getElementById('mr-title').value.trim();
+            let evalText = document.getElementById('mr-evaluation').value.trim();
+            let details = document.getElementById('mr-details').value.trim();
+
+            let report = { id: Date.now(), studentCode: code, title: title, evaluation: evalText, details: details, date: new Date().toLocaleDateString('ar-EG') };
+            let reports = JSON.parse(localStorage.getItem('spedia_monthly_reports') || '[]');
+            reports.push(report);
+            localStorage.setItem('spedia_monthly_reports', JSON.stringify(reports));
+
+            if (window.fsData && window.fsData.addMonthlyReport) {
+                try { await window.fsData.addMonthlyReport(report); } catch (er) { }
+            }
+
+            let notifs = JSON.parse(localStorage.getItem('spedia_notifications') || '[]');
+            notifs.push({ code: code, text: `تقرير شهري جديد: ${title}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+            localStorage.setItem('spedia_notifications', JSON.stringify(notifs));
+
+            alert('تم إرسال التقرير الشهري بنجاح.');
+            e.target.reset();
+        };
+
+        window.addTeacherReport = async function (e) {
+            e.preventDefault();
+            let name = document.getElementById('tr-name').value.trim();
+            let lesson = document.getElementById('tr-lesson').value.trim();
+
+            let treport = { id: Date.now(), teacherName: name, lesson: lesson, date: new Date().toLocaleDateString('ar-EG') };
+            let tReports = JSON.parse(localStorage.getItem('spedia_teacher_reports') || '[]');
+            tReports.push(treport);
+            localStorage.setItem('spedia_teacher_reports', JSON.stringify(tReports));
+
+            if (window.fsData && window.fsData.addTeacherReport) {
+                try { await window.fsData.addTeacherReport(treport); } catch (er) { }
+            }
+
+            alert('تم حفظ التقرير بنجاح.');
+            e.target.reset();
+            renderTables();
+        };
     </script>
 </body>
 

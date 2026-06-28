@@ -1258,6 +1258,55 @@ window.loadStudentData = async function (user) {
             customCont.innerHTML = '<p style="color:#888; font-weight:600;">لا يوجد محتوى مخصص لك حالياً.</p>';
         }
     }
+
+    // Messages
+    let messagesCont = document.getElementById('student-messages-container');
+    if (messagesCont) {
+        let allChats = JSON.parse(localStorage.getItem('spedia_chat') || '[]');
+        if (window.fsData && window.fsData.getChatMessages) {
+            try { allChats = await window.fsData.getChatMessages(); } catch (e) { }
+        }
+        let myChats = allChats.filter(c => c.studentCode === user.code);
+        if (myChats.length) {
+            messagesCont.innerHTML = myChats.map(c => `
+                <div class="animate-on-scroll" style="background:#fff; border-right:5px solid ${c.sender === 'admin' ? '#9c27b0' : '#4caf50'}; border-radius:12px; padding:15px; margin-bottom:10px; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="font-weight:bold; color:#121e33;">${c.sender === 'admin' ? 'الإدارة (المعلم: ' + (c.teacher || '') + ')' : 'أنت (إلى: ' + (c.teacher || '') + ')'}</span>
+                        <span style="font-size:12px; color:#888;">${c.date}</span>
+                    </div>
+                    <p style="margin-top:10px; color:#444;">${c.message}</p>
+                </div>
+            `).join('');
+        } else {
+            messagesCont.innerHTML = '<p style="color:#888; font-weight:600;">لا توجد رسائل سابقة.</p>';
+        }
+    }
+
+    // Monthly Reports
+    let reportsCont = document.getElementById('student-monthly-reports-container');
+    if (reportsCont) {
+        let allReports = JSON.parse(localStorage.getItem('spedia_monthly_reports') || '[]');
+        if (window.fsData && window.fsData.getMonthlyReports) {
+            try { allReports = await window.fsData.getMonthlyReports(); } catch (e) { }
+        }
+        let myReports = allReports.filter(r => r.studentCode === user.code);
+        if (myReports.length) {
+            reportsCont.innerHTML = myReports.map(r => `
+                <div class="animate-on-scroll" style="background:#fff; border-right:5px solid #009688; border-radius:12px; padding:20px; margin-bottom:10px; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
+                        <h4 style="font-weight:bold; color:#009688; margin:0;"><i class="fas fa-file-invoice"></i> ${r.title}</h4>
+                        <span style="background:${r.evaluation.includes('ممتاز') ? '#e8f5e9' : (r.evaluation.includes('ضعيف') ? '#ffebee' : '#fff3e0')}; color:${r.evaluation.includes('ممتاز') ? '#2e7d32' : (r.evaluation.includes('ضعيف') ? '#c62828' : '#ef6c00')}; padding:5px 10px; border-radius:20px; font-weight:bold; font-size:14px;">${r.evaluation}</span>
+                    </div>
+                    <p style="color:#444; line-height:1.6;">${r.details}</p>
+                    <div style="font-size:12px; color:#888; margin-top:10px; text-align:left;">${r.date}</div>
+                </div>
+            `).join('');
+        } else {
+            reportsCont.innerHTML = '<p style="color:#888; font-weight:600;">لم يتم إصدار تقارير شهرية لك بعد.</p>';
+        }
+    }
+
+    if (window.loadNotifications) window.loadNotifications('student');
 }
 
 window.showDashTab = function (tabId, el) {
@@ -1650,3 +1699,124 @@ window.uploadStudentFile = async function (e) {
     }
     btn.innerText = 'رفع وإرسال';
 };
+
+window.sendStudentMessage = async function (e) {
+    e.preventDefault();
+    let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
+    if (!user) return alert('يرجى تسجيل الدخول أولاً');
+
+    const btn = document.getElementById('btn-sm-send');
+    if (btn) btn.innerText = 'جاري الإرسال...';
+
+    let teacher = document.getElementById('sm-teacher').value.trim();
+    let msg = document.getElementById('sm-message').value.trim();
+
+    let chatMsg = {
+        id: Date.now(),
+        studentCode: user.code,
+        studentName: user.name,
+        teacher: teacher,
+        message: msg,
+        date: new Date().toLocaleDateString('ar-EG'),
+        sender: 'student'
+    };
+
+    let chats = JSON.parse(localStorage.getItem('spedia_chat') || '[]');
+    chats.push(chatMsg);
+    localStorage.setItem('spedia_chat', JSON.stringify(chats));
+
+    if (window.fsData && window.fsData.addChatMessage) {
+        try { await window.fsData.addChatMessage(chatMsg); } catch (er) { }
+    }
+
+    // notify admin
+    let notifs = JSON.parse(localStorage.getItem('spedia_admin_notifications') || '[]');
+    notifs.push({ code: 'admin', text: `رسالة جديدة من الطالب ${user.name} (${user.code}) إلى المدرس ${teacher}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+    localStorage.setItem('spedia_admin_notifications', JSON.stringify(notifs));
+    if (window.loadNotifications) window.loadNotifications('student');
+
+    alert('تم إرسال رسالتك للمعلم. سيتم الرد عليك في أقرب وقت!');
+    e.target.reset();
+    if (btn) btn.innerText = 'إرسال الرسالة';
+    if (window.loadStudentData) window.loadStudentData(user);
+};
+
+window.toggleNotifications = function (e, type = 'student') {
+    e.stopPropagation();
+    const dropdown = type === 'admin' ? document.getElementById('admin-noti-dropdown') : document.getElementById('noti-dropdown');
+    if (!dropdown) return;
+
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+        dropdown.style.display = 'block';
+
+        // mark as read
+        const lsKey = type === 'admin' ? 'spedia_admin_notifications' : 'spedia_notifications';
+        let notifs = JSON.parse(localStorage.getItem(lsKey) || '[]');
+        let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
+        let myNotifs = type === 'admin' ? notifs : notifs.filter(n => n.code === user.code);
+
+        myNotifs.forEach(n => n.read = true);
+        localStorage.setItem(lsKey, JSON.stringify(notifs));
+        window.loadNotifications(type);
+    } else {
+        dropdown.style.display = 'none';
+    }
+};
+
+window.loadNotifications = function (type = 'student') {
+    const lsKey = type === 'admin' ? 'spedia_admin_notifications' : 'spedia_notifications';
+    let notifs = JSON.parse(localStorage.getItem(lsKey) || '[]');
+    let myNotifs = [];
+
+    if (type === 'student') {
+        let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
+        if (!user) return;
+        myNotifs = notifs.filter(n => n.code === user.code);
+    } else {
+        myNotifs = notifs;
+    }
+
+    const unread = myNotifs.filter(n => !n.read).length;
+
+    const badge = type === 'admin' ? document.getElementById('admin-noti-badge') : document.getElementById('noti-badge');
+    const list = type === 'admin' ? document.getElementById('admin-noti-list') : document.getElementById('noti-list');
+
+    if (badge) {
+        if (unread > 0) {
+            badge.style.display = 'block';
+            badge.innerText = unread;
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    if (list) {
+        if (myNotifs.length > 0) {
+            // sort by newest
+            myNotifs.reverse();
+            list.innerHTML = myNotifs.map(n => `
+                <div style="padding:10px; border-bottom:1px solid #eee; background:${n.read ? '#fff' : '#f4f7fa'};">
+                    <div style="font-weight:bold; color:#121e33; font-size:14px;">${n.text}</div>
+                    <div style="font-size:11px; color:#888; margin-top:5px;">${n.date}</div>
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<div style="padding:15px; text-align:center; color:#888;">لا توجد إشعارات</div>';
+        }
+    }
+};
+
+// Listen for clicks outside to close dropdown
+document.addEventListener('click', function (e) {
+    const sDropdown = document.getElementById('noti-dropdown');
+    const aDropdown = document.getElementById('admin-noti-dropdown');
+    const sBtn = document.getElementById('noti-btn');
+    const aBtn = document.getElementById('admin-noti-btn');
+
+    if (sDropdown && sDropdown.style.display === 'block' && (!sBtn || !sBtn.contains(e.target)) && !sDropdown.contains(e.target)) {
+        sDropdown.style.display = 'none';
+    }
+    if (aDropdown && aDropdown.style.display === 'block' && (!aBtn || !aBtn.contains(e.target)) && !aDropdown.contains(e.target)) {
+        aDropdown.style.display = 'none';
+    }
+});
