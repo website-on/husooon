@@ -881,6 +881,7 @@
             let localContent = JSON.parse(localStorage.getItem('spedia_content') || '[]');
             // Merge to avoid duplicates
             localContent.forEach(lc => { if (!contentList.find(cc => cc.id === lc.id)) contentList.push(lc); });
+            localStorage.setItem('spedia_content', JSON.stringify(contentList));
 
             const tContent = document.getElementById('table-content-manager');
             if (tContent) {
