@@ -977,6 +977,9 @@
             const chatTable = document.getElementById('table-chat-messages');
             if (chatTable) {
                 let chats = JSON.parse(localStorage.getItem('spedia_chat') || '[]');
+                if (window.fsData && window.fsData.getAllChatMessages) {
+                    try { chats = await window.fsData.getAllChatMessages(); localStorage.setItem('spedia_chat', JSON.stringify(chats)); } catch (e) { }
+                }
                 chatTable.innerHTML = `<tr><th>كود الطالب</th><th>المرسل / المدرس</th><th>الرسالة</th><th>التاريخ</th></tr>` +
                     chats.map(c => {
                         let senderLabel = c.sender === 'admin' ? `الإدارة (${c.teacher || ''})` : `الطالب (إلى: ${c.teacher || ''})`;
@@ -987,6 +990,9 @@
             const tReportTable = document.getElementById('table-teacher-reports');
             if (tReportTable) {
                 let treports = JSON.parse(localStorage.getItem('spedia_teacher_reports') || '[]');
+                if (window.fsData && window.fsData.getAllTeacherReports) {
+                    try { treports = await window.fsData.getAllTeacherReports(); localStorage.setItem('spedia_teacher_reports', JSON.stringify(treports)); } catch (e) { }
+                }
                 tReportTable.innerHTML = `<tr><th>اسم المدرس / الأدمن</th><th>عنوان الحصة</th><th>التاريخ</th></tr>` +
                     treports.map(t => `<tr><td>${t.teacherName}</td><td>${t.lesson}</td><td>${t.date}</td></tr>`).join('');
             }

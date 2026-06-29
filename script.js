@@ -450,12 +450,15 @@ window.renderCurrentPage = async function () {
 
         let books = filteredContent.filter(c => c.type == 'book');
         let courses = filteredContent.filter(c => c.type == 'course');
+        let games = filteredContent.filter(c => c.type == 'game');
 
         const courseCont = document.getElementById('courses-list') || document.getElementById('courses-grid');
         const bookCont = document.getElementById('books-list') || document.getElementById('books-grid');
+        const gameCont = document.getElementById('games-grid');
 
         if (bookCont) window.renderCards(bookCont.id, books, "أريد طلب الكتاب", window.getDialect('req', cCode) || "الطلب الآن");
         if (courseCont) window.renderCards(courseCont.id, courses, "أريد الاشتراك في", window.getDialect('req', cCode) || "الاشتراك الآن");
+        if (gameCont) window.renderCards(gameCont.id, games, "أريد اللعب/التطبيق", "تشغيل/دخول اللعبة");
     }
     else if (path.includes('my-subscriptions.html')) {
         let code = localStorage.getItem('spedia_my_sub_code');
@@ -490,12 +493,15 @@ window.renderCurrentPage = async function () {
 
         let books = filteredContent.filter(c => c.type == 'book');
         let courses = filteredContent.filter(c => c.type == 'course');
+        let games = filteredContent.filter(c => c.type == 'game');
 
         const courseCont = document.getElementById('courses-grid');
         const bookCont = document.getElementById('books-grid');
+        const gameCont = document.getElementById('games-grid');
 
         if (bookCont) window.renderCards(bookCont.id, books, "", "إدخال كود القفل السري", true);
         if (courseCont) window.renderCards(courseCont.id, courses, "", "إدخال كود القفل السري", true);
+        if (gameCont) window.renderCards(gameCont.id, games, "", "إدخال كود القفل السري", true);
     }
     else if (path.includes('dashboard.html')) {
         let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
@@ -1266,8 +1272,11 @@ window.loadStudentData = async function (user) {
     let messagesCont = document.getElementById('student-messages-container');
     if (messagesCont) {
         let allChats = JSON.parse(localStorage.getItem('spedia_chat') || '[]');
-        if (window.fsData && window.fsData.getChatMessages) {
-            try { allChats = await window.fsData.getChatMessages(); } catch (e) { }
+        if (window.fsData && window.fsData.getAllChatMessages) {
+            try {
+                allChats = await window.fsData.getAllChatMessages();
+                localStorage.setItem('spedia_chat', JSON.stringify(allChats));
+            } catch (e) { }
         }
         let myChats = allChats.filter(c => c.studentCode === user.code);
         if (myChats.length) {
@@ -1289,8 +1298,11 @@ window.loadStudentData = async function (user) {
     let reportsCont = document.getElementById('student-monthly-reports-container');
     if (reportsCont) {
         let allReports = JSON.parse(localStorage.getItem('spedia_monthly_reports') || '[]');
-        if (window.fsData && window.fsData.getMonthlyReports) {
-            try { allReports = await window.fsData.getMonthlyReports(); } catch (e) { }
+        if (window.fsData && window.fsData.getAllMonthlyReports) {
+            try {
+                allReports = await window.fsData.getAllMonthlyReports();
+                localStorage.setItem('spedia_monthly_reports', JSON.stringify(allReports));
+            } catch (e) { }
         }
         let myReports = allReports.filter(r => r.studentCode === user.code);
         if (myReports.length) {

@@ -208,6 +208,34 @@ window.fsData = {
         const snap = await getDocs(q);
         return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
     },
+
+    // CHAT MESSAGES
+    addChatMessage: async (msg) => {
+        return await addDoc(collection(db, "chat_messages"), msg);
+    },
+    getAllChatMessages: async () => {
+        const snap = await getDocs(collection(db, "chat_messages"));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+
+    // MONTHLY REPORTS
+    addMonthlyReport: async (report) => {
+        return await addDoc(collection(db, "monthly_reports"), report);
+    },
+    getAllMonthlyReports: async () => {
+        const snap = await getDocs(collection(db, "monthly_reports"));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+
+    // TEACHER REPORTS
+    addTeacherReport: async (report) => {
+        return await addDoc(collection(db, "teacher_reports"), report);
+    },
+    getAllTeacherReports: async () => {
+        const snap = await getDocs(collection(db, "teacher_reports"));
+        return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+    },
+
     deleteGeneric: async (colName, idToQuery, matchField = 'id') => {
         try {
             await deleteDoc(doc(db, colName, idToQuery.toString()));
