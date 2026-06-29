@@ -544,6 +544,9 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
             if (item.type === 'course') {
                 let ytLink = item.videoUrl ? item.videoUrl : (item.youtubeId ? `https://www.youtube.com/watch?v=${item.youtubeId}` : '#');
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
+            } else if (item.type === 'game') {
+                let htmlLink = item.htmlUrl || '#';
+                btnHtml = `<a href="${htmlLink}" target="_blank" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #9c27b0, #6a1b9a); text-decoration:none;"><i class="fas fa-gamepad" style="font-size:24px;"></i> تشغيل اللعبة/التطبيق </a>`;
             } else {
                 let pdfLink = item.pdfUrl || '#';
                 btnHtml = `<a href="${pdfLink}" target="_blank" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32); text-decoration:none;"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </a>`;
@@ -555,7 +558,7 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
                     <a href="#" onclick="window.sendWhatsApp('أريد طلب كود فتح المحتوى لـ: ${item.title}'); return false;" style="display:block; text-align:center; color:#f44336; font-size:15px; font-weight:800; text-decoration:underline;">طلب كود فتح المحتوى</a>
                 </div>`;
             } else {
-                let cartAction = `window.initiatePurchase('${item.title}', '${window.renderPrice(item.priceBase)}', '${item.type === 'course' ? 'كورس' : 'كتاب'}')`;
+                let cartAction = `window.initiatePurchase('${item.title}', '${window.renderPrice(item.priceBase)}', '${item.type === 'course' ? 'كورس' : (item.type === 'game' ? 'لعبة' : 'كتاب')}')`;
                 let unlockBtn = item.courseCode ? `<button onclick="window.unlockCourse('${item.title}', '${item.courseCode}')" class="btn-primary" style="flex:1; padding:15px; border-radius:12px; font-size:16px; background:linear-gradient(135deg, #FF9800, #F57C00);"><i class="fas fa-key"></i> لدي كود</button>` : '';
                 btnHtml = `<div style="display:flex; gap:5px; width:100%;">
                     <button onclick="${cartAction}" class="btn-primary w-100" style="flex:2; padding:15px; border-radius:12px; font-size:16px;"><i class="fas fa-shopping-cart"></i> ${btnText}</button>
