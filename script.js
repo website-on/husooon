@@ -438,10 +438,13 @@ window.renderCurrentPage = async function () {
 
         const cCode = localStorage.getItem('spedia_country') || 'EG';
         let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
-        if (window.fsData) {
+        if (window.fsData && window.fsData.getAllContent) {
             try {
                 let fsContent = await window.fsData.getAllContent();
-                content = [...content, ...fsContent];
+                let combined = [...content, ...fsContent];
+                let uniqueMap = new Map();
+                combined.forEach(c => uniqueMap.set(c.id || c.fsId, c));
+                content = Array.from(uniqueMap.values());
             } catch (e) { console.warn(e); }
         }
 
@@ -469,10 +472,13 @@ window.renderCurrentPage = async function () {
         }
 
         let content = JSON.parse(localStorage.getItem('spedia_content') || '[]');
-        if (window.fsData) {
+        if (window.fsData && window.fsData.getAllContent) {
             try {
                 let fsContent = await window.fsData.getAllContent();
-                content = [...content, ...fsContent];
+                let combined = [...content, ...fsContent];
+                let uniqueMap = new Map();
+                combined.forEach(c => uniqueMap.set(c.id || c.fsId, c));
+                content = Array.from(uniqueMap.values());
             } catch (e) { console.warn(e); }
         }
 
@@ -1318,7 +1324,28 @@ window.loadStudentData = async function (user) {
                 </div>
             `).join('');
         } else {
-            reportsCont.innerHTML = '<p style="color:#888; font-weight:600;">لم يتم إصدار تقارير شهرية لك بعد.</p>';
+            reportsCont.innerHTML = '<p style="color:#888; font-weight:600;">لم يتم إصدار تقارير لك بعد.</p>';
+        }
+
+        // Add Teacher Reports rendering within the same container or separated visually
+        let allTReports = JSON.parse(localStorage.getItem('spedia_teacher_reports') || '[]');
+        if (window.fsData && window.fsData.getAllTeacherReports) {
+            try {
+                allTReports = await window.fsData.getAllTeacherReports();
+                localStorage.setItem('spedia_teacher_reports', JSON.stringify(allTReports));
+            } catch (e) { }
+        }
+        let myTReports = allTReports.filter(tr => tr.studentCode === user.code);
+        if (myTReports.length) {
+            reportsCont.innerHTML += `<h4 style="margin-top:20px; margin-bottom:15px; color:#795548;"><i class="fas fa-chalkboard-teacher"></i> تقارير الحصص المشروحة</h4>` + myTReports.map(tr => `
+                <div class="animate-on-scroll" style="background:#fff; border-right:5px solid #795548; border-radius:12px; padding:20px; margin-bottom:10px; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
+                        <h4 style="font-weight:bold; color:#795548; margin:0;">رقم الحصة: ${tr.classNumber || '-'} <span style="font-size:14px; color:#444; margin-right:10px;">(${tr.subject})</span></h4>
+                    </div>
+                    <p style="color:#444; line-height:1.6; margin-bottom:5px;"><strong>توقيع المعلم:</strong> ${tr.teacherSignature}</p>
+                    <div style="font-size:12px; color:#888; margin-top:5px; text-align:left;">بتاريخ: ${tr.classDate || tr.date || ''}</div>
+                </div>
+            `).join('');
         }
     }
 
