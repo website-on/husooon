@@ -687,12 +687,28 @@
             <h2 style="color:#795548;">كتابة تقرير الحصة المشروحة (للأدمن الثانوي)</h2>
             <form onsubmit="window.addTeacherReport(event)">
                 <div class="form-group">
-                    <label>اسمك (اسم المدرس أو الأدمن الثانوي)</label>
-                    <input type="text" id="tr-name" required placeholder="مثال: أ. محمد أحمد">
+                    <label>كود الطالب</label>
+                    <input type="text" id="tr-code" required placeholder="مثال: 1234">
                 </div>
                 <div class="form-group">
-                    <label>عنوان الحصة التي تم شرحها</label>
-                    <input type="text" id="tr-lesson" required placeholder="مثال: الباب الأول - الفيزياء الكلاسيكية">
+                    <label>اسم الطالب/الطلاب</label>
+                    <input type="text" id="tr-name" required placeholder="مثال: أحمد، محمود">
+                </div>
+                <div class="form-group">
+                    <label>اسم المادة</label>
+                    <input type="text" id="tr-subject" required placeholder="مثال: فيزياء">
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الحصة</label>
+                    <input type="date" id="tr-date" required>
+                </div>
+                <div class="form-group">
+                    <label>رقم الحصة</label>
+                    <input type="number" id="tr-number" required placeholder="مثال: 1">
+                </div>
+                <div class="form-group">
+                    <label>توقيع المعلم/ة</label>
+                    <input type="text" id="tr-teacher" required placeholder="اسم أو توقيع المعلم/ة">
                 </div>
                 <button type="submit" class="btn-primary w-100"
                     style="background:#795548; font-size:20px; padding:15px;">حفظ التقرير في الجدول</button>
@@ -994,8 +1010,8 @@
                 if (window.fsData && window.fsData.getAllTeacherReports) {
                     try { treports = await window.fsData.getAllTeacherReports(); localStorage.setItem('spedia_teacher_reports', JSON.stringify(treports)); } catch (e) { }
                 }
-                tReportTable.innerHTML = `<tr><th>اسم المدرس / الأدمن</th><th>عنوان الحصة</th><th>التاريخ</th></tr>` +
-                    treports.map(t => `<tr><td>${t.teacherName}</td><td>${t.lesson}</td><td>${t.date}</td></tr>`).join('');
+                tReportTable.innerHTML = `<tr><th>كود الطالب</th><th>اسم الطالب</th><th>المادة</th><th>تاريخ الحصة</th><th>رقم الحصة</th><th>توقيع المعلم</th></tr>` +
+                    treports.map(t => `<tr><td>${t.studentCode || ''}</td><td>${t.studentName || t.teacherName || ''}</td><td>${t.subject || t.lesson || ''}</td><td>${t.classDate || t.date || ''}</td><td>${t.classNumber || ''}</td><td>${t.teacherSignature || ''}</td></tr>`).join('');
             }
         }
 
@@ -1263,7 +1279,7 @@
         window.addContent = async function (e) {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
-            if (btn) btn.innerText = "جاري الحفظ...";
+            if (btn) { btn.innerText = "جاري الحفظ..."; btn.disabled = true; }
 
             try {
                 let ctType = document.getElementById('ct-type') ? document.getElementById('ct-type').value : 'course';
@@ -1352,7 +1368,7 @@
                 console.error("Save Error:", err);
                 alert('عذراً، فشل الحفظ. تأكد من إعدادات Storage أو اتصال الإنترنت.\nالمشكلة: ' + err.message);
             } finally {
-                if (btn) btn.innerText = "حفظ المحتوى";
+                if (btn) { btn.innerText = "حفظ المحتوى"; btn.disabled = false; }
             }
         }
 
@@ -1559,10 +1575,23 @@
 
         window.addTeacherReport = async function (e) {
             e.preventDefault();
+            let code = document.getElementById('tr-code').value.trim();
             let name = document.getElementById('tr-name').value.trim();
-            let lesson = document.getElementById('tr-lesson').value.trim();
+            let subject = document.getElementById('tr-subject').value.trim();
+            let cDate = document.getElementById('tr-date').value;
+            let cNumber = document.getElementById('tr-number').value.trim();
+            let teacher = document.getElementById('tr-teacher').value.trim();
 
-            let treport = { id: Date.now(), teacherName: name, lesson: lesson, date: new Date().toLocaleDateString('ar-EG') };
+            let treport = {
+                id: Date.now(),
+                studentCode: code,
+                studentName: name,
+                subject: subject,
+                classDate: cDate,
+                classNumber: cNumber,
+                teacherSignature: teacher,
+                date: new Date().toLocaleDateString('ar-EG') // Default record date
+            };
             let tReports = JSON.parse(localStorage.getItem('spedia_teacher_reports') || '[]');
             tReports.push(treport);
             localStorage.setItem('spedia_teacher_reports', JSON.stringify(tReports));

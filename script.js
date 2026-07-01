@@ -551,8 +551,9 @@ window.renderCards = function (containerId, items, whatsappPrefix, btnText, isMy
                 let ytLink = item.videoUrl ? item.videoUrl : (item.youtubeId ? `https://www.youtube.com/watch?v=${item.youtubeId}` : '#');
                 btnHtml = `<button onclick="window.open('${ytLink}', '_blank')" class="btn-primary w-100" style="width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32);"><i class="fas fa-play-circle" style="font-size:24px;"></i> شاهد الفيديو الآن </button>`;
             } else if (item.type === 'game') {
-                let htmlLink = item.htmlUrl || '#';
-                btnHtml = `<a href="${htmlLink}" target="_blank" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #9c27b0, #6a1b9a); text-decoration:none;"><i class="fas fa-gamepad" style="font-size:24px;"></i> تشغيل اللعبة/التطبيق </a>`;
+                let htmlLink = item.htmlUrl || item.fileUrl || '#';
+                btnHtml = `<button onclick="window.openGameModal('${htmlLink}')" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #9c27b0, #6a1b9a); border:none; color:#fff; cursor:pointer;"><i class="fas fa-gamepad" style="font-size:24px;"></i> تشغيل اللعبة/التطبيق </button>`;
+
             } else {
                 let pdfLink = item.pdfUrl || '#';
                 btnHtml = `<a href="${pdfLink}" target="_blank" class="btn-primary w-100" style="display:block; text-align:center; box-sizing:border-box; width:100%; padding:15px; border-radius:12px; font-size:18px; background:linear-gradient(135deg, #4caf50, #2e7d32); text-decoration:none;"><i class="fas fa-book-open" style="font-size:24px;"></i> تصفح الكتاب </a>`;
@@ -1309,7 +1310,7 @@ window.loadStudentData = async function (user) {
             reportsCont.innerHTML = myReports.map(r => `
                 <div class="animate-on-scroll" style="background:#fff; border-right:5px solid #009688; border-radius:12px; padding:20px; margin-bottom:10px; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
-                        <h4 style="font-weight:bold; color:#009688; margin:0;"><i class="fas fa-file-invoice"></i> ${r.title}</h4>
+                        <h4 style="font-weight:bold; color:#009688; margin:0;"><i class="fas fa-file-invoice"></i> ${r.title} <span style="font-size:14px; color:#444; margin-right:10px;">(كود الطالب: ${r.studentCode})</span></h4>
                         <span style="background:${r.evaluation.includes('ممتاز') ? '#e8f5e9' : (r.evaluation.includes('ضعيف') ? '#ffebee' : '#fff3e0')}; color:${r.evaluation.includes('ممتاز') ? '#2e7d32' : (r.evaluation.includes('ضعيف') ? '#c62828' : '#ef6c00')}; padding:5px 10px; border-radius:20px; font-weight:bold; font-size:14px;">${r.evaluation}</span>
                     </div>
                     <p style="color:#444; line-height:1.6;">${r.details}</p>
@@ -1709,11 +1710,32 @@ window.uploadStudentFile = async function (e) {
 
         alert('تم إرسال الملف للإدارة بنجاح!');
         e.target.reset();
+        window.loadStudentData(user);
     } catch (err) {
-        alert('حدث خطأ في الرفع: ' + err.message);
+        alert('خطأ أثناء الرفع: ' + err.message);
+    } finally {
+        btn.innerText = 'رفع وإرسال';
     }
-    btn.innerText = 'رفع وإرسال';
 };
+
+window.openGameModal = function (url) {
+    let modal = document.getElementById('game-iframe-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'game-iframe-modal';
+        modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999999; display:flex; flex-direction:column; justify-content:center; align-items:center;';
+        modal.innerHTML = `
+            <div style="width:95%; height:95%; position:relative; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+                <button onclick="document.getElementById('game-iframe-modal').style.display='none'; document.getElementById('game-iframe').src='';" style="position:absolute; top:20px; right:20px; z-index:10; background:#f44336; color:#fff; border:none; border-radius:50%; width:50px; height:50px; font-size:24px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.2);"><i class="fas fa-times"></i></button>
+                <iframe id="game-iframe" src="" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    document.getElementById('game-iframe').src = url;
+    modal.style.display = 'flex';
+};
+
 
 window.sendStudentMessage = async function (e) {
     e.preventDefault();
