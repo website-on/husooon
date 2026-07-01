@@ -1349,6 +1349,27 @@ window.loadStudentData = async function (user) {
         }
     }
 
+    let crNameField = document.getElementById('cr-student-name');
+    if (crNameField) crNameField.value = user.name;
+
+    let crList = document.getElementById('student-class-reports-list');
+    if (crList) {
+        let pendingReports = JSON.parse(localStorage.getItem('spedia_student_class_reports') || '[]');
+        let myPending = pendingReports.filter(pr => pr.studentCode === user.code);
+
+        let allTReports = JSON.parse(localStorage.getItem('spedia_teacher_reports') || '[]');
+        let myTReports = allTReports.filter(tr => tr.studentCode === user.code);
+
+        let html = '';
+        myPending.forEach(pr => {
+            html += `<div style="background:#fff; border-right:5px solid #ff9800; padding:15px; border-radius:10px; margin-bottom:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05);"><h4 style="margin:0; font-weight:bold; color:#ff9800;">${pr.className} - ${pr.subjectName}</h4><p style="margin:5px 0; color:#666; font-size:14px;">${pr.summary}</p><p style="margin:5px 0; color:#888; font-weight:bold; font-size:12px;">بانتظار توقيع المعلم <i class="fas fa-clock"></i></p></div>`;
+        });
+        myTReports.forEach(tr => {
+            html += `<div style="background:#fff; border-right:5px solid #4caf50; padding:15px; border-radius:10px; margin-bottom:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05);"><h4 style="margin:0; font-weight:bold; color:#4caf50;">${tr.subject} - الحصة: ${tr.classNumber || '-'}</h4><p style="margin:5px 0; color:#666; font-size:14px;">توقيع المعلم: ${tr.teacherSignature}</p><p style="margin:5px 0; color:#888; font-weight:bold; font-size:12px;">تم الاعتماد <i class="fas fa-check-circle"></i></p></div>`;
+        });
+        crList.innerHTML = html || '<p style="color:#888; font-weight:bold;">لا توجد تقارير مسجلة</p>';
+    }
+
     if (window.loadNotifications) window.loadNotifications('student');
 }
 
@@ -1805,6 +1826,40 @@ window.sendStudentMessage = async function (e) {
     if (window.loadStudentData) window.loadStudentData(user);
 };
 
+window.submitClassReport = async function (e) {
+    e.preventDefault();
+    let user = JSON.parse(localStorage.getItem('spedia_currentUser'));
+    if (!user) return alert('يرجى تسجيل الدخول أولاً');
+
+    const btn = document.getElementById('btn-cr-send');
+    if (btn) btn.innerText = 'جاري الإرسال...';
+
+    let reportObj = {
+        id: Date.now(),
+        studentCode: user.code,
+        studentName: user.name,
+        className: document.getElementById('cr-class-name').value.trim(),
+        classDate: document.getElementById('cr-class-date').value,
+        subjectName: document.getElementById('cr-subject-name').value.trim(),
+        summary: document.getElementById('cr-summary').value.trim(),
+        date: new Date().toLocaleDateString('ar-EG')
+    };
+
+    let allReports = JSON.parse(localStorage.getItem('spedia_student_class_reports') || '[]');
+    allReports.push(reportObj);
+    localStorage.setItem('spedia_student_class_reports', JSON.stringify(allReports));
+
+    if (window.fsData && window.fsData.addStudentClassReport) {
+        try { await window.fsData.addStudentClassReport(reportObj); } catch (er) { }
+    }
+
+    alert('تم إرسال التقرير للإدارة بنجاح.');
+    e.target.reset();
+    if (document.getElementById('cr-student-name')) document.getElementById('cr-student-name').value = user.name;
+    if (btn) btn.innerText = 'إرسال التقرير للإدارة';
+    window.loadStudentData(user);
+};
+
 window.toggleNotifications = function (e, type = 'student') {
     e.stopPropagation();
     const dropdown = type === 'admin' ? document.getElementById('admin-noti-dropdown') : document.getElementById('noti-dropdown');
@@ -1884,3 +1939,30 @@ document.addEventListener('click', function (e) {
         aDropdown.style.display = 'none';
     }
 });
+
+window.filterPageContent = function () {
+    let termObj = document.getElementById('content-search-bar');
+    if (!termObj) return;
+    let query = termObj.value.toLowerCase().trim();
+    let cards = document.querySelectorAll('.course-card, .book-card, .subject-mini-card');
+    cards.forEach(card => {
+        let titleEl = card.querySelector('h3') || card.querySelector('h4') || card;
+        let titleText = titleEl ? titleEl.innerText.toLowerCase() : '';
+        if (titleText.includes(query)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    let games = document.querySelectorAll('.game-card, .exam-card, .file-card');
+    games.forEach(card => {
+        let titleEl = card.querySelector('h3') || card.querySelector('h4') || card;
+        let titleText = titleEl ? titleEl.innerText.toLowerCase() : '';
+        if (titleText.includes(query)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+};
