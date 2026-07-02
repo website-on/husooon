@@ -677,9 +677,14 @@
                     <textarea id="mr-details" rows="5" required
                         placeholder="اكتب تفاصيل التقرير ومستوى الطالب..."></textarea>
                 </div>
-                <button type="submit" class="btn-primary w-100"
+                <button type="submit" id="btn-mr-send" class="btn-primary w-100"
                     style="background:#009688; font-size:20px; padding:15px;">إرسال التقرير الشهري</button>
             </form>
+
+            <h3 class="mt-30">التقارير الشهرية المسجلة بنظام الإدارة</h3>
+            <div style="overflow-x:auto;">
+                <table id="table-monthly-reports"></table>
+            </div>
         </div>
 
         <!-- 3. Teacher Log Reports Tab -->
@@ -1016,6 +1021,22 @@
             }
 
 
+            const tMonthly = document.getElementById('table-monthly-reports');
+            if (tMonthly) {
+                let mreports = [];
+                try { mreports = JSON.parse(localStorage.getItem('spedia_monthly_reports') || '[]'); } catch (e) { }
+                if (window.fsData && window.fsData.getAllMonthlyReports) {
+                    try { mreports = await window.fsData.getAllMonthlyReports(); localStorage.setItem('spedia_monthly_reports', JSON.stringify(mreports)); } catch (e) { }
+                }
+                let ths = `<th>كود الطالب</th><th>العنوان</th><th>التقييم</th><th>النبذة</th><th>تاريخ</th>`;
+                if (adminType === 'full') ths += `<th>حذف</th>`;
+                tMonthly.innerHTML = `<tr>${ths}</tr>` +
+                    mreports.map(m => {
+                        let tr = `<td>${m.studentCode}</td><td>${m.title}</td><td><span style="font-weight:bold;">${m.evaluation}</span></td><td>${m.details}</td><td>${m.date}</td>`;
+                        if (adminType === 'full') tr += `<td><button type="button" onclick="window.deleteItemGeneric('monthly_reports', '${m.fsId || m.id}', 'spedia_monthly_reports', 'id')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+                        return `<tr>${tr}</tr>`;
+                    }).join('');
+            }
         }
 
         window.deleteItemGeneric = async function (collection, idVal, lsKey, idProp) {
@@ -1554,26 +1575,31 @@
 
         window.sendMonthlyReport = async function (e) {
             e.preventDefault();
-            let code = document.getElementById('mr-code').value.trim();
-            let title = document.getElementById('mr-title').value.trim();
-            let evalText = document.getElementById('mr-evaluation').value.trim();
-            let details = document.getElementById('mr-details').value.trim();
+            try {
+                let code = document.getElementById('mr-code').value.trim();
+                let title = document.getElementById('mr-title').value.trim();
+                let evalText = document.getElementById('mr-evaluation').value.trim();
+                let details = document.getElementById('mr-details').value.trim();
 
-            let report = { id: Date.now(), studentCode: code, title: title, evaluation: evalText, details: details, date: new Date().toLocaleDateString('ar-EG') };
-            let reports = JSON.parse(localStorage.getItem('spedia_monthly_reports') || '[]');
-            reports.push(report);
-            localStorage.setItem('spedia_monthly_reports', JSON.stringify(reports));
+                let report = { id: Date.now(), studentCode: code, title: title, evaluation: evalText, details: details, date: new Date().toLocaleDateString('ar-EG') };
+                let reports = JSON.parse(localStorage.getItem('spedia_monthly_reports') || '[]');
+                reports.push(report);
+                localStorage.setItem('spedia_monthly_reports', JSON.stringify(reports));
 
-            if (window.fsData && window.fsData.addMonthlyReport) {
-                try { await window.fsData.addMonthlyReport(report); } catch (er) { }
+                if (window.fsData && window.fsData.addMonthlyReport) {
+                    try { await window.fsData.addMonthlyReport(report); } catch (er) { console.warn(er); }
+                }
+
+                let notifs = JSON.parse(localStorage.getItem('spedia_notifications') || '[]');
+                notifs.push({ code: code, text: `تقرير شهري جديد: ${title}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+                localStorage.setItem('spedia_notifications', JSON.stringify(notifs));
+
+                alert('تم إرسال التقرير الشهري واعتماده بنجاح.');
+                e.target.reset();
+                renderTables();
+            } catch (err) {
+                alert('عذراً، حدث خطأ: ' + err.message);
             }
-
-            let notifs = JSON.parse(localStorage.getItem('spedia_notifications') || '[]');
-            notifs.push({ code: code, text: `تقرير شهري جديد: ${title}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
-            localStorage.setItem('spedia_notifications', JSON.stringify(notifs));
-
-            alert('تم إرسال التقرير الشهري بنجاح.');
-            e.target.reset();
         };
 
         window.addTeacherReport = async function (e) {
@@ -1610,7 +1636,11 @@
                 try { await window.fsData.addTeacherReport(treport); } catch (er) { }
             }
 
-            alert('تم حفظ واعتماد التقرير بنجاح.');
+            let notifs = JSON.parse(localStorage.getItem('spedia_notifications') || '[]');
+            notifs.push({ code: code, text: `تم تسجيل تقرير حصة جديد: ${subject} (${cNumber})`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+            localStorage.setItem('spedia_notifications', JSON.stringify(notifs));
+
+            alert('تم حفظ التقرير وإرساله للطالب بنجاح.');
             e.target.reset();
             if (document.getElementById('tr-pending-id')) document.getElementById('tr-pending-id').value = '';
             renderTables();
