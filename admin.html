@@ -684,14 +684,8 @@
 
         <!-- 3. Teacher Log Reports Tab -->
         <div id="tab-teacher-reports" class="admin-section">
-            <h2 style="color:#795548;">تقارير الطلاب (بانتظار توقيع المعلم)</h2>
-            <div style="overflow-x:auto;">
-                <table id="table-incoming-reports"></table>
-            </div>
-
-            <h2 style="color:#795548; margin-top:40px;">كتابة تقرير الحصة المشروحة واعتمادها (للأدمن الثانوي)</h2>
+            <h2 style="color:#795548; margin-top:20px;">كتابة وتوثيق تقرير الحصة المشروحة (للأدمن العادي والثانوي)</h2>
             <form onsubmit="window.addTeacherReport(event)">
-                <input type="hidden" id="tr-pending-id">
                 <div class="form-group">
                     <label>كود الطالب</label>
                     <input type="text" id="tr-code" required placeholder="مثال: 1234">
@@ -790,19 +784,7 @@
             if (btn) btn.classList.add('active');
         }
 
-        window.populateSignReport = function (id) {
-            let reports = JSON.parse(localStorage.getItem('spedia_student_class_reports') || '[]');
-            let report = reports.find(r => r.id.toString() === id.toString());
-            if (report) {
-                document.getElementById('tr-pending-id').value = id;
-                document.getElementById('tr-code').value = report.studentCode;
-                document.getElementById('tr-name').value = report.studentName;
-                document.getElementById('tr-subject').value = report.subjectName;
-                document.getElementById('tr-number').value = report.className;
-                document.getElementById('tr-date').value = report.classDate || new Date().toISOString().split('T')[0];
-                document.getElementById('tr-teacher').focus();
-            }
-        };
+
 
         window.addEval = async function (e) {
             e.preventDefault();
@@ -1033,12 +1015,7 @@
                     treports.map(t => `<tr><td>${t.studentCode || ''}</td><td>${t.studentName || t.teacherName || ''}</td><td>${t.subject || t.lesson || ''}</td><td>${t.classDate || t.date || ''}</td><td>${t.classNumber || ''}</td><td>${t.teacherSignature || ''}</td></tr>`).join('');
             }
 
-            const tIncomingReports = document.getElementById('table-incoming-reports');
-            if (tIncomingReports) {
-                let pendingReports = JSON.parse(localStorage.getItem('spedia_student_class_reports') || '[]');
-                tIncomingReports.innerHTML = `<tr><th>كود الطالب</th><th>اسم الطالب</th><th>المادة</th><th>تاريخ الحصة</th><th>اسم الحصة</th><th>نبذة</th><th>توقيع المعلم والإعتماد</th></tr>` +
-                    pendingReports.map(pr => `<tr><td>${pr.studentCode}</td><td>${pr.studentName}</td><td>${pr.subjectName}</td><td>${pr.classDate}</td><td>${pr.className}</td><td>${pr.summary}</td><td><button type="button" onclick="window.populateSignReport('${pr.id}')" style="background:#4caf50; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">توقيع واعتماد</button></td></tr>`).join('');
-            }
+
         }
 
         window.deleteItemGeneric = async function (collection, idVal, lsKey, idProp) {
