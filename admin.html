@@ -623,8 +623,35 @@
             <h2 style="color:#9c27b0;">إرسال رسالة للطالب (نظام التواصل)</h2>
             <form onsubmit="window.sendChatMessage(event)">
                 <div class="form-group">
-                    <label>كود الطالب</label>
-                    <input type="text" id="chat-code" required placeholder="أدخل كود الطالب">
+                    <label>كود الطالب (اختياري - اترك فارغاً للإرسال لصف كامل)</label>
+                    <input type="text" id="chat-code" placeholder="أدخل كود الطالب">
+                </div>
+                <div class="form-group">
+                    <label>الدولة</label>
+                    <select id="chat-country"
+                        onchange="if(window.updateCountryStages) window.updateCountryStages('chat-country', 'chat-stage', 'chat-grade')">
+                        <option value="ALL">جميع الدول</option>
+                        <option value="KW">الكويت</option>
+                        <option value="SA">السعودية</option>
+                        <option value="AE">الإمارات</option>
+                        <option value="QA">قطر</option>
+                        <option value="OM">عمان</option>
+                        <option value="EG">مصر</option>
+                        <option value="BH">البحرين</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المرحلة</label>
+                    <select id="chat-stage"
+                        onchange="if(window.updateGrades) window.updateGrades('chat-country', 'chat-stage', 'chat-grade')">
+                        <option value="ALL">الكل</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الصف</label>
+                    <select id="chat-grade" required>
+                        <option value="ALL">الكل</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>اسم المدرس</label>
@@ -1513,8 +1540,21 @@
             let code = document.getElementById('chat-code').value.trim();
             let teacher = document.getElementById('chat-teacher-name').value.trim();
             let msg = document.getElementById('chat-message').value.trim();
+            let country = document.getElementById('chat-country') ? document.getElementById('chat-country').value : 'ALL';
+            let stage = document.getElementById('chat-stage') ? document.getElementById('chat-stage').value : 'ALL';
+            let grade = document.getElementById('chat-grade') ? document.getElementById('chat-grade').value : 'ALL';
 
-            let chatMsg = { id: Date.now(), studentCode: code, teacher: teacher, message: msg, date: new Date().toLocaleDateString('ar-EG'), sender: 'admin' };
+            let chatMsg = {
+                id: Date.now(),
+                studentCode: code,
+                country: country,
+                stage: stage,
+                grade: grade,
+                teacher: teacher,
+                message: msg,
+                date: new Date().toLocaleDateString('ar-EG'),
+                sender: 'admin'
+            };
             let chats = JSON.parse(localStorage.getItem('spedia_chat') || '[]');
             chats.push(chatMsg);
             localStorage.setItem('spedia_chat', JSON.stringify(chats));
@@ -1524,7 +1564,11 @@
             }
 
             let notifs = JSON.parse(localStorage.getItem('spedia_notifications') || '[]');
-            notifs.push({ code: code, text: `رسالة جديدة من ${teacher}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+            if (code) {
+                notifs.push({ code: code, text: `رسالة جديدة من ${teacher}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+            } else {
+                notifs.push({ grade: grade, text: `رسالة للمرحلة من ${teacher}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+            }
             localStorage.setItem('spedia_notifications', JSON.stringify(notifs));
 
             alert('تم إرسال الرسالة بنجاح.');

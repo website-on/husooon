@@ -1285,7 +1285,15 @@ window.loadStudentData = async function (user) {
                 localStorage.setItem('spedia_chat', JSON.stringify(allChats));
             } catch (e) { }
         }
-        let myChats = allChats.filter(c => c.studentCode === user.code);
+        let myChats = allChats.filter(c => {
+            if (c.studentCode && c.studentCode.trim() !== "") {
+                return c.studentCode === user.code;
+            }
+            if (c.grade) {
+                return (c.grade === String(user.grade) || c.grade === "ALL") && (!c.country || c.country === "ALL" || c.country === cCode);
+            }
+            return false;
+        });
         if (myChats.length) {
             messagesCont.innerHTML = myChats.map(c => `
                 <div class="animate-on-scroll" style="background:#fff; border-right:5px solid ${c.sender === 'admin' ? '#9c27b0' : '#4caf50'}; border-radius:12px; padding:15px; margin-bottom:10px; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
