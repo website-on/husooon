@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=800">
     <title>لوحة الإدارة - Spedia</title>
+    <link rel="icon" href="media__1782732982554.jpg" type="image/jpeg">
     <link rel="stylesheet" href="style.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap"
         rel="stylesheet">
@@ -194,8 +195,7 @@
             <button onclick="showSection('tab-files', this)">إرسال المحتوى الورقي</button>
             <button onclick="showSection('tab-custom', this)">إرسال محتوى لمستخدم</button>
             <button onclick="showSection('tab-re-chat', this)">نظام التواصل</button>
-            <button onclick="showSection('tab-monthly-reports', this)">التقارير الشهرية</button>
-            <button onclick="showSection('tab-teacher-reports', this)">تقارير الحصص</button>
+            <button onclick="showSection('tab-monthly-reports', this)">تقرير الحصص</button>
         </div>
 
         <div class="restricted-nav" id="restricted-nav"
@@ -228,12 +228,7 @@
             <div onclick="showSection('tab-monthly-reports', this)"
                 style="background: linear-gradient(135deg, #009688, #00796b); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(0,150,136,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
                 <i class="fas fa-file-invoice" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
-                التقارير الشهرية
-            </div>
-            <div onclick="showSection('tab-teacher-reports', this)"
-                style="background: linear-gradient(135deg, #795548, #5d4037); color: #fff; padding: 40px; border-radius: 20px; cursor: pointer; text-align: center; flex: 1; min-width: 250px; box-shadow: 0 10px 30px rgba(121,85,72,0.3); transition: 0.3s; font-size: 24px; font-weight: 900;">
-                <i class="fas fa-chalkboard-teacher" style="font-size: 40px; display: block; margin-bottom: 15px;"></i>
-                تقارير الحصص المشروحة
+                تقرير الحصص
             </div>
         </div>
 
@@ -652,15 +647,15 @@
 
         <!-- 2. Monthly Reports Tab -->
         <div id="tab-monthly-reports" class="admin-section">
-            <h2 style="color:#009688;">إرسال تقرير شهري للطالب</h2>
+            <h2 style="color:#009688;">إرسال تقرير حصص للطالب</h2>
             <form onsubmit="window.sendMonthlyReport(event)">
                 <div class="form-group">
                     <label>كود الطالب</label>
                     <input type="text" id="mr-code" required placeholder="أدخل كود الطالب">
                 </div>
                 <div class="form-group">
-                    <label>عنوان التقرير (أو اسم الشهر)</label>
-                    <input type="text" id="mr-title" required placeholder="مثال: تقرير شهر أكتوبر">
+                    <label>عنوان التقرير</label>
+                    <input type="text" id="mr-title" required placeholder="مثال: تقرير الحصص">
                 </div>
                 <div class="form-group">
                     <label>التقييم العام</label>
@@ -678,52 +673,16 @@
                         placeholder="اكتب تفاصيل التقرير ومستوى الطالب..."></textarea>
                 </div>
                 <button type="submit" id="btn-mr-send" class="btn-primary w-100"
-                    style="background:#009688; font-size:20px; padding:15px;">إرسال التقرير الشهري</button>
+                    style="background:#009688; font-size:20px; padding:15px;">إرسال تقرير الحصص</button>
             </form>
 
-            <h3 class="mt-30">التقارير الشهرية المسجلة بنظام الإدارة</h3>
+            <h3 class="mt-30">تقارير الحصص المسجلة بنظام الإدارة</h3>
             <div style="overflow-x:auto;">
                 <table id="table-monthly-reports"></table>
             </div>
         </div>
 
-        <!-- 3. Teacher Log Reports Tab -->
-        <div id="tab-teacher-reports" class="admin-section">
-            <h2 style="color:#795548; margin-top:20px;">كتابة وتوثيق تقرير الحصة المشروحة (للأدمن العادي والثانوي)</h2>
-            <form onsubmit="window.addTeacherReport(event)">
-                <div class="form-group">
-                    <label>كود الطالب</label>
-                    <input type="text" id="tr-code" required placeholder="مثال: 1234">
-                </div>
-                <div class="form-group">
-                    <label>اسم الطالب/الطلاب</label>
-                    <input type="text" id="tr-name" required placeholder="مثال: أحمد، محمود">
-                </div>
-                <div class="form-group">
-                    <label>اسم المادة</label>
-                    <input type="text" id="tr-subject" required placeholder="مثال: فيزياء">
-                </div>
-                <div class="form-group">
-                    <label>تاريخ الحصة</label>
-                    <input type="date" id="tr-date" required>
-                </div>
-                <div class="form-group">
-                    <label>رقم أو اسم الحصة</label>
-                    <input type="text" id="tr-number" required placeholder="مثال: 1 أو الحصة الأولى">
-                </div>
-                <div class="form-group">
-                    <label>توقيع المعلم/ة</label>
-                    <input type="text" id="tr-teacher" required placeholder="اسم أو توقيع المعلم/ة">
-                </div>
-                <button type="submit" class="btn-primary w-100"
-                    style="background:#795548; font-size:20px; padding:15px;">اعتماد وحفظ التقرير في الجدول</button>
-            </form>
-
-            <h3 class="mt-30">جدول التقارير المسجلة المعتمدة</h3>
-            <div style="overflow-x:auto;">
-                <table id="table-teacher-reports"></table>
-            </div>
-        </div>
+        <!-- Removed Teacher Log Reports Tab -->
     </div>
 
     <!-- Edit Content Modal -->
@@ -912,9 +871,9 @@
                     <td>${c.title}</td>
                     <td>${c.country === 'ALL' ? 'كل الدول' : c.country}</td>
                     <td>${c.priceBase || 0}</td>
-                    <td>
-                        <button onclick="window.editContent('${c.fsId ? c.fsId : c.id}')" style="background:#ff9800; color:#fff; border:none; padding:5px 10px; border-radius:5px; margin-bottom:5px; cursor:pointer; display:block; width:100%;"><i class="fas fa-edit"></i> تعديل</button>
-                        <button onclick="window.deleteContent('${c.fsId ? c.fsId : c.id}')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; width:100%;"><i class="fas fa-trash"></i> حذف</button>
+                    <td style="white-space: nowrap;">
+                        <button onclick="window.editContent('${c.fsId ? c.fsId : c.id}')" style="background:#ff9800; color:#fff; border:none; padding:5px 10px; border-radius:5px; margin:2px; cursor:pointer; display:inline-block;"><i class="fas fa-edit"></i> تعديل</button>
+                        <button onclick="window.deleteContent('${c.fsId ? c.fsId : c.id}')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; margin:2px; cursor:pointer; display:inline-block;"><i class="fas fa-trash"></i> حذف</button>
                     </td>
                 </tr>`).join('');
             }
